@@ -1,0 +1,21 @@
+{
+  "restartable": "rs",
+  "ignore": [
+    ".git",
+    "*.test.ts",
+    "node_modules/*"
+  ],
+  "delay": "1500",
+  "verbose": false,
+  "watch": [
+    "src",
+    "config",
+    "apidoc",
+    "public",
+    "package.json"
+  ],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "ext": "ts,json,md,yml"
+}

@@ -4,4 +4,4 @@ WORKDIR /app
 COPY dist .
 RUN npm ci --only=production
 ENTRYPOINT [ "node", "./main.js" ]
-EXPOSE 5001
+EXPOSE 5003

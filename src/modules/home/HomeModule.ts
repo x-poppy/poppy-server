@@ -1,16 +1,20 @@
-import { IKoaContext, RequestMapping, RequestParams } from "@augejs/koa";
-import { Provider } from "@augejs/module-core";
+import { RequestMapping } from '@augejs/koa';
+import { GetLogger, ILogger, Provider, Value } from '@augejs/core';
 
 @Provider()
 export class HomeModule {
-
   @RequestMapping.Get('/ping')
-  async ping() {
+  async ping(): Promise<string> {
     return 'pong';
   }
 
-  @RequestMapping.Get('/')
-  async home(@RequestParams.Context() context: IKoaContext) {
-    context.redirect('/public/apidoc/index.html');
+  @Value('/webserver.port')
+  webserverPort!: number;
+
+  @GetLogger()
+  logger!: ILogger;
+
+  async onAppDidReady() {
+    this.logger.info(`app onReady http://127.0.0.1:${this.webserverPort}`);
   }
 }

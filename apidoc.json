@@ -1,0 +1,10 @@
+{
+  "title": "HMPay Channel API document",
+  "header": {
+    "title": "HMPay Channel API document",
+    "filename": "./apidoc/header.md"
+  },
+  "footer": {
+    "filename": "./apidoc/footer.md"
+  }
+}
