@@ -3,7 +3,9 @@
   "ignore": [
     ".git",
     "*.test.ts",
-    "node_modules/*"
+    "node_modules/*",
+    "apidoc",
+    "public"
   ],
   "delay": "1500",
   "verbose": false,

@@ -17,8 +17,18 @@
   "files": [
     "dist"
   ],
-  "author": "Alex.Zhang",
+  "author": "X-Poppy",
   "license": "MIT",
+  "apidoc": {
+    "title": "IFPay Online Payment API document",
+    "header": {
+      "title": "IFPay Online Payment API document",
+      "filename": "./apidoc/header.md"
+    },
+    "footer": {
+      "filename": "./apidoc/footer.md"
+    }
+  },
   "dependencies": {
     "@augejs/core": "1.0.3",
     "@augejs/axios": "1.0.4",
