@@ -7,7 +7,7 @@ import { YAMLConfig } from '@augejs/file-config';
 import { Log4js } from '@augejs/log4js';
 import { MailTransport } from '@augejs/mail';
 
-import { WebAPIModule } from './modules/webAPI';
+import { WebAPIModule } from './modules/biz';
 import { APIDocModule } from './modules/apiDoc';
 import { HomeModule } from './modules/home';
 
