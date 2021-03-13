@@ -4,6 +4,10 @@ webserver:
 static:
   prefix: '/public'
 
+redis:
+  host: 106.14.147.173
+  port: 6379
+
 log4js:
   appenders:
     out:

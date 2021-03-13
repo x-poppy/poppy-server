@@ -1,17 +1,20 @@
 import { formatErrorMessage } from '@/utils/formatErrorMessage';
-import { ILogger, IScanNode, Logger, Provider } from '@augejs/core';
+import { ILogger, IScanNode, Logger, Module } from '@augejs/core';
 import { KoaErrorHandleMiddleWare } from '@augejs/koa-error-handle';
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 
 import { ErrorCodeEnum } from '@/errors/ErrorCodeEnum';
 import { IKoaContext, Middleware, Validator } from '@augejs/koa';
 import { I18N_IDENTIFIER, II18n } from '@augejs/i18n';
+import { AppModule } from './app/AppModule';
 
 const { ValidationError } = Validator;
 
 const logger: ILogger = Logger.getLogger('errorHandle');
 
-@Provider()
+@Module({
+  subModules: [AppModule],
+})
 @KoaBodyParserMiddleware()
 @Middleware(async (ctx: IKoaContext, next: Function) => {
   await next();

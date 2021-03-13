@@ -6,6 +6,7 @@ import { AxiosConfig } from '@augejs/axios';
 import { YAMLConfig } from '@augejs/file-config';
 import { Log4js } from '@augejs/log4js';
 import { MailTransport } from '@augejs/mail';
+import { RedisConnection } from '@augejs/redis';
 
 import { WebAPIModule } from './modules/biz';
 import { APIDocModule } from './modules/apiDoc';
@@ -19,6 +20,7 @@ import { HomeModule } from './modules/home';
 @AxiosConfig()
 @KoaStatic()
 @WebServer()
+@RedisConnection()
 @Module({
   subModules: [HomeModule, WebAPIModule, APIDocModule],
 })

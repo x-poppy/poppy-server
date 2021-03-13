@@ -30,18 +30,19 @@
     }
   },
   "dependencies": {
-    "@augejs/core": "1.0.3",
     "@augejs/axios": "1.0.4",
+    "@augejs/core": "1.0.3",
     "@augejs/file-config": "1.0.4",
     "@augejs/i18n": "1.0.4",
     "@augejs/koa": "1.0.4",
-    "@augejs/log4js": "1.0.4",
-    "@augejs/mail": "1.0.4",
-    "@augejs/views": "1.0.4",
     "@augejs/koa-bodyparser": "1.0.3",
     "@augejs/koa-error-handle": "1.0.3",
     "@augejs/koa-security": "1.0.3",
-    "@augejs/koa-static": "1.0.3"
+    "@augejs/koa-static": "1.0.3",
+    "@augejs/log4js": "1.0.4",
+    "@augejs/mail": "1.0.4",
+    "@augejs/redis": "^1.0.4",
+    "@augejs/views": "1.0.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
