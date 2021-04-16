@@ -6,12 +6,7 @@
   ],
   "extends": [
     "prettier",
-    "prettier/standard",
-    "prettier/@typescript-eslint",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
-  ],
-  "rules": {
-    "@typescript-eslint/ban-types": 0
-  }
+  ]
 }
