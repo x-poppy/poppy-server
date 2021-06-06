@@ -1,6 +1,6 @@
 import { II18n } from '@augejs/i18n';
 import { ErrorCodeEnum } from './ErrorCodeEnum';
-import { formatErrorMessage } from '@/utils/formatErrorMessage';
+import { formatErrorMessage } from '@/poppy/utils/formatErrorMessage';
 export class ServiceError extends Error {
   errorCode: string;
 

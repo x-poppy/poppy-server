@@ -4,7 +4,7 @@ import { UniqueID } from 'nodejs-snowflake';
 @Provider()
 export class SnowflakeService {
   @Value('/snowflake')
-  config: any;
+  config!: Record<string, unknown> | null;
 
   snowflakeInst!: UniqueID;
 
