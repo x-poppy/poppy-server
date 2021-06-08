@@ -1,5 +1,6 @@
 import { Module, boot, GetLogger, ILogger } from '@augejs/core';
-import { RequestMapping, WebServer } from '@augejs/koa';
+import { WebServer } from '@augejs/koa';
+import { KoaSwagger } from '@augejs/koa-swagger';
 import { KoaStatic, KoaFavicon } from '@augejs/koa-static';
 import { I18n } from '@augejs/i18n';
 import { AxiosConfig } from '@augejs/axios';
@@ -18,6 +19,7 @@ import { Views } from '@augejs/views';
 @Log4js()
 @YAMLConfig()
 @KoaFavicon()
+@KoaSwagger()
 @AxiosConfig()
 @KoaStatic()
 @WebServer()
