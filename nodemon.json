@@ -9,7 +9,6 @@
   "delay": "1500",
   "verbose": false,
   "watch": [
-    "swagger.yml",
     "src",
     "config",
     "package.json"

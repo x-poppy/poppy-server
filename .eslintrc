@@ -8,5 +8,8 @@
     "prettier",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended"
-  ]
+  ],
+  "rules": {
+    "no-non-null-assertion": 0
+  }
 }
