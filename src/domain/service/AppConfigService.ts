@@ -1,6 +1,7 @@
-import { Inject, Provider } from '@augejs/core';
+import { Inject, Provider, ScanNode } from '@augejs/core';
 import { AppEntity } from '../model/AppEntity';
 import { AppRepository } from '../../infrastructure/repository/AppRepository';
+import { MiddlewareFactory } from '@augejs/koa';
 
 @Provider()
 export class AppConfigService {

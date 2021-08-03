@@ -1,19 +1,21 @@
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, FindConditions, getRepository, InsertResult, Repository } from '@augejs/typeorm';
+import { EntityManager, FindConditions, getRepository, Repository } from '@augejs/typeorm';
 import { AppEntity, AppStatus } from '../../domain/model/AppEntity';
 import { SnowflakeService } from '../service/SnowflakeService';
 
 interface CreateOpt {
-  orgNo: string | null;
-  roleNo: string;
-  displayName: string;
-  icon: string | null;
-  desc: string | null;
+  orgNo: string | null
+  roleNo: string
+  parent: string | null
+  level: number
+  displayName: string
+  icon: string | null
+  desc: string | null
 }
 
 interface ListOpts {
-  offset: number,
-  size: number,
+  offset: number
+  size: number
   orgNo: string
 }
 
@@ -42,6 +44,8 @@ export class AppRepository {
     const app = new AppEntity();
     app.appNo = appNo;
     app.orgNo = opts.orgNo;
+    app.level = opts.level;
+    app.parent = opts.parent;
     app.roleNo = opts.roleNo;
     app.icon = opts.icon;
     app.displayName = opts.displayName;
@@ -60,7 +64,7 @@ export class AppRepository {
   async findRoot(): Promise<AppEntity | undefined> {
     return await this.appRepository.findOne({
       where: {
-        orgNo: 0,
+        orgNo: null,
       },
     });
   }

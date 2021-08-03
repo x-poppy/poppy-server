@@ -32,14 +32,15 @@ export class OrgEntity {
     comment: 'parent null means no parent',
     nullable: true,
   })
-  parent!: string | null;
+  @Index()
+  parent: string | null = null
 
   @Column({
     type: 'smallint',
     comment: 'org level',
     default: 0,
   })
-  level!: number;
+  level = 0;
 
   @Column({
     type: 'varchar',
