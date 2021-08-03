@@ -4,11 +4,6 @@ import { AppDomainRepository } from '../../infrastructure/repository/AppDomainRe
 import { FindOneOptions } from '@augejs/typeorm';
 @Provider()
 export class AppDomainService {
-
   @Inject(AppDomainRepository)
   private appDomainRepository!: AppDomainRepository;
-
-
-  async create() {
-  }
 }

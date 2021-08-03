@@ -6,14 +6,14 @@ import { UserEntity, UserStatus } from '../../domain/model/UserEntity';
 import { PasswordService } from '../service/PasswordService';
 
 interface CreateOpts {
-  orgNo: string
-  appNo: string
-  roleNo: string
-  accountName: string
-  password: string | null
-  mobileNo: string | null
-  emailAddr: string | null
-  displayName: string
+  orgNo: string;
+  appNo: string;
+  roleNo: string;
+  accountName: string;
+  password: string | null;
+  mobileNo: string | null;
+  emailAddr: string | null;
+  displayName: string;
 }
 @Provider()
 export class UserRepository {
@@ -36,7 +36,7 @@ export class UserRepository {
     const nonce = crypto.randomBytes(16).toString('hex');
 
     const rawPassword = opts.password ?? crypto.randomBytes(16).toString('hex');
-    const hashPassword = this.passwordService.hashPwd(userNo, nonce, rawPassword);
+    const hashPassword = await this.passwordService.hashPwd(userNo, nonce, rawPassword);
 
     const user = new UserEntity();
     user.userNo = userNo;

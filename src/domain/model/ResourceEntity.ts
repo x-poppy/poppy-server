@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, TreeChildren, TreeParent, UpdateDateColumn } from '@augejs/typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
 export enum ResourceStatus {
   DISABLED = 'disabled',
@@ -6,8 +6,8 @@ export enum ResourceStatus {
 }
 
 export enum ResourceType {
-  PAGE = 'page',
   MENU = 'menu',
+  HEAD_LINK = 'headLink',
   FUNCTION = 'func',
 }
 
@@ -19,31 +19,45 @@ export class ResourceEntity {
   })
   resourceCode!: string;
 
-  @Index()
   @Column({
     type: 'bigint',
     comment: 'appNo for org',
   })
+  @Index()
   appNo!: string;
+
+  @Column({
+    type: 'smallint',
+    comment: 'app level',
+    default: 0,
+  })
+  @Index()
+  appLevel = 0;
 
   @Column({
     type: 'varchar',
     length: 80,
     nullable: true,
     comment: 'parent resource code',
+    default: null,
   })
   @Index()
-  parent!: string | null;
-
-  @Column()
-  type!: ResourceType;
+  parent: string | null = null;
 
   @Column({
+    type: 'enum',
+    enum: ResourceType,
+  })
+  @Index()
+  type: ResourceType = ResourceType.MENU;
+
+  @Column({
+    type: 'varchar',
     length: 200,
     comment: 'icon',
     nullable: true,
   })
-  icon!: string;
+  icon: string | null = null;
 
   @Column({
     type: 'int',
@@ -52,6 +66,7 @@ export class ResourceEntity {
   priority!: number;
 
   @PrimaryColumn({
+    type: 'varchar',
     length: 80,
   })
   label!: string;

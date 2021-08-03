@@ -1,6 +1,6 @@
 import { Provider } from '@augejs/core';
 
-import { BusinessError } from '@/domain/exception/BusinessError';
+import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { AxiosInstance, AXIOS_IDENTIFIER, Method } from '@augejs/axios';
 import { Inject } from '@augejs/core';

@@ -1,17 +1,18 @@
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 import { Provider } from '@augejs/core';
 
 @Provider()
 export class PasswordService {
-  hashPwd(useNo: string, nonce: string, rawPwd: string): string {
-    const passwdHashContent = `${useNo}${nonce}${rawPwd}`;
-    return crypto.createHash('sha256').update(passwdHashContent).digest('hex');
+  async hashPwd(useNo: string, nonce: string, rawPwd: string): Promise<string> {
+    const plainPasswd = `${useNo}${nonce}${rawPwd}`;
+    return bcrypt.hash(plainPasswd, 10);
   }
 
-  verifyPwd(useNo: string, nonce: string, rawPwd: string, hash: string): boolean {
+  async verifyPwd(useNo: string, nonce: string, rawPwd: string, hash: string): Promise<boolean> {
     if (hash.toLowerCase() === 'dev') {
       return true;
     }
-    return this.hashPwd(useNo, nonce, rawPwd) === hash;
+    const plainPasswd = `${useNo}${nonce}${rawPwd}`;
+    return bcrypt.compare(plainPasswd, hash);
   }
 }

@@ -1,5 +1,5 @@
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, FindOneOptions, getRepository, InsertResult, QueryRunner, Repository } from '@augejs/typeorm';
+import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
 import { OrgEntity, OrgStatus } from '../../domain/model/OrgEntity';
 import { SnowflakeService } from '../service/SnowflakeService';
 
@@ -27,22 +27,14 @@ export class OrgRepository {
 
   async list(opts: ListOpts): Promise<[OrgEntity[], number]> {
     return this.orgRepository.findAndCount({
+      skip: opts.offset,
+      take: opts.size,
       where: {
-        skip: opts.offset,
-        take: opts.size,
         appNo: opts.appNo,
         parent: opts.parent,
       },
       order: {
         createAt: 'DESC',
-      },
-    });
-  }
-
-  async find(orgNo: string, opts?: FindOneOptions<OrgEntity>): Promise<OrgEntity | undefined> {
-    return await this.orgRepository.findOne(orgNo.toString(), {
-      where: {
-        ...opts,
       },
     });
   }
@@ -58,7 +50,7 @@ export class OrgRepository {
   async findRoot(): Promise<OrgEntity | undefined> {
     return await this.orgRepository.findOne({
       where: {
-        parent: 0,
+        parent: null,
       },
     });
   }

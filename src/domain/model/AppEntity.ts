@@ -15,10 +15,26 @@ export class AppEntity {
 
   @Column({
     type: 'bigint',
-    comment: 'orgNo for app, null means no org',
-    nullable: true
+    comment: 'parent for app null means no parent',
+    nullable: true,
   })
-  orgNo!: string | null;
+  @Index()
+  parent: string | null = null;
+
+  @Column({
+    type: 'smallint',
+    comment: 'app level',
+    default: 0,
+  })
+  @Index()
+  level = 0;
+
+  @Column({
+    type: 'bigint',
+    comment: 'orgNo for app, null means no org',
+    nullable: true,
+  })
+  orgNo: string | null = null;
 
   @Column({
     type: 'bigint',
@@ -67,8 +83,4 @@ export class AppEntity {
 
   @UpdateDateColumn()
   updateAt!: Date;
-
-  get isTop(): boolean {
-    return !this.orgNo;
-  }
 }

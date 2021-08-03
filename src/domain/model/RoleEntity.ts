@@ -18,7 +18,7 @@ export class RoleEntity {
     comment: 'parent for role null means no parent',
     nullable: true
   })
-  parent!: string | null;
+  parent: string | null = null;
 
   @Column({
     type: 'boolean',

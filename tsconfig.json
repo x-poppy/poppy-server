@@ -22,7 +22,7 @@
         "./src/*"
       ]
     },
-
+    "declaration": false,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

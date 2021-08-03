@@ -5,7 +5,7 @@ import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { getConnection } from '@augejs/typeorm';
 import { OrgRepository } from '../../infrastructure/repository/OrgRepository';
-import { BusinessError } from '../exception/BusinessError';
+import { BusinessError } from '../../util/BusinessError';
 import { OrgEntity } from '../model/OrgEntity';
 
 interface CreatOpts {
@@ -53,7 +53,7 @@ export class OrgService {
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
-    const isTopOrg = app.isTop;
+    const isTopOrg = !app.parent;
     const parentOrg = isTopOrg ? null : await this.orgRepository.findByStatusNormal(app.orgNo as string);
     if (!isTopOrg && !parentOrg) {
       throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);

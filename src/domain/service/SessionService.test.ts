@@ -8,16 +8,13 @@ describe('SessionService', () => {
   it('createAccessData will throw error with empty domain', async () => {
     const sessionService = new SessionService();
     const mockContext = {} as KoaContext;
-    const mockLoginDto = {
-      userName: 'xxx',
-    } as LoginDto;
 
     const mockAppDomainServiceFind = jest.fn();
     mockAppDomainServiceFind.mockResolvedValue(null);
 
     let noAppDomainErr: unknown;
     try {
-      await sessionService.createAccessData(mockContext, mockLoginDto);
+      await sessionService.createAccessData(mockContext);
     } catch (err) {
       noAppDomainErr = err;
     }

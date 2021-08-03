@@ -1,6 +1,6 @@
-import { ResourceEntity, ResourceStatus } from '@/domain/model/ResourceEntity';
+import { ResourceEntity, ResourceStatus, ResourceType } from '@/domain/model/ResourceEntity';
 import { Provider } from '@augejs/core';
-import { getRepository, Repository } from '@augejs/typeorm';
+import { getRepository, LessThan, Repository } from '@augejs/typeorm';
 @Provider()
 export class ResourceRepository {
   private resourceRepository: Repository<ResourceEntity> = getRepository(ResourceEntity);
@@ -13,4 +13,19 @@ export class ResourceRepository {
       },
     });
   }
+
+  async findAllMenuByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
+    return await this.resourceRepository.find({
+      where: {
+        appLevel: LessThan(appLevel + 1),
+        type: ResourceType.MENU,
+        status: ResourceStatus.NORMAL,
+      },
+      order: {
+        priority: 'DESC',
+      },
+    });
+  }
+
+
 }

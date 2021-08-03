@@ -3,7 +3,7 @@ import { GetLogger, ILogger, Inject, Provider, Value } from '@augejs/core';
 
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
-import { BusinessError } from '../exception/BusinessError';
+import { BusinessError } from '../../util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { AppEntity } from '../model/AppEntity';
@@ -58,6 +58,12 @@ export class AppService {
       throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
     }
 
+    const creatorApp = creatorUser ? await this.appRepository.findByStatusNormal(creatorUser.appNo) : null;
+    if (!isTopApp && !creatorApp) {
+      this.logger.warn(`create the app error. parent app: ${creatorUser?.appNo} is not exist!`);
+      throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
+    }
+
     let creatorRole = null;
     if (creatorUser) {
       creatorRole = await this.roleRepository.findByStatusNormal(creatorUser.roleNo);
@@ -103,6 +109,8 @@ export class AppService {
         {
           orgNo: creatorUser?.orgNo ?? null,
           roleNo: createdRole.roleNo,
+          parent: creatorApp?.appNo ?? null,
+          level: creatorApp ? creatorApp.level + 1 : 0,
           icon: opts.icon ?? null,
           displayName: opts.appDisplayName,
           desc: opts.appDesc ?? null,

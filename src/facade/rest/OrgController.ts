@@ -1,6 +1,6 @@
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
-import { AccessTokenMiddleware } from '@augejs/koa-access-token';
+import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { OrgService } from '../../domain/service/OrgService';
 
 @Prefix('/api/v1/org')
@@ -9,15 +9,15 @@ export class OrgController {
   @Inject(OrgService)
   private orgService!: OrgService;
 
-  @AccessTokenMiddleware()
+  @KoaAccessTokenMiddleware()
   @RequestMapping.Get('')
   async list(
     @RequestParams.Context() context: KoaContext,
-    @RequestParams.Query('offset') @RequestParams(parseInt) offset: number,
-    @RequestParams.Query('size') @RequestParams(parseInt) size: number,
-    ): Promise<Record<string, unknown>> {
-    const parent = context.accessData?.get('orgNo') as string ?? null;
-    const appNo = context.accessData?.get('appNo') as string ?? null;
+    @RequestParams.Query('offset') @RequestParams((value: string) => parseInt(value)) offset: number,
+    @RequestParams.Query('size') @RequestParams((value: string) => parseInt(value)) size: number,
+  ): Promise<Record<string, unknown>> {
+    const parent = (context.accessData?.get('orgNo') as string) ?? null;
+    const appNo = (context.accessData?.get('appNo') as string) ?? null;
     const [list, count] = await this.orgService.list({
       offset,
       size,

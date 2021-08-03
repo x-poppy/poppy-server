@@ -20,14 +20,14 @@ export class UserController {
    *
    * @apiSampleRequest /api/user/findAllUsers
    */
-  @RequestMapping.Get()
-  async findAllUsers(@RequestParams.Context() ctx: KoaContext): Promise<UserEntity[]> {
+  @RequestMapping.Get('')
+  async list(@RequestParams.Context() ctx: KoaContext): Promise<UserEntity[]> {
     this.logger.info(ctx.header);
     return await this.userRepository.findAllUsers();
   }
 
-  @RequestMapping.Post()
-  async createNewUser(): Promise<void> {
+  @RequestMapping.Post('')
+  async create(): Promise<void> {
     // return await this.userRepository.createNewUser();
   }
 

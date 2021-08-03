@@ -8,7 +8,8 @@ import { RedisConnection } from '@augejs/redis';
 import { Log4js } from '@augejs/log4js';
 import { MailTransport } from '@augejs/mail';
 import { Typeorm } from '@augejs/typeorm';
-import { AccessTokenManager } from '@augejs/koa-access-token';
+import { KoaAccessTokenManager } from '@augejs/koa-access-token';
+import { KoaSessionTokenManager } from '@augejs/koa-session-token';
 import { Views } from '@augejs/views';
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 
@@ -20,9 +21,7 @@ import { Providers as InfrastructureLayerProviders } from './infrastructure';
 import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandlerService';
 
 @I18nConfig()
-@Typeorm({
-  logging: ['error'],
-})
+@Typeorm()
 @MailTransport()
 @Log4js()
 @YAMLConfig()
@@ -32,14 +31,11 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @WebServer()
 @Views()
 @RedisConnection()
-@AccessTokenManager()
+@KoaAccessTokenManager()
+@KoaSessionTokenManager()
 @KoaBodyParserMiddleware()
 @Module({
-  providers: [
-    ...FacadeLayerProviders,
-    ...ApplicationLayerProviders,
-    ...DomainLayerProviders,
-    ...InfrastructureLayerProviders],
+  providers: [...FacadeLayerProviders, ...ApplicationLayerProviders, ...DomainLayerProviders, ...InfrastructureLayerProviders],
 })
 class AppModule {
   @GetLogger()

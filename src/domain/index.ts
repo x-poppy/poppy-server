@@ -11,6 +11,7 @@ import { UserService } from './service/UserService';
 import { AppServerWebHookService } from './service/AppServerWebHookService';
 import { AppServerProxyService } from './service/AppServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
+import { AuthService } from './service/AuthService';
 
 export const Providers = [
   AppConfigService,
@@ -26,4 +27,5 @@ export const Providers = [
   RolePermissionService,
   SessionService,
   UserService,
+  AuthService,
 ];
