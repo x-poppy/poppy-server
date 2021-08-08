@@ -1,7 +1,7 @@
 import { Inject, Provider } from '@augejs/core';
 import crypto from 'crypto';
 import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
-import { SnowflakeService } from '../service/SnowflakeService';
+import { UniqueIdService } from '../service/UniqueIdService';
 import { UserEntity, UserStatus } from '../../domain/model/UserEntity';
 import { PasswordService } from '../service/PasswordService';
 
@@ -17,8 +17,8 @@ interface CreateOpts {
 }
 @Provider()
 export class UserRepository {
-  @Inject(SnowflakeService)
-  private snowflakeService!: SnowflakeService;
+  @Inject(UniqueIdService)
+  private uniqueIdService!: UniqueIdService;
 
   @Inject(PasswordService)
   private passwordService!: PasswordService;
@@ -32,7 +32,7 @@ export class UserRepository {
   async create(opts: CreateOpts, manager?: EntityManager): Promise<UserEntity> {
     const userRepository = manager?.getRepository(UserEntity) ?? this.userRepository;
 
-    const userNo = await this.snowflakeService.getUniqueId();
+    const userNo = await this.uniqueIdService.getUniqueId();
     const nonce = crypto.randomBytes(16).toString('hex');
 
     const rawPassword = opts.password ?? crypto.randomBytes(16).toString('hex');

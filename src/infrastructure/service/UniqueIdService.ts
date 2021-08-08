@@ -2,7 +2,7 @@ import { Provider, Value } from '@augejs/core';
 import { UniqueID } from 'nodejs-snowflake';
 
 @Provider()
-export class SnowflakeService {
+export class UniqueIdService {
   @Value('/snowflake')
   private config!: Record<string, unknown> | null;
 
