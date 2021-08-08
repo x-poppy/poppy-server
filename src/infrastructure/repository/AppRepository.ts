@@ -1,32 +1,32 @@
 import { Inject, Provider } from '@augejs/core';
 import { EntityManager, FindConditions, getRepository, Repository } from '@augejs/typeorm';
 import { AppEntity, AppStatus } from '../../domain/model/AppEntity';
-import { SnowflakeService } from '../service/SnowflakeService';
+import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
-  orgNo: string | null
-  roleNo: string
-  parent: string | null
-  level: number
-  displayName: string
-  icon: string | null
-  desc: string | null
+  orgNo: string | null;
+  roleNo: string;
+  parent: string | null;
+  level: number;
+  displayName: string;
+  icon: string | null;
+  desc: string | null;
 }
 
 interface ListOpts {
-  offset: number
-  size: number
-  orgNo: string
+  offset: number;
+  size: number;
+  orgNo: string;
 }
 
 interface DeleteOpts {
-  appNo: string
+  appNo: string;
 }
 
 @Provider()
 export class AppRepository {
-  @Inject(SnowflakeService)
-  private snowflakeService!: SnowflakeService;
+  @Inject(UniqueIdService)
+  private uniqueIdService!: UniqueIdService;
 
   private appRepository: Repository<AppEntity> = getRepository(AppEntity);
 
@@ -40,7 +40,7 @@ export class AppRepository {
 
   async create(opts: CreateOpt, manager?: EntityManager): Promise<AppEntity> {
     const appRepository = manager?.getRepository(AppEntity) ?? this.appRepository;
-    const appNo = await this.snowflakeService.getUniqueId();
+    const appNo = await this.uniqueIdService.getUniqueId();
     const app = new AppEntity();
     app.appNo = appNo;
     app.orgNo = opts.orgNo;
@@ -83,6 +83,6 @@ export class AppRepository {
   }
 
   async delete(opts: DeleteOpts): Promise<void> {
-    await this.appRepository.delete(opts.appNo)
+    await this.appRepository.delete(opts.appNo);
   }
 }

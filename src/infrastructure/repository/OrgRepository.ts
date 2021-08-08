@@ -1,27 +1,27 @@
 import { Inject, Provider } from '@augejs/core';
 import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
 import { OrgEntity, OrgStatus } from '../../domain/model/OrgEntity';
-import { SnowflakeService } from '../service/SnowflakeService';
+import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
-  parent: string | null
-  appNo: string
-  level: number
-  displayName: string
-  desc: string | null
+  parent: string | null;
+  appNo: string;
+  level: number;
+  displayName: string;
+  desc: string | null;
 }
 
 interface ListOpts {
-  offset: number
-  size: number
-  appNo: string
-  parent?: string | null
+  offset: number;
+  size: number;
+  appNo: string;
+  parent?: string | null;
 }
 
 @Provider()
 export class OrgRepository {
-  @Inject(SnowflakeService)
-  private snowflakeService!: SnowflakeService;
+  @Inject(UniqueIdService)
+  private uniqueIdService!: UniqueIdService;
 
   orgRepository: Repository<OrgEntity> = getRepository(OrgEntity);
 
@@ -58,7 +58,7 @@ export class OrgRepository {
   async create(opts: CreateOpt, manager?: EntityManager): Promise<OrgEntity> {
     const orgRepository = manager?.getRepository(OrgEntity) ?? this.orgRepository;
 
-    const orgNo = await this.snowflakeService.getUniqueId();
+    const orgNo = await this.uniqueIdService.getUniqueId();
     const org = new OrgEntity();
     org.orgNo = orgNo;
     org.appNo = opts.appNo;

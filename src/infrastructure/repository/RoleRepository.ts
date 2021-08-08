@@ -2,38 +2,38 @@ import { ResourceStatus } from '@/domain/model/ResourceEntity';
 import { RoleEntity } from '@/domain/model/RoleEntity';
 import { Inject, Provider } from '@augejs/core';
 import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
-import { SnowflakeService } from '../service/SnowflakeService';
+import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
-  parent: string | null
-  appNo: string | null
-  orgNo: string | null
-  level: number
-  inherited: boolean
-  displayName: string
-  desc: string | null
-  hasAppResPerms?: boolean
+  parent: string | null;
+  appNo: string | null;
+  orgNo: string | null;
+  level: number;
+  inherited: boolean;
+  displayName: string;
+  desc: string | null;
+  hasAppResPerms?: boolean;
 }
 
 interface ListOpts {
-  offset: number
-  size: number
-  appNo: string
-  orgNo?: string | null
-  parent?: string | null
+  offset: number;
+  size: number;
+  appNo: string;
+  orgNo?: string | null;
+  parent?: string | null;
 }
 
 @Provider()
 export class RoleRepository {
-  @Inject(SnowflakeService)
-  private snowflakeService!: SnowflakeService;
+  @Inject(UniqueIdService)
+  private uniqueIdService!: UniqueIdService;
 
   private roleRepository: Repository<RoleEntity> = getRepository(RoleEntity);
 
   async create(opts: CreateOpt, manager?: EntityManager): Promise<RoleEntity> {
     const roleRepository = manager?.getRepository(RoleEntity) ?? this.roleRepository;
 
-    const roleNo = await this.snowflakeService.getUniqueId();
+    const roleNo = await this.uniqueIdService.getUniqueId();
     const role = new RoleEntity();
     role.roleNo = roleNo;
     role.orgNo = opts.orgNo;
@@ -62,7 +62,7 @@ export class RoleRepository {
         take: opts.size,
         appNo: opts.appNo,
         orgNo: opts.orgNo,
-        parent: opts.parent
+        parent: opts.parent,
       },
       order: {
         createAt: 'DESC',

@@ -9,7 +9,7 @@ import { ResourceRepository } from './repository/ResourceRepository';
 import { RolePermissionRepository } from './repository/RolePermissionRepository';
 import { RoleRepository } from './repository/RoleRepository';
 import { UserRepository } from './repository/UserRepository';
-import { SnowflakeService } from './service/SnowflakeService';
+import { UniqueIdService } from './service/UniqueIdService';
 
 export const Providers = [
   AppConfigRepository,
@@ -23,5 +23,5 @@ export const Providers = [
   PageRepository,
   ResourceRepository,
   UserRepository,
-  SnowflakeService,
+  UniqueIdService,
 ];
