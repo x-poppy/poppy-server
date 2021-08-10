@@ -6,7 +6,7 @@ import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
   parent: string | null;
-  appNo: string | null;
+  appNo: string;
   orgNo: string | null;
   level: number;
   inherited: boolean;

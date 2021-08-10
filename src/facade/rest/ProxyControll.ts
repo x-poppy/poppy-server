@@ -11,7 +11,11 @@ export class ProxyController {
 
   @KoaAccessTokenMiddleware()
   @RequestMapping.All('/:serverName/:serverPath?')
-  async proxy(@RequestParams.Context() context: KoaContext, @RequestParams.Params('serverName') serverName: string, @RequestParams.Params('serverPath') serverPath: string): Promise<unknown> {
+  async proxy(
+    @RequestParams.Context() context: KoaContext,
+    @RequestParams.Params('serverName') serverName: string,
+    @RequestParams.Params('serverPath') serverPath: string,
+  ): Promise<unknown> {
     return this.appServerProxyService.proxy(context, serverName, serverPath);
   }
 }

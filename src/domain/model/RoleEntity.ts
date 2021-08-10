@@ -16,7 +16,7 @@ export class RoleEntity {
   @Column({
     type: 'bigint',
     comment: 'parent for role null means no parent',
-    nullable: true
+    nullable: true,
   })
   parent: string | null = null;
 
@@ -30,16 +30,15 @@ export class RoleEntity {
   @Column({
     type: 'bigint',
     comment: 'orgNo for user',
-    nullable: true
+    nullable: true,
   })
   orgNo!: string | null;
 
   @Column({
     type: 'bigint',
     comment: 'appNo for role',
-    nullable: true
   })
-  appNo!: string | null;
+  appNo!: string;
 
   @Column({
     type: 'boolean',

@@ -3,24 +3,23 @@ import { Provider } from '@augejs/core';
 import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
 
 interface CreateOpt {
-  key: string
-  appNo:string
-  displayName: string
-  uiType: AppConfigUIType
-  desc?: string | null,
+  key: string;
+  appNo: string;
+  displayName: string;
+  uiType: AppConfigUIType;
+  desc?: string | null;
 }
 
 interface ListOpts {
-  appNo: string
+  appNo: string;
 }
 
 interface FindOpts {
-  key: string,
-  appNo: string
+  key: string;
+  appNo: string;
 }
 @Provider()
 export class AppConfigRepository {
-
   private appRepository: Repository<AppConfigEntity> = getRepository(AppConfigEntity);
 
   async create(opts: CreateOpt, manager?: EntityManager): Promise<AppConfigEntity> {
@@ -37,8 +36,8 @@ export class AppConfigRepository {
     const results = await this.appRepository.find({
       where: {
         appNo: opts.appNo,
-        status: AppConfigStatus.NORMAL
-      }
+        status: AppConfigStatus.NORMAL,
+      },
     });
 
     return results;
@@ -49,8 +48,8 @@ export class AppConfigRepository {
       where: {
         key: opts.key,
         appNo: opts.appNo,
-        status: AppConfigStatus.NORMAL
-      }
+        status: AppConfigStatus.NORMAL,
+      },
     });
 
     return results;

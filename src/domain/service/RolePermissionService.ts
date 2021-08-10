@@ -47,7 +47,7 @@ export class RolePermissionService {
   private async findAppPermissions(role: RoleEntity): Promise<Record<string, boolean>> {
     if (!role.hasAppResPerms) return {};
 
-    const resources = await this.resourceRepository.findAllByAppNoAndStatusNormal(role.appNo as string);
+    const resources = await this.resourceRepository.findAllByAppNoAndStatusNormal(role.appNo);
     const permissions: Record<string, boolean> = {};
     if (resources) {
       for (const resource of resources) {

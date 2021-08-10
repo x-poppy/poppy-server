@@ -4,6 +4,7 @@ import { AppEntity, AppStatus } from '../../domain/model/AppEntity';
 import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
+  appNo: string;
   orgNo: string | null;
   roleNo: string;
   parent: string | null;
@@ -40,9 +41,8 @@ export class AppRepository {
 
   async create(opts: CreateOpt, manager?: EntityManager): Promise<AppEntity> {
     const appRepository = manager?.getRepository(AppEntity) ?? this.appRepository;
-    const appNo = await this.uniqueIdService.getUniqueId();
     const app = new AppEntity();
-    app.appNo = appNo;
+    app.appNo = opts.appNo;
     app.orgNo = opts.orgNo;
     app.level = opts.level;
     app.parent = opts.parent;
