@@ -9,23 +9,23 @@ import { BusinessError } from '../../util/BusinessError';
 import { OrgEntity } from '../model/OrgEntity';
 
 interface CreatOpts {
-  appNo: string
-  orgDisplayName: string
-  orgDesc?: string | null
-  roleDisplayName: string
-  roleDesc?: string | null
-  userAccountName: string
-  userPassword: string
-  userDisplayName?: string | null
-  userMobileNo?: string | null
-  userEmailAddr?: string | null
+  appNo: string;
+  orgDisplayName: string;
+  orgDesc?: string | null;
+  roleDisplayName: string;
+  roleDesc?: string | null;
+  userAccountName: string;
+  userPassword: string;
+  userDisplayName?: string | null;
+  userMobileNo?: string | null;
+  userEmailAddr?: string | null;
 }
 
 interface ListOpts {
-  offset: number,
-  size: number,
-  appNo: string
-  parent?: string | null
+  offset: number;
+  size: number;
+  appNo: string;
+  parent?: string | null;
 }
 
 @Provider()
@@ -95,13 +95,15 @@ export class OrgService {
           level: parentRole.level + 1,
           orgNo: createdOrg.orgNo,
           appNo: app.appNo,
-          displayName: `${opts.orgDisplayName}-${opts.roleDisplayName}`,
+          displayName: `${opts.roleDisplayName}`,
           desc: opts.roleDesc ?? null,
           inherited: true,
         },
         queryRunner.manager,
       );
-      this.logger.info(`create the org start steps: creat org user role entity end. appNo: ${opts.appNo} parent role: ${parentRole.roleNo} roleNo: ${createdRole.roleNo} roleLevel: ${createdRole.level}`);
+      this.logger.info(
+        `create the org start steps: creat org user role entity end. appNo: ${opts.appNo} parent role: ${parentRole.roleNo} roleNo: ${createdRole.roleNo} roleLevel: ${createdRole.level}`,
+      );
 
       // step 3 admin user
       this.logger.info(`create the org start steps: creat org user entity start. appNo: ${opts.appNo} roleNo: ${createdRole.roleNo}`);
@@ -135,8 +137,8 @@ export class OrgService {
       offset: opts.offset,
       size: opts.size,
       appNo: opts.appNo,
-      parent: opts.parent
-    })
+      parent: opts.parent,
+    });
   }
 
   // async delete() {

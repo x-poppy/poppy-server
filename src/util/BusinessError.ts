@@ -1,4 +1,4 @@
-type ErrorValues = Record<string, string | number | boolean | null | undefined | Date>;
+export type ErrorValues = Record<string, string | number | boolean | null | undefined | Date>;
 
 interface ErrorOpts {
   errorMessageValues?: ErrorValues;

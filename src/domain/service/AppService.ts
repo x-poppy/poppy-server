@@ -8,6 +8,7 @@ import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { AppEntity } from '../model/AppEntity';
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
+import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
 
 interface CreateOpts {
   userNo: string | null; // the creator user maybe empty
@@ -19,13 +20,13 @@ interface CreateOpts {
 }
 
 interface ListOpts {
-  offset: number,
-  size: number,
-  orgNo: string
+  offset: number;
+  size: number;
+  orgNo: string;
 }
 
 interface DeleteOpts {
-  appNo: string
+  appNo: string;
 }
 
 @Provider()
@@ -47,6 +48,9 @@ export class AppService {
 
   @Inject(AppDomainRepository)
   private appDomainRepository!: AppDomainRepository;
+
+  @Inject(UniqueIdService)
+  private uniqueIdService!: UniqueIdService;
 
   async create(opts: CreateOpts): Promise<AppEntity> {
     const isTopApp = !opts.userNo;
@@ -85,6 +89,8 @@ export class AppService {
     this.logger.info(`create the app: startTransaction. userNo: ${opts.userNo}`);
 
     try {
+      const createdAppNo = await this.uniqueIdService.getUniqueId();
+
       // step 1 app role
       const creatorRoleNo = creatorRole?.roleNo ?? null;
       this.logger.info(`create the app start steps: creat role entity start. userNo: ${opts.userNo} creatorRoleNo: ${creatorRoleNo}`);
@@ -92,21 +98,24 @@ export class AppService {
         {
           parent: creatorRoleNo,
           level: creatorRole ? creatorRole.level + 1 : 0,
-          appNo: creatorUser?.appNo ?? null,
+          appNo: creatorUser?.appNo ?? createdAppNo,
           orgNo: creatorUser?.orgNo ?? null,
           displayName: opts.roleDisplayName,
-          desc: opts.appDesc ?? null,
+          desc: opts.roleDesc ?? null,
           inherited: true,
           hasAppResPerms: true,
         },
         queryRunner.manager,
       );
-      this.logger.info(`create the app start steps: creat role entity end. userNo: ${opts.userNo} creatorRoleNo: ${creatorRoleNo} roleNo: ${createdRole.roleNo} roleLevel: ${createdRole.level}`);
+      this.logger.info(
+        `create the app start steps: creat role entity end. userNo: ${opts.userNo} creatorRoleNo: ${creatorRoleNo} roleNo: ${createdRole.roleNo} roleLevel: ${createdRole.level}`,
+      );
 
       // step 2 app
       this.logger.info(`create the app start steps: creat app entity start. userNo: ${opts.userNo}`);
       const createdApp = await this.appRepository.create(
         {
+          appNo: createdAppNo,
           orgNo: creatorUser?.orgNo ?? null,
           roleNo: createdRole.roleNo,
           parent: creatorApp?.appNo ?? null,
@@ -151,7 +160,7 @@ export class AppService {
 
   async delete(opts: DeleteOpts): Promise<void> {
     return this.appRepository.delete({
-      appNo: opts.appNo
+      appNo: opts.appNo,
     });
   }
 }

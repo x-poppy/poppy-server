@@ -8,9 +8,9 @@ interface CreateOpts {
 }
 
 interface ListOpts {
-  offset: number,
-  size: number,
-  appNo: string
+  offset: number;
+  size: number;
+  appNo: string;
 }
 
 @Provider()

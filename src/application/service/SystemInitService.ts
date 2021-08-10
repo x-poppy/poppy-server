@@ -30,10 +30,10 @@ export class SystemInitService {
     if (!rootApp) {
       rootApp = await this.appService.create({
         userNo: null,
-        roleDisplayName: 'Root',
-        roleDesc: 'The root role for the system',
-        appDisplayName: 'Root System',
-        appDesc: 'The Root System',
+        roleDisplayName: '_root',
+        roleDesc: 'The _root role for the system',
+        appDisplayName: 'Poppy System',
+        appDesc: 'The poppy System',
       });
       this.logger.info(`System Prepare Data for init start. step created root app. appNo: ${rootApp.appNo}`);
     } else {
@@ -52,7 +52,7 @@ export class SystemInitService {
       rootOrg = await this.orgService.create({
         appNo: rootApp.appNo,
         orgDisplayName: 'Root Org',
-        orgDesc: 'This root Org for the system',
+        orgDesc: 'The root org for the system',
         roleDisplayName: 'Root',
         roleDesc: 'The root role for the system',
         userAccountName: 'root',

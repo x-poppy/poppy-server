@@ -33,7 +33,7 @@ export class OrgEntity {
     nullable: true,
   })
   @Index()
-  parent: string | null = null
+  parent: string | null = null;
 
   @Column({
     type: 'smallint',

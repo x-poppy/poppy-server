@@ -11,7 +11,9 @@ export class AuthController {
   private authService!: AuthService;
 
   @RequestMapping.Post('')
-  async auth(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(LoginDto) loginDTO: LoginDto): Promise<Record<string, string>> {
+  async auth(
+    @RequestParams.Context() ctx: KoaContext,
+    @RequestParams.Body() @RequestValidator(LoginDto) loginDTO: LoginDto): Promise<Record<string, string>> {
     const sessionData = await this.authService.auth(ctx, loginDTO as LoginDto);
     return {
       token: sessionData.token,

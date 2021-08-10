@@ -12,6 +12,7 @@ import { AppServerWebHookService } from './service/AppServerWebHookService';
 import { AppServerProxyService } from './service/AppServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
 import { AuthService } from './service/AuthService';
+import { MenuService } from './service/MenuService';
 
 export const Providers = [
   AppConfigService,
@@ -28,4 +29,5 @@ export const Providers = [
   SessionService,
   UserService,
   AuthService,
+  MenuService,
 ];
