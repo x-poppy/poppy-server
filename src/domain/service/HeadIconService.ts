@@ -38,7 +38,7 @@ export class HeadIconService {
 
   private filterResourcesByPermission(resources: ResourceEntity[], permissionsBo: PermissionsBo): ResourceEntity[] {
     return resources.filter((resource) => {
-      return permissionsBo.hasPermission(resource.resourceCode);
+      return permissionsBo.has(resource.resourceCode);
     });
   }
 }

@@ -5,6 +5,11 @@ export enum PageStatus {
   NORMAL = 'normal',
 }
 
+export enum PageType {
+  HTML = 'html',
+  MARKDOWN = 'markdown',
+}
+
 @Entity('pp_page')
 export class PageEntity {
   @PrimaryColumn({
@@ -23,6 +28,14 @@ export class PageEntity {
   })
   @Index()
   status!: PageStatus;
+
+  @Column({
+    type: 'enum',
+    enum: PageType,
+    default: PageType.HTML,
+  })
+  @Index()
+  type!: PageType;
 
   @CreateDateColumn()
   createAt!: Date;

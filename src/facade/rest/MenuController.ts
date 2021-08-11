@@ -15,9 +15,9 @@ export class MenuController {
   @RequestMapping.Get('')
   async list(@RequestParams.Context() context: KoaContext): Promise<MenuTreeBo | null> {
     const appNo = (context.accessData?.get('appNo') as string) ?? null;
-    const permissions = context.accessData?.get<Record<string, boolean>>('userPermissions') ?? {};
-    const permissionsBo = new PermissionsBo(permissions);
-    const menuTree = await this.menuService.findMenuTreeByAppNo(appNo, permissionsBo);
+    const permissionsJson = context.accessData?.get<Record<string, boolean>>('userPermissions') ?? null;
+    const permissions = PermissionsBo.fromJSON(permissionsJson);
+    const menuTree = await this.menuService.findMenuTreeByAppNo(appNo, permissions);
     return menuTree;
   }
 }

@@ -16,9 +16,9 @@ export class HeadIconController {
   @RequestMapping.Get('')
   async list(@RequestParams.Context() context: KoaContext): Promise<HeadIconBo[] | null> {
     const appNo = (context.accessData?.get('appNo') as string) ?? null;
-    const permissions = context.accessData?.get<Record<string, boolean>>('userPermissions') ?? {};
-    const permissionsBo = new PermissionsBo(permissions);
-    const menuTree = await this.headIconService.list(appNo, permissionsBo);
+    const permissionsJson = context.accessData?.get<Record<string, boolean>>('userPermissions') ?? null;
+    const permissions = PermissionsBo.fromJSON(permissionsJson);
+    const menuTree = await this.headIconService.list(appNo, permissions);
     return menuTree;
   }
 }

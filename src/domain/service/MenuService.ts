@@ -40,7 +40,7 @@ export class MenuService {
 
   private filterResourcesByPermission(resources: ResourceEntity[], permissionsBo: PermissionsBo): ResourceEntity[] {
     return resources.filter((resource) => {
-      return permissionsBo.hasPermission(resource.resourceCode);
+      return permissionsBo.has(resource.resourceCode);
     });
   }
 
@@ -58,7 +58,7 @@ export class MenuService {
     const childrenResources = this.findChildrenMenus(resources, menu.node.resourceCode);
     for (const childrenResource of childrenResources) {
       const childMenu = this.buildMenuTree(new MenuTreeBo(childrenResource), resources);
-      menu.children.push(childMenu);
+      menu.addChild(childMenu);
     }
     return menu;
   }
