@@ -61,10 +61,11 @@ export class ResourceEntity {
 
   @Column({
     type: 'boolean',
-    comment: 'is share with global',
-    default: false,
+    comment: 'is resource is cover by permission',
+    default: true,
   })
-  isGlobal = false;
+  @Index()
+  hasPermission = true;
 
   @Column({
     type: 'int',

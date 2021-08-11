@@ -4,7 +4,8 @@ import { ResourceRepository } from '@/infrastructure/repository/ResourceReposito
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { RolePermissionRepository } from '@/infrastructure/repository/RolePermissionRepository';
 import { RoleEntity } from '../model/RoleEntity';
-import { PermissionBo, PermissionsBo } from '../bo/PermissionsBo';
+import { PermissionsBo } from '../bo/PermissionsBo';
+import { AppRepository } from '@/infrastructure/repository/AppRepository';
 
 @Provider()
 export class RolePermissionService {
@@ -17,23 +18,14 @@ export class RolePermissionService {
   @Inject(RolePermissionRepository)
   private rolePermissionRepository!: RolePermissionRepository;
 
+  @Inject(AppRepository)
+  private appRepository!: AppRepository;
+
   private cachedMergedRolePermissions: Map<string, PermissionsBo> = new Map();
 
   private async findSelfPermissions(role: RoleEntity, parentPermissions: PermissionsBo): Promise<PermissionsBo> {
-    const roleResourcePermEntities = await this.rolePermissionRepository.findAllByRoleNo(role.roleNo);
-    const permissions = new PermissionsBo();
-
-    if (roleResourcePermEntities) {
-      for (const roleResourcePermEntity of roleResourcePermEntities) {
-        const permissionName = roleResourcePermEntity.resourceCode;
-        if (parentPermissions.has(permissionName)) {
-          const permission = new PermissionBo(roleResourcePermEntity.resourceCode);
-          permissions.set(permission);
-        }
-      }
-    }
-
-    return permissions;
+    const rolePermissions = await this.rolePermissionRepository.findAllByRoleNo(role.roleNo);
+    return PermissionsBo.fromRolePermissions(rolePermissions, parentPermissions);
   }
 
   private async findParentPermissions(role: RoleEntity): Promise<PermissionsBo> {
@@ -49,16 +41,18 @@ export class RolePermissionService {
       return new PermissionsBo();
     }
 
-    const resources = await this.resourceRepository.findAllByAppNoAndStatusNormal(role.appNo);
-    const permissions = new PermissionsBo();
-    if (resources) {
-      for (const resource of resources) {
-        const permissionName = resource.resourceCode;
-        const permission = new PermissionBo(permissionName);
-        permissions.set(permission);
-      }
+    const resources = await this.resourceRepository.findAllPermissionsByAppNo(role.appNo);
+    return PermissionsBo.fromResources(resources);
+  }
+
+  private async findGlobalPermissions(role: RoleEntity): Promise<PermissionsBo> {
+    const app = await this.appRepository.findByStatusNormal(role.appNo);
+    if (!app) {
+      return new PermissionsBo();
     }
-    return permissions;
+
+    const resources = await this.resourceRepository.findAllGlobalPermissionsByAppLevel(app.level);
+    return PermissionsBo.fromResources(resources);
   }
 
   private async findMergedPermissionsByRoleNo(roleNo: string): Promise<PermissionsBo> {
@@ -71,11 +65,12 @@ export class RolePermissionService {
       return new PermissionsBo();
     }
 
+    const roleGoalPermissions = await this.findGlobalPermissions(role);
     const roleAppPermissions = await this.findAppPermissions(role);
     const roleParentPermissions = await this.findParentPermissions(role);
     const roleSelfPermissions = await this.findSelfPermissions(role, roleParentPermissions);
 
-    const mergedPermissions = new PermissionsBo().merge(roleAppPermissions).merge(roleParentPermissions).merge(roleSelfPermissions);
+    const mergedPermissions = new PermissionsBo().merge(roleGoalPermissions).merge(roleAppPermissions).merge(roleParentPermissions).merge(roleSelfPermissions);
 
     this.cachedMergedRolePermissions.set(roleNo, mergedPermissions);
 

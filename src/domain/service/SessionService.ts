@@ -60,7 +60,7 @@ export class SessionService {
     accessData.set('appNo', sessionData.get('appNo'));
     accessData.set('appOrgNo', sessionData.get('appOrgNo'));
 
-    accessData.set('userPermissions', userPermissions);
+    accessData.set('userPermissions', userPermissions.toJson());
 
     await accessData.save();
 

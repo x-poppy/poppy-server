@@ -5,10 +5,21 @@ import { getRepository, LessThan, Repository } from '@augejs/typeorm';
 export class ResourceRepository {
   private resourceRepository: Repository<ResourceEntity> = getRepository(ResourceEntity);
 
-  async findAllByAppNoAndStatusNormal(appNo: string): Promise<ResourceEntity[] | undefined> {
+  async findAllPermissionsByAppNo(appNo: string): Promise<ResourceEntity[] | undefined> {
     return await this.resourceRepository.find({
       where: {
         appNo,
+        hasPermission: true,
+        status: ResourceStatus.NORMAL,
+      },
+    });
+  }
+
+  async findAllGlobalPermissionsByAppLevel(appLevel: number): Promise<ResourceEntity[] | undefined> {
+    return await this.resourceRepository.find({
+      where: {
+        appLevel: LessThan(appLevel + 1),
+        hasPermission: false,
         status: ResourceStatus.NORMAL,
       },
     });

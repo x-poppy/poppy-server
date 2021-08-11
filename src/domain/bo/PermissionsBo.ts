@@ -1,3 +1,6 @@
+import { ResourceEntity } from '../model/ResourceEntity';
+import { RolePermissionEntity } from '../model/RolePermissionEntity';
+
 export class PermissionBo {
   constructor(public name: string) {}
 }
@@ -9,6 +12,34 @@ export class PermissionsBo {
       for (const [name] of Object.entries(json)) {
         const permission = new PermissionBo(name);
         permissions.set(permission);
+      }
+    }
+
+    return permissions;
+  }
+
+  static fromResources(resources: ResourceEntity[] | null | undefined): PermissionsBo {
+    const permissions = new PermissionsBo();
+    if (resources) {
+      for (const resource of resources) {
+        const permissionName = resource.resourceCode;
+        const permission = new PermissionBo(permissionName);
+        permissions.set(permission);
+      }
+    }
+    return permissions;
+  }
+
+  static fromRolePermissions(rolePermissions: RolePermissionEntity[] | null | undefined, parentPermissions: PermissionsBo): PermissionsBo {
+    const permissions = new PermissionsBo();
+
+    if (rolePermissions) {
+      for (const rolePermission of rolePermissions) {
+        const permissionName = rolePermission.resourceCode;
+        if (parentPermissions.has(permissionName)) {
+          const permission = new PermissionBo(rolePermission.resourceCode);
+          permissions.set(permission);
+        }
       }
     }
 
@@ -46,11 +77,11 @@ export class PermissionsBo {
     return this;
   }
 
-  toJson(): Record<string, PermissionBo> {
-    const results: Record<string, PermissionBo> = {};
+  toJson(): Record<string, boolean> {
+    const results: Record<string, boolean> = {};
     if (this.permsMap) {
-      for (const [key, value] of this.permsMap) {
-        results[key] = value;
+      for (const [key] of this.permsMap) {
+        results[key] = true;
       }
     }
 
