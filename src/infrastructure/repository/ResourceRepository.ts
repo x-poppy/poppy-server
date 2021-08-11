@@ -26,6 +26,7 @@ export class ResourceRepository {
       },
     });
   }
+
   async findAllHeadIconsByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
     return await this.resourceRepository.find({
       where: {
@@ -35,6 +36,14 @@ export class ResourceRepository {
       },
       order: {
         priority: 'DESC',
+      },
+    });
+  }
+
+  async findMenuByResourceCode(resourceCode: string): Promise<ResourceEntity | undefined> {
+    return await this.resourceRepository.findOne(resourceCode, {
+      where: {
+        type: ResourceType.MENU,
       },
     });
   }

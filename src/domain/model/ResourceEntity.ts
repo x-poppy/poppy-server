@@ -19,10 +19,11 @@ export class ResourceEntity {
   })
   resourceCode!: string;
 
-  @PrimaryColumn({
+  @Column({
     type: 'bigint',
     comment: 'appNo',
   })
+  @Index()
   appNo!: string;
 
   @Column({
@@ -57,6 +58,13 @@ export class ResourceEntity {
     nullable: true,
   })
   icon: string | null = null;
+
+  @Column({
+    type: 'boolean',
+    comment: 'is share with global',
+    default: false,
+  })
+  isGlobal = false;
 
   @Column({
     type: 'int',
