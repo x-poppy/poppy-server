@@ -7,7 +7,7 @@ export enum ResourceStatus {
 
 export enum ResourceType {
   MENU = 'menu',
-  HEAD_LINK = 'headLink',
+  HEAD_ICON = 'headIcon',
   FUNCTION = 'func',
 }
 
@@ -19,11 +19,10 @@ export class ResourceEntity {
   })
   resourceCode!: string;
 
-  @Column({
+  @PrimaryColumn({
     type: 'bigint',
-    comment: 'appNo for org',
+    comment: 'appNo',
   })
-  @Index()
   appNo!: string;
 
   @Column({
@@ -65,11 +64,18 @@ export class ResourceEntity {
   })
   priority!: number;
 
-  @PrimaryColumn({
+  @Column({
     type: 'varchar',
     length: 80,
   })
   label!: string;
+
+  @Column({
+    type: 'varchar',
+    length: 80,
+    nullable: true,
+  })
+  i18nLabelKey: string | null = null;
 
   @Column({
     type: 'text',

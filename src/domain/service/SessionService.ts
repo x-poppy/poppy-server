@@ -52,7 +52,7 @@ export class SessionService {
 
     await this.kickOffOnlineUsers(context, userNo);
 
-    const accessData = context.createAccessData(userNo);
+    const accessData = context.createAccessData(userNo, process.env.NODE_ENV !== 'production' ? '2h' : undefined);
 
     accessData.set('userNo', userNo);
     accessData.set('userRoleNo', sessionData.get('userRoleNo'));

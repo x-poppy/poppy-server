@@ -1,7 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
 @Entity('pp_i18n')
-@Index('idx_local_key', ['locale', 'key'], { unique: true })
 export class I18nEntity {
   @PrimaryColumn({
     length: 80,
@@ -13,10 +12,17 @@ export class I18nEntity {
   })
   key!: string;
 
+  @PrimaryColumn({
+    type: 'bigint',
+    comment: 'appNo',
+  })
+  appNo!: string;
+
   @Column({
     length: 500,
+    nullable: true,
   })
-  value = '';
+  value: string | null = null;
 
   @Column({
     type: 'text',

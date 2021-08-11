@@ -16,30 +16,25 @@ export class RestfulAPIHandlerService {
     this.logger.info(ctx.url);
   }
 
-  async handlerError(ctx: KoaContext, error: any): Promise<void> {
-    if (error?.name === 'UnauthorizedError') {
-      ctx.status = HttpStatus.StatusCodes.UNAUTHORIZED;
-      const errorMessage = this.i18n.formatMessage({ id: I18nMessageKeys.Common_Client_Unauthorized_Error });
-      ctx.body = {
-        errorMessage,
-      };
-    } else if (error instanceof ClientValidationError) {
-      const errorMessage = this.i18n.formatMessage({ id: error.errorMessage }, error.errorMessageValues ?? {});
+  async handlerError(ctx: KoaContext, err: any): Promise<void> {
+    if (err instanceof ClientValidationError) {
+      const errorMessage = this.i18n.formatMessage({ id: err.errorMessage }, err.errorMessageValues ?? {});
       ctx.status = HttpStatus.StatusCodes.BAD_REQUEST;
       ctx.body = {
         errorMessage,
       };
-    } else if (error instanceof BusinessError) {
-      const errorMessage = this.i18n.formatMessage({ id: error.errorMessage }, error.errorMessageValues ?? {});
+    } else if (err instanceof BusinessError) {
+      const errorMessage = this.i18n.formatMessage({ id: err.errorMessage }, err.errorMessageValues ?? {});
       ctx.status = HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = {
         errorMessage,
       };
-    } else {
-      this.logger.error(`Server Error: ${ctx.url} ${error} ${(error as Record<string, string>).stack}`);
-
-      ctx.status = HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
-      const errorMessage = this.i18n.formatMessage({ id: I18nMessageKeys.Common_Server_Unknown_Error });
+    } else if (err instanceof Error) {
+      this.logger.error(`Server Error: ${ctx.url} ${err} ${err.stack}`);
+      if (ctx.status === HttpStatus.StatusCodes.NOT_FOUND) {
+        ctx.status = (err as unknown as Record<string, number>).status ?? HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
+      }
+      const errorMessage = err.message ?? this.i18n.formatMessage({ id: I18nMessageKeys.Common_Server_Unknown_Error });
       ctx.body = {
         errorMessage,
       };

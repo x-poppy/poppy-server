@@ -1,7 +1,7 @@
 import { AppConfigRepository } from './repository/AppConfigRepository';
 import { AppDomainRepository } from './repository/AppDomainRepository';
 import { AppRepository } from './repository/AppRepository';
-import { AppServerProxyRepository } from './repository/AppServerProxyRepository';
+import { AppServerProxyRepository } from './repository/ServerProxyRepository';
 import { OperationLogRepository } from './repository/OperationLogRepository';
 import { OrgRepository } from './repository/OrgRepository';
 import { PageRepository } from './repository/PageRepository';
