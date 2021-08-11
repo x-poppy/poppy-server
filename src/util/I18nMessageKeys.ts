@@ -1,7 +1,6 @@
 export enum I18nMessageKeys {
   // client error
   Common_Client_Validation_Error = 'Common_Client_Validation_Error',
-  Common_Client_Unauthorized_Error = 'Common_Client_Unauthorized_Error',
 
   Login_User_Name_Length_Error = 'Login_User_Name_Length_Error',
   Login_User_Password_Length_Error = 'Login_User_Password_Length_Error',

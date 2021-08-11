@@ -1,12 +1,12 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
-export enum AppProxyServerStatus {
+export enum ProxyServerStatus {
   DISABLED = 'disabled',
   NORMAL = 'normal',
 }
 
-@Entity('pp_app_server_proxy')
-export class AppServerProxyEntity {
+@Entity('pp_server_proxy')
+export class ServerProxyEntity {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format 0 means global',
@@ -20,10 +20,10 @@ export class AppServerProxyEntity {
   serverName!: string;
 
   @Column({
-    length: 500,
+    type: 'simple-array',
     comment: 'server urls',
   })
-  serverUrl!: string;
+  serverUrl!: string[];
 
   @Column({
     type: 'int',
@@ -39,6 +39,12 @@ export class AppServerProxyEntity {
   displayName!: string;
 
   @Column({
+    type: 'simple-json',
+    comment: 'extraParams',
+  })
+  extraParams!: Record<string, unknown>;
+
+  @Column({
     type: 'text',
     nullable: true,
   })
@@ -46,11 +52,11 @@ export class AppServerProxyEntity {
 
   @Column({
     type: 'enum',
-    enum: AppProxyServerStatus,
-    default: AppProxyServerStatus.NORMAL,
+    enum: ProxyServerStatus,
+    default: ProxyServerStatus.NORMAL,
   })
   @Index()
-  status: AppProxyServerStatus = AppProxyServerStatus.NORMAL;
+  status: ProxyServerStatus = ProxyServerStatus.NORMAL;
 
   @CreateDateColumn()
   createAt!: Date;

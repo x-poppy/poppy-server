@@ -14,11 +14,23 @@ export class ResourceRepository {
     });
   }
 
-  async findAllMenuByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
+  async findAllMenusByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
     return await this.resourceRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
         type: ResourceType.MENU,
+        status: ResourceStatus.NORMAL,
+      },
+      order: {
+        priority: 'DESC',
+      },
+    });
+  }
+  async findAllHeadIconsByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
+    return await this.resourceRepository.find({
+      where: {
+        appLevel: LessThan(appLevel + 1),
+        type: ResourceType.HEAD_ICON,
         status: ResourceStatus.NORMAL,
       },
       order: {

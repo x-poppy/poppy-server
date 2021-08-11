@@ -1,4 +1,4 @@
-import { AppServerProxyService } from '@/domain/service/AppServerProxyService';
+import { AppServerProxyService } from '@/domain/service/ServerProxyService';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';

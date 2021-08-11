@@ -71,6 +71,12 @@ export class AppEntity {
   desc: string | null = null;
 
   @Column({
+    type: 'text',
+    nullable: true,
+  })
+  icp: string | null = null;
+
+  @Column({
     type: 'enum',
     enum: AppStatus,
     default: AppStatus.NORMAL,

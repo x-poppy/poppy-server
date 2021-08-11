@@ -6,7 +6,7 @@ import { AxiosInstance, AXIOS_IDENTIFIER, Method } from '@augejs/axios';
 import { Inject } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
 import { AccessData } from '@augejs/koa-access-token';
-import { AppServerProxyRepository } from '@/infrastructure/repository/AppServerProxyRepository';
+import { AppServerProxyRepository } from '@/infrastructure/repository/ServerProxyRepository';
 
 @Provider()
 export class AppServerProxyService {
@@ -30,20 +30,12 @@ export class AppServerProxyService {
       throw new BusinessError(I18nMessageKeys.Proxy_Server_Is_Not_Exist);
     }
 
-    const serverUrlStr = appServerProxy.serverUrl;
-    if (!serverUrlStr) {
+    const serverUrls = appServerProxy.serverUrl;
+    if (!serverUrls || serverUrls.length === 0) {
       throw new BusinessError(I18nMessageKeys.Proxy_Server_Url_Error);
     }
 
-    const serverUrlArr: string[] = serverUrlStr
-      .split(',')
-      .map((url) => url.trim())
-      .filter(Boolean);
-    if (!serverUrlArr || serverUrlArr.length === 0) {
-      throw new BusinessError(I18nMessageKeys.Proxy_Server_Url_Error);
-    }
-
-    const serverUrl = serverUrlArr.length === 1 ? serverUrlArr[0] : serverUrlArr[Math.trunc(Math.random() * serverUrlArr.length)];
+    const serverUrl = serverUrls.length === 1 ? serverUrls[0] : serverUrls[Math.trunc(Math.random() * serverUrls.length)];
 
     const response = await this.httpService.request({
       baseURL: serverUrl,

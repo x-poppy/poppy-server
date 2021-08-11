@@ -1,5 +1,5 @@
-import { AppServerProxyEntity, AppProxyServerStatus } from '@/domain/model/AppServerProxyEntity';
-import { Inject, Provider } from '@augejs/core';
+import { ServerProxyEntity, ProxyServerStatus } from '@/domain/model/ServerProxyEntity';
+import { Provider } from '@augejs/core';
 import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
 
 interface CreateOpts {
@@ -12,27 +12,27 @@ interface CreateOpts {
 
 @Provider()
 export class AppServerProxyRepository {
-  private appServerProxyRepository: Repository<AppServerProxyEntity> = getRepository(AppServerProxyEntity);
+  private appServerProxyRepository: Repository<ServerProxyEntity> = getRepository(ServerProxyEntity);
 
-  async findByStatusNormal(appNo: string, serverName: string): Promise<AppServerProxyEntity | undefined> {
+  async findByStatusNormal(appNo: string, serverName: string): Promise<ServerProxyEntity | undefined> {
     return await this.appServerProxyRepository.findOne(appNo, {
       where: {
         appNo,
         serverName,
-        status: AppProxyServerStatus.NORMAL,
+        status: ProxyServerStatus.NORMAL,
       },
     });
   }
 
-  async create(opts: CreateOpts, manager?: EntityManager): Promise<AppServerProxyEntity> {
-    const appServerProxyRepository = manager?.getRepository(AppServerProxyEntity) ?? this.appServerProxyRepository;
+  async create(opts: CreateOpts, manager?: EntityManager): Promise<ServerProxyEntity> {
+    const appServerProxyRepository = manager?.getRepository(ServerProxyEntity) ?? this.appServerProxyRepository;
 
     const serverUrls: string[] = (Array.isArray(opts.serverUrl) ? opts.serverUrl : [opts.serverUrl]).map((url) => url.trim()).filter(Boolean);
 
-    const appServerProxy = new AppServerProxyEntity();
+    const appServerProxy = new ServerProxyEntity();
     appServerProxy.appNo = opts.appNo;
     appServerProxy.serverName = opts.serverName;
-    appServerProxy.serverUrl = serverUrls.join(',');
+    appServerProxy.serverUrl = serverUrls;
 
     await appServerProxyRepository.save(appServerProxy);
     return appServerProxy;
