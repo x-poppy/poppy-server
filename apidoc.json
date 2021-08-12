@@ -1,9 +1,0 @@
-{
-  "title": "X-Poppy Document",
-  "header": {
-    "filename": "./apidoc/header.md"
-  },
-  "footer": {
-    "filename": "./apidoc/footer.md"
-  }
-}
