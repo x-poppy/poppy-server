@@ -1,3 +1,4 @@
+import path from 'path';
 import crypto from 'crypto';
 import randomPassword from 'secure-random-password';
 
@@ -5,7 +6,8 @@ import { AppService } from '@/domain/service/AppService';
 import { OrgService } from '@/domain/service/OrgService';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { OrgRepository } from '@/infrastructure/repository/OrgRepository';
-import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
+import { GetLogger, ILogger, Inject, Provider, __appRootDir } from '@augejs/core';
+import { KoaContext, RequestMapping, RequestParams } from '@augejs/koa';
 
 @Provider()
 export class SystemInitService {
@@ -23,6 +25,19 @@ export class SystemInitService {
 
   @GetLogger()
   logger!: ILogger;
+
+  @RequestMapping.Get('/')
+  home(): string {
+    return 'It Works.';
+  }
+
+  @RequestMapping.Get('/LICENSE')
+  async license(@RequestParams.Context() context: KoaContext): Promise<void> {
+    context.type = 'text';
+    await context.sendFile('./LICENSE', {
+      root: __appRootDir,
+    });
+  }
 
   async onAppWillReady(): Promise<void> {
     this.logger.info('System Prepare Data for init start.');

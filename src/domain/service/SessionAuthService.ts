@@ -19,7 +19,7 @@ import { RolePermissionService } from './RolePermissionService';
 import { SessionData } from '@augejs/koa-session-token';
 
 @Provider()
-export class AuthService {
+export class SessionAuthService {
   @GetLogger()
   logger!: ILogger;
 

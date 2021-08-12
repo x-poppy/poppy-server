@@ -1,6 +1,6 @@
 import { Module, boot, GetLogger, ILogger, Inject } from '@augejs/core';
-import { KoaContext, MiddlewareHandler, RequestMapping, WebServer } from '@augejs/koa';
-import { KoaStatic, KoaFavicon } from '@augejs/koa-static';
+import { KoaContext, MiddlewareHandler, WebServer } from '@augejs/koa';
+import { KoaStatic, KoaFavicon, KoaSend } from '@augejs/koa-static';
 import { I18nConfig } from '@augejs/i18n';
 import { AxiosConfig } from '@augejs/axios';
 import { YAMLConfig } from '@augejs/file-config';
@@ -12,6 +12,7 @@ import { KoaAccessTokenManager } from '@augejs/koa-access-token';
 import { KoaSessionTokenManager } from '@augejs/koa-session-token';
 import { Views } from '@augejs/views';
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
+import { KoaSwagger } from '@augejs/koa-swagger';
 
 import { Providers as ApplicationLayerProviders } from './application';
 import { Providers as DomainLayerProviders } from './domain';
@@ -34,6 +35,8 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @KoaAccessTokenManager()
 @KoaSessionTokenManager()
 @KoaBodyParserMiddleware()
+@KoaSend()
+@KoaSwagger()
 @Module({
   providers: [...FacadeLayerProviders, ...ApplicationLayerProviders, ...DomainLayerProviders, ...InfrastructureLayerProviders],
 })
@@ -43,11 +46,6 @@ class AppModule {
 
   @Inject(RestfulAPIHandlerService)
   restfulAPIHandlerService!: RestfulAPIHandlerService;
-
-  @RequestMapping.Get('/')
-  home(): string {
-    return 'It Works.';
-  }
 
   @MiddlewareHandler()
   async globalHandler(ctx: KoaContext, next: CallableFunction): Promise<void> {
