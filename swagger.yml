@@ -60,21 +60,30 @@ paths:
       - "Authorization"
       description: "authorize for create session"
       parameters:
-      - in: "body"
-        name: "loginDto"
-        required: true
-        schema:
-          $ref: "#/definitions/LoginDto"
+      in:
+      - "body"
+      name: "loginDto"
+      required: true
+      schema:
+        $ref: "#/definitions/LoginDto"
       responses:
         200:
           description: OK
 
-  # /api/v1/session:
-  #   post:
-  #     tags:
-  #     - "Authorization"
-  #     description: "create session by authorize token"
-
+  /api/v1/session:
+    post:
+      tags:
+      - "Authorization"
+      description: "create session by authorized token"
+      parameters:
+      - in: "header"
+      name: "session-token"
+      required: true
+      schema:
+        type: string
+      responses:
+        200:
+          description: OK
 
 externalDocs:
   description: "http://swagger.io"
