@@ -37,9 +37,9 @@ export class LoginDto {
         min: args.constraints[0],
         max: args.constraints[1],
       };
-      validatorOwner.errorMessageKey = I18nMessageKeys.Login_Domain_Length_Error;
+      validatorOwner.errorMessageKey = I18nMessageKeys.Login_App_No_Length_Error;
       return validatorOwner.errorMessageKey;
     },
   })
-  domain!: string;
+  appNo!: string;
 }
