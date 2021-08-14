@@ -31,12 +31,12 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @KoaStatic()
 @WebServer()
 @Views()
+// @KoaSwagger()
 @RedisConnection()
 @KoaAccessTokenManager()
 @KoaSessionTokenManager()
 @KoaBodyParserMiddleware()
 @KoaSend()
-@KoaSwagger()
 @Module({
   providers: [...FacadeLayerProviders, ...ApplicationLayerProviders, ...DomainLayerProviders, ...InfrastructureLayerProviders],
 })

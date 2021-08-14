@@ -39,51 +39,17 @@ securityDefinitions:
 
 definitions:
   LoginDto:
+    type: object
     properties:
       userName:
         type: string
-        required: true
         example: root
       password:
         type: string
-        required: true
         example: "********"
       domain:
         type: string
-        required: true
         example: "http:/127.0.0.1:7001"
-
-paths:
-  /api/v1/session-auth:
-    post:
-      tags:
-      - "Authorization"
-      description: "authorize for create session"
-      parameters:
-      in:
-      - "body"
-      name: "loginDto"
-      required: true
-      schema:
-        $ref: "#/definitions/LoginDto"
-      responses:
-        200:
-          description: OK
-
-  /api/v1/session:
-    post:
-      tags:
-      - "Authorization"
-      description: "create session by authorized token"
-      parameters:
-      - in: "header"
-      name: "session-token"
-      required: true
-      schema:
-        type: string
-      responses:
-        200:
-          description: OK
 
 externalDocs:
   description: "http://swagger.io"

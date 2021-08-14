@@ -48,17 +48,11 @@ export class SessionAuthService {
   orgRepository!: OrgRepository;
 
   async auth(ctx: KoaContext, loginDto: LoginDto): Promise<SessionData> {
-    this.logger.info(`auth start. userName ${loginDto.userName} domain: ${loginDto.domain}`);
+    this.logger.info(`auth start. userName ${loginDto.userName} appNo: ${loginDto.appNo}`);
 
-    const appDomain = await this.appDomainRepository.findByStatusNormal(loginDto.domain);
-    if (!appDomain) {
-      this.logger.info(`Domain_Is_Not_Exist. ${loginDto.domain}`);
-      throw new BusinessError(I18nMessageKeys.Domain_Is_Not_Exist);
-    }
-
-    const app = await this.appRepository.findByStatusNormal(appDomain.appNo);
+    const app = await this.appRepository.findByStatusNormal(loginDto.appNo);
     if (!app) {
-      this.logger.info(`App_Is_Not_Exist. appNo: ${appDomain.appNo}`);
+      this.logger.info(`App_Is_Not_Exist. appNo: ${loginDto.appNo}`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
@@ -69,25 +63,25 @@ export class SessionAuthService {
       throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);
     }
 
-    const user = await this.userRepository.findByAccountNameAndAppNo(loginDto.userName, appDomain.appNo);
+    const user = await this.userRepository.findByAccountNameAndAppNo(loginDto.userName, loginDto.appNo);
     if (!user) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${appDomain.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
     }
 
     if (user.status === UserStatus.DISABLED) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${appDomain.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
     }
 
     if (user.status === UserStatus.LOCKED) {
-      this.logger.warn(`User_Is_Locked. userName: ${loginDto.userName} appNo: ${appDomain.appNo}`);
+      this.logger.warn(`User_Is_Locked. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
     }
 
     const userOrg = await this.orgRepository.findByStatusNormal(user.orgNo);
     if (!userOrg) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${appDomain.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
       throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);
     }
 
@@ -112,7 +106,7 @@ export class SessionAuthService {
     sessionData.commit();
     await sessionData.save();
 
-    this.logger.info(`auth end. userName ${loginDto.userName} domain: ${loginDto.domain}`);
+    this.logger.info(`auth end. userName ${loginDto.userName} domain: ${loginDto.appNo}`);
 
     return sessionData;
   }
