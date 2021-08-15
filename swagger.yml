@@ -4,14 +4,14 @@ info:
   title: "Poppy Server API Specification"
 
 tags:
-- name: "Authorization"
-  description: "Authenticate to `poppy server`"
+- name: "Login"
+  description: "Login to `poppy server`"
 
-- name: "org"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
+- name: "Resource"
+  description: "Resource Entity"
+
+- name: "Org"
+  description: "Org Entity"
 
 - name: "app"
   description: "Access to Petstore orders"
@@ -24,6 +24,7 @@ tags:
 
 consumes:
   - "application/json"
+  - "application/x-www-form-urlencoded"
 produces:
   - "application/json"
 
@@ -33,9 +34,9 @@ schemes:
 
 securityDefinitions:
   accessToken:
-    type: "apiKey"
-    name: "Authorization"
-    in: "header"
+    type: apiKey
+    name: Authorization
+    in: header
 
 definitions:
   LoginDto:
@@ -47,9 +48,112 @@ definitions:
       password:
         type: string
         example: "********"
+      appNo:
+        type: string
+    required:
+      - "userName"
+      - "password"
+      - "appNo"
+
+  AppDomainEntity:
+    type: object
+    properties:
+      appNo:
+        type: string
       domain:
         type: string
-        example: "http:/127.0.0.1:7001"
+
+paths:
+  /api/v1/app-domain:
+    get:
+      tags:
+        - "Login"
+      summary: "Get app-domain entity by domain"
+      description: "This API should be the first one API for client to get the AppNo by domain."
+      parameters:
+        - in: "header"
+          name: "x-app-domain"
+          description: "If this value is empty it will get the domain from the request"
+          type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/AppDomainEntity"
+
+  /api/v1/session-auth:
+    post:
+      tags:
+        - "Login"
+      summary: "Validate and get the login token."
+      description: "Validate the login centennial and response the authorization token."
+      parameters:
+        - in: body
+          name: loginDto
+          required: true
+          schema:
+            $ref: "#/definitions/LoginDto"
+      responses:
+        "200":
+          description: ""
+
+  /api/v1/session:
+    post:
+      tags:
+        - "Login"
+      parameters:
+        - in: header
+          name: "session-token"
+          required: true
+          type: string
+      responses:
+        "200":
+          description: ""
+
+    delete:
+      tags:
+        - "Login"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/menu:
+    get:
+      summary: "Get the app menu tree for current user"
+      tags:
+        - "Resource"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/head-icon:
+    get:
+      summary: "Get the app head icon for current user"
+      tags:
+        - "Resource"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/org:
+    get:
+      summary: "Get org list for current user"
+      tags:
+        - "Org"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+
+      deprecated: false
 
 externalDocs:
   description: "http://swagger.io"

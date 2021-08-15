@@ -4,7 +4,7 @@ export enum I18nMessageKeys {
 
   Login_User_Name_Length_Error = 'Login_User_Name_Length_Error',
   Login_User_Password_Length_Error = 'Login_User_Password_Length_Error',
-  Login_App_No_Length_Error = 'Login_App_No_Length_Error',
+  Login_App_No_Empty_Error = 'Login_App_No_Empty_Error',
 
   // business error
   Common_Server_Unknown_Error = 'Common_Server_Unknown_Error',

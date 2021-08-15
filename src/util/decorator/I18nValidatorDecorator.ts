@@ -9,5 +9,5 @@ export function I18nValidatorDecorator(): ClassDecorator {
 
 export interface I18nValidatorOwner {
   errorMessageKey: string | null;
-  errorMessageValues: ErrorValues;
+  errorMessageValues: ErrorValues | null;
 }

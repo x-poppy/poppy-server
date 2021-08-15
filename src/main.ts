@@ -1,5 +1,5 @@
 import { Module, boot, GetLogger, ILogger, Inject } from '@augejs/core';
-import { KoaContext, MiddlewareHandler, WebServer } from '@augejs/koa';
+import { HttpStatus, KoaContext, MiddlewareHandler, WebServer } from '@augejs/koa';
 import { KoaStatic, KoaFavicon, KoaSend } from '@augejs/koa-static';
 import { I18nConfig } from '@augejs/i18n';
 import { AxiosConfig } from '@augejs/axios';
@@ -31,7 +31,7 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @KoaStatic()
 @WebServer()
 @Views()
-// @KoaSwagger()
+@KoaSwagger()
 @RedisConnection()
 @KoaAccessTokenManager()
 @KoaSessionTokenManager()
@@ -51,6 +51,9 @@ class AppModule {
   async globalHandler(ctx: KoaContext, next: CallableFunction): Promise<void> {
     try {
       await next();
+      if (ctx.body === null) {
+        ctx.throw(HttpStatus.StatusCodes.NOT_FOUND);
+      }
       this.restfulAPIHandlerService.handlerSuccess(ctx);
     } catch (err) {
       this.restfulAPIHandlerService.handlerError(ctx, err);
