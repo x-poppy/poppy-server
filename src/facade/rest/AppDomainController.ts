@@ -10,10 +10,15 @@ export class AppDomainController {
   appDomainService!: AppDomainService;
 
   @RequestMapping.Get('')
-  async getAppNoByDomain(@RequestParams.Context() ctx: KoaContext): Promise<AppDomainEntity | null> {
+  async getAppNoByDomain(@RequestParams.Context() ctx: KoaContext): Promise<Pick<AppDomainEntity, 'appNo' | 'domain'> | null> {
     const targetDomain = ctx.get('x-app-domain') || ctx.request.origin;
 
     const appDomain = (await this.appDomainService.find(targetDomain)) ?? null;
-    return appDomain;
+    if (!appDomain) return null;
+
+    return {
+      appNo: appDomain.appNo,
+      domain: appDomain.domain,
+    };
   }
 }

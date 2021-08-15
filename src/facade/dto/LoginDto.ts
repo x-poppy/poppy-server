@@ -1,6 +1,6 @@
 import { I18nValidatorDecorator, I18nValidatorOwner } from '@/util/decorator/I18nValidatorDecorator';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-import { Length, ValidationArguments } from '@augejs/validator';
+import { IsEmpty, IsNotEmpty, Length, ValidationArguments } from '@augejs/validator';
 
 @I18nValidatorDecorator()
 export class LoginDto {
@@ -30,14 +30,11 @@ export class LoginDto {
   })
   password!: string;
 
-  @Length(5, 100, {
+  @IsNotEmpty({
     message: (args: ValidationArguments) => {
       const validatorOwner = args.object as I18nValidatorOwner;
-      validatorOwner.errorMessageValues = {
-        min: args.constraints[0],
-        max: args.constraints[1],
-      };
-      validatorOwner.errorMessageKey = I18nMessageKeys.Login_App_No_Length_Error;
+      validatorOwner.errorMessageValues = null;
+      validatorOwner.errorMessageKey = I18nMessageKeys.Login_App_No_Empty_Error;
       return validatorOwner.errorMessageKey;
     },
   })

@@ -1,11 +1,9 @@
 import { HeadIconBo } from '@/domain/bo/HeadIconBo';
-import { MenuTreeBo } from '@/domain/bo/MenuTreeBo';
 import { PermissionsBo } from '@/domain/bo/PermissionsBo';
 import { HeadIconService } from '@/domain/service/HeadIconService';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
-import { Apidoc } from '../../../../../augejs/koa-modules/packages/koa-apidoc/dist/main';
 
 @Prefix('/api/v1/head-icon')
 @Provider()

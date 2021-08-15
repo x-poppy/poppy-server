@@ -20,13 +20,18 @@ export class SessionController {
   async create(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
     const accessData = await this.sessionService.createAccessData(ctx);
     ctx.sessionData = null;
+
+    ctx.set('Set-Authorization', accessData.token);
+
     return accessData.toJSON();
   }
 
   @KoaAccessTokenMiddleware()
   @RequestMapping.Delete('')
-  async delete(@RequestParams.Context() ctx: KoaContext): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  async delete(@RequestParams.Context() ctx: KoaContext): Promise<{}> {
     ctx.accessData = null;
+    return {};
   }
 
   @KoaAccessTokenMiddleware()

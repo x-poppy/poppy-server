@@ -1,4 +1,4 @@
-import { BusinessError, ClientValidationError } from '@/util/BusinessError';
+import { BusinessError, ClientValidationError, NotFoundError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { I18N_IDENTIFIER, I18n } from '@augejs/i18n';
@@ -13,7 +13,7 @@ export class RestfulAPIHandlerService {
   i18n!: I18n;
 
   async handlerSuccess(ctx: KoaContext): Promise<void> {
-    this.logger.info(ctx.url);
+    this.logger.info(ctx.method + ' ' + ctx.url);
   }
 
   async handlerError(ctx: KoaContext, err: any): Promise<void> {
@@ -30,14 +30,17 @@ export class RestfulAPIHandlerService {
         errorMessage,
       };
     } else if (err instanceof Error) {
-      this.logger.error(`Server Error: ${ctx.url} ${err} ${err.stack}`);
-      if (ctx.status === HttpStatus.StatusCodes.NOT_FOUND) {
-        ctx.status = (err as unknown as Record<string, number>).status ?? HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
-      }
       const errorMessage = err.message ?? this.i18n.formatMessage({ id: I18nMessageKeys.Common_Server_Unknown_Error });
+      ctx.status = (err as unknown as Record<string, number>).status ?? HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR;
       ctx.body = {
         errorMessage,
       };
+      if ('status' in err) {
+        // consider as the BusinessError
+        this.logger.error(`Server Error: ${ctx.url} ${err}`);
+      } else {
+        this.logger.error(`Server Error: ${ctx.url} ${err} ${err.stack}`);
+      }
     }
   }
 }
