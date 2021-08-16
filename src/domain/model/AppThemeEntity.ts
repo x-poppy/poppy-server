@@ -14,9 +14,19 @@ export class AppThemeEntity {
   appNo!: string;
 
   @PrimaryColumn({
+    type: 'varchar',
     length: 80,
+    comment: 'theme variable name camelCase',
   })
   key!: string;
+
+  @Column({
+    type: 'varchar',
+    length: 200,
+    nullable: true,
+    default: null,
+  })
+  value: string | null = null;
 
   @Column({
     type: 'text',

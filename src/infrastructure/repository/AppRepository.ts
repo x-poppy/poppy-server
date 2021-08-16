@@ -54,7 +54,7 @@ export class AppRepository {
   }
 
   find(appNo: string, opts?: FindConditions<AppEntity>): Promise<AppEntity | undefined> {
-    return this.appRepository.findOne(appNo.toString(), {
+    return this.appRepository.findOne(appNo, {
       where: {
         ...opts,
       },

@@ -10,6 +10,7 @@ import { RolePermissionRepository } from './repository/RolePermissionRepository'
 import { RoleRepository } from './repository/RoleRepository';
 import { UserRepository } from './repository/UserRepository';
 import { UniqueIdService } from './service/UniqueIdService';
+import { AppThemeRepository } from './repository/AppThemeRepository';
 
 export const Providers = [
   AppConfigRepository,
@@ -24,4 +25,5 @@ export const Providers = [
   ResourceRepository,
   UserRepository,
   UniqueIdService,
+  AppThemeRepository,
 ];

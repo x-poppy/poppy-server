@@ -4,17 +4,17 @@ info:
   title: "Poppy Server API Specification"
 
 tags:
-- name: "Login"
-  description: "Login to `poppy server`"
+- name: "AppUI"
+  description: "App UI Resource"
 
-- name: "Resource"
-  description: "Resource Entity"
+- name: "Authorization"
+  description: "Authorization to `poppy server`"
+
+- name: "Menu"
+  description: "Menu Entity (Need Session)"
 
 - name: "Org"
-  description: "Org Entity"
-
-- name: "app"
-  description: "Access to Petstore orders"
+  description: "Org Entity (Need Session)"
 
 - name: "role"
   description: "Operations about user"
@@ -51,11 +51,11 @@ definitions:
       appNo:
         type: string
     required:
-      - "userName"
-      - "password"
-      - "appNo"
+      - userName
+      - password
+      - appNo
 
-  AppDomainEntity:
+  AppDomainUIInfoBo:
     type: object
     properties:
       appNo:
@@ -63,28 +63,74 @@ definitions:
       domain:
         type: string
 
+  AppUIInfoBo:
+    type: object
+    properties:
+      locale:
+        type: string
+      displayName:
+         type: string
+      icp:
+        type: string
+      status:
+        type: string
+
 paths:
-  /api/v1/app-domain:
+  /api/v1/app-ui/domain-info/{domain}:
     get:
       tags:
-        - "Login"
+        - "AppUI"
       summary: "Get app-domain entity by domain"
       description: "This API should be the first one API for client to get the AppNo by domain."
       parameters:
-        - in: "header"
-          name: "x-app-domain"
+        - in: path
+          name: domain
+          default: "http%3A%2F%2Flocalhost%3A7001"
           description: "If this value is empty it will get the domain from the request"
           type: string
+          required: true
       responses:
         "200":
           description: ""
           schema:
-            $ref: "#/definitions/AppDomainEntity"
+            $ref: "#/definitions/AppDomainUIInfoBo"
 
-  /api/v1/session-auth:
+  /api/v1/app-ui/app-info/{appNo}:
+    get:
+      tags:
+        - "AppUI"
+      summary: "Get app-theme properties"
+      description: "Get the app info before login"
+      parameters:
+        - in: path
+          name: appNo
+          type: string
+          required: true
+      responses:
+        "200":
+          schema:
+            $ref: "#/definitions/AppUIInfoBo"
+          description: ""
+
+  /api/v1/app-ui/theme-info/{appNo}:
+    get:
+      tags:
+        - "AppUI"
+      summary: "Get app ui info"
+      description: "Get the app ui info before login"
+      parameters:
+        - in: path
+          name: appNo
+          type: string
+          required: true
+      responses:
+        "200":
+          description: ""
+
+  /api/v1/authorization/session-auth:
     post:
       tags:
-        - "Login"
+        - "Authorization"
       summary: "Validate and get the login token."
       description: "Validate the login centennial and response the authorization token."
       parameters:
@@ -97,10 +143,10 @@ paths:
         "200":
           description: ""
 
-  /api/v1/session:
+  /api/v1/authorization/session:
     post:
       tags:
-        - "Login"
+        - "Authorization"
       parameters:
         - in: header
           name: "session-token"
@@ -112,29 +158,29 @@ paths:
 
     delete:
       tags:
-        - "Login"
+        - "Authorization"
       responses:
         "200":
           description: ""
       security:
         - accessToken: []
 
-  /api/v1/menu:
+  /api/v1/menu/home-menu:
     get:
       summary: "Get the app menu tree for current user"
       tags:
-        - "Resource"
+        - "Menu"
       responses:
         "200":
           description: ""
       security:
         - accessToken: []
 
-  /api/v1/head-icon:
+  /api/v1/menu/head-menu:
     get:
       summary: "Get the app head icon for current user"
       tags:
-        - "Resource"
+        - "Menu"
       responses:
         "200":
           description: ""

@@ -4,7 +4,7 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { LoginDto } from '../dto/LoginDto';
 
-@Prefix('/api/v1/session-auth')
+@Prefix('/api/v1/authorization/session-auth')
 @Provider()
 export class SessionAuthController {
   @Inject(SessionAuthService)

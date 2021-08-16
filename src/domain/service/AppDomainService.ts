@@ -1,6 +1,7 @@
 import { Inject, Provider } from '@augejs/core';
 import { AppDomainEntity } from '../model/AppDomainEntity';
 import { AppDomainRepository } from '../../infrastructure/repository/AppDomainRepository';
+import { AppDomainUIInfoBo } from '../bo/AppUIDomainInfoBo';
 
 @Provider()
 export class AppDomainService {

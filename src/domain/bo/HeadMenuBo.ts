@@ -1,6 +1,6 @@
 import { ResourceEntity } from '../model/ResourceEntity';
 
-export class HeadIconBo {
+export class HeadMenuBo {
   node: ResourceEntity;
   constructor(node: ResourceEntity) {
     this.node = node;

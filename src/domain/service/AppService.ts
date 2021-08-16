@@ -9,6 +9,7 @@ import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { AppEntity } from '../model/AppEntity';
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
+import { AppUIInfoBo } from '../bo/AppUIInfoBo';
 
 interface CreateOpts {
   userNo: string | null; // the creator user maybe empty
@@ -23,10 +24,6 @@ interface ListOpts {
   offset: number;
   size: number;
   orgNo: string;
-}
-
-interface DeleteOpts {
-  appNo: string;
 }
 
 @Provider()
@@ -158,9 +155,9 @@ export class AppService {
     });
   }
 
-  async delete(opts: DeleteOpts): Promise<void> {
+  async delete(appNo: string): Promise<void> {
     return this.appRepository.delete({
-      appNo: opts.appNo,
+      appNo,
     });
   }
 }

@@ -6,8 +6,8 @@ export enum ResourceStatus {
 }
 
 export enum ResourceType {
-  MENU = 'menu',
-  HEAD_ICON = 'headIcon',
+  HOME_MENU = 'homeMenu',
+  HEAD_MENU = 'headMenu',
   FUNCTION = 'func',
 }
 
@@ -49,7 +49,7 @@ export class ResourceEntity {
     enum: ResourceType,
   })
   @Index()
-  type: ResourceType = ResourceType.MENU;
+  type: ResourceType = ResourceType.HOME_MENU;
 
   @Column({
     type: 'varchar',
