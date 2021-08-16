@@ -6,7 +6,7 @@ import { SessionService } from '../../domain/service/SessionService';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
 import { KoaSessionTokenMiddleware } from '@augejs/koa-session-token';
 
-@Prefix('/api/v1/session')
+@Prefix('/api/v1/authorization/session')
 @Provider()
 export class SessionController {
   @Inject(I18N_IDENTIFIER)

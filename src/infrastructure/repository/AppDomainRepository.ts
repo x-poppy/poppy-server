@@ -1,5 +1,5 @@
 import { Provider } from '@augejs/core';
-import { EntityManager, FindOneOptions, getRepository, Repository } from '@augejs/typeorm';
+import { EntityManager, FindConditions, FindOneOptions, getRepository, Repository } from '@augejs/typeorm';
 import { AppDomainEntity, AppDomainStatus } from '../../domain/model/AppDomainEntity';
 
 interface CreateOpts {
@@ -35,6 +35,14 @@ export class AppDomainRepository {
       },
       order: {
         createAt: 'DESC',
+      },
+    });
+  }
+
+  find(domain: string, opts?: FindConditions<AppDomainEntity>): Promise<AppDomainEntity | undefined> {
+    return this.appDomainRepository.findOne(domain, {
+      where: {
+        ...opts,
       },
     });
   }

@@ -12,8 +12,11 @@ import { AppServerWebHookService } from './service/ServerWebHookService';
 import { AppServerProxyService } from './service/ServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
 import { SessionAuthService } from './service/SessionAuthService';
-import { MenuService } from './service/MenuService';
-import { HeadIconService } from './service/HeadIconService';
+import { HomeMenuService } from './service/HomeMenuService';
+import { HeadMenuService } from './service/HeadMenuService';
+import { AppThemeService } from './service/AppThemeService';
+import { AppUIService } from './service/AppUIService';
+import { TwoFactorService } from './service/TwoFactorService';
 
 export const Providers = [
   AppConfigService,
@@ -30,6 +33,9 @@ export const Providers = [
   SessionService,
   UserService,
   SessionAuthService,
-  MenuService,
-  HeadIconService,
+  HomeMenuService,
+  HeadMenuService,
+  AppThemeService,
+  AppUIService,
+  TwoFactorService,
 ];

@@ -29,7 +29,7 @@ export class ResourceRepository {
     return await this.resourceRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
-        type: ResourceType.MENU,
+        type: ResourceType.HOME_MENU,
         status: ResourceStatus.NORMAL,
       },
       order: {
@@ -38,11 +38,11 @@ export class ResourceRepository {
     });
   }
 
-  async findAllHeadIconsByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
+  async findAllHeadMenusByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
     return await this.resourceRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
-        type: ResourceType.HEAD_ICON,
+        type: ResourceType.HEAD_MENU,
         status: ResourceStatus.NORMAL,
       },
       order: {
@@ -54,7 +54,7 @@ export class ResourceRepository {
   async findMenuByResourceCode(resourceCode: string): Promise<ResourceEntity | undefined> {
     return await this.resourceRepository.findOne(resourceCode, {
       where: {
-        type: ResourceType.MENU,
+        type: ResourceType.HOME_MENU,
       },
     });
   }

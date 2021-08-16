@@ -1,10 +1,21 @@
 import { SessionAuthController } from './rest/SessionAuthController';
-import { HeadIconController } from './rest/HeadIconController';
-import { MenuController } from './rest/MenuController';
+import { HeadMenuController } from './rest/HeadMenuController';
+import { HomeMenuController } from './rest/HomeMenuController';
 import { OrgController } from './rest/OrgController';
 import { PageController } from './rest/PageController';
 import { SessionController } from './rest/SessionController';
 import { UserController } from './rest/UserController';
-import { AppDomainController } from './rest/AppDomainController';
+import { AppUIController } from './rest/AppUIController';
+import { TwoFactorController } from './rest/TwoFactorController';
 
-export const Providers = [SessionAuthController, OrgController, PageController, SessionController, UserController, MenuController, HeadIconController, AppDomainController];
+export const Providers = [
+  SessionAuthController,
+  OrgController,
+  PageController,
+  SessionController,
+  UserController,
+  HomeMenuController,
+  HeadMenuController,
+  AppUIController,
+  TwoFactorController,
+];
