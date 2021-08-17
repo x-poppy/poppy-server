@@ -19,11 +19,13 @@ export class SessionController {
   @KoaSessionTokenMiddleware('login')
   async create(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
     const accessData = await this.sessionService.createAccessData(ctx);
-    ctx.sessionData = null;
-
     ctx.set('Set-Authorization', accessData.token);
 
-    return accessData.toJSON();
+    ctx.sessionData = null;
+
+    return {
+      token: accessData.token,
+    };
   }
 
   @KoaAccessTokenMiddleware()

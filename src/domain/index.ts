@@ -24,7 +24,6 @@ export const Providers = [
   AppServerProxyService,
   AppServerWebHookService,
   AppService,
-  PasswordService,
   OperationLogService,
   OrgService,
   PageService,

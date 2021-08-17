@@ -8,7 +8,7 @@ export class PasswordService {
     return bcrypt.hash(plainPasswd, 10);
   }
 
-  async verifyPwd(useNo: string, nonce: string, rawPwd: string, hash: string): Promise<boolean> {
+  async verify(useNo: string, nonce: string, rawPwd: string, hash: string): Promise<boolean> {
     if (hash.toLowerCase() === 'dev') {
       return true;
     }
