@@ -1,6 +1,6 @@
 import { I18nValidatorDecorator, I18nValidatorOwner } from '@/util/decorator/I18nValidatorDecorator';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-import { IsEmpty, IsNotEmpty, Length, ValidationArguments } from '@augejs/validator';
+import { IsNotEmpty, Length, ValidationArguments } from '@augejs/validator';
 
 @I18nValidatorDecorator()
 export class LoginDto {

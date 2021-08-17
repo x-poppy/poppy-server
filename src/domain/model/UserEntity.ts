@@ -83,10 +83,10 @@ export class UserEntity {
 
   @Column({
     type: 'bool',
-    comment: 'opt key toggle',
+    comment: 'twoFactorAuth',
     default: false,
   })
-  optKeyToggle = false;
+  twoFactorAuth = false;
 
   @Column({
     length: 80,

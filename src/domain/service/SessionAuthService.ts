@@ -8,7 +8,7 @@ import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { OrgRepository } from '@/infrastructure/repository/OrgRepository';
 
 import { UserStatus } from '../model/UserEntity';
-import { BusinessError } from '../../util/BusinessError';
+import { BusinessError, ClientValidationError } from '../../util/BusinessError';
 
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
@@ -17,6 +17,7 @@ import { PasswordService } from '@/infrastructure/service/PasswordService';
 
 import { RolePermissionService } from './RolePermissionService';
 import { SessionData } from '@augejs/koa-session-token';
+import { TwoFactorListBo } from '../bo/TwoFactorListBo';
 
 @Provider()
 export class SessionAuthService {
@@ -25,9 +26,6 @@ export class SessionAuthService {
 
   @Inject(I18N_IDENTIFIER)
   i18n!: I18n;
-
-  @Inject(AppDomainRepository)
-  private appDomainRepository!: AppDomainRepository;
 
   @Inject(AppRepository)
   private appRepository!: AppRepository;
@@ -91,10 +89,12 @@ export class SessionAuthService {
       throw new BusinessError(I18nMessageKeys.Role_Is_Not_Exist);
     }
 
-    const verifyPwdResult = await this.passwordService.verifyPwd(user.userNo, user.nonce, loginDto.password, user.passwd);
+    const verifyPwdResult = await this.passwordService.verify(user.userNo, user.nonce, loginDto.password, user.passwd);
     if (!verifyPwdResult) {
+      // here is punish mechanism here for test the passwd.
+
       this.logger.warn(`User_Name_Or_Password_Is_InCorrect. userName: ${loginDto.userName}`);
-      throw new BusinessError(I18nMessageKeys.User_Name_Or_Password_Is_InCorrect);
+      throw new ClientValidationError(I18nMessageKeys.User_Name_Or_Password_Is_InCorrect);
     }
 
     const sessionData = ctx.createSessionData('login');
@@ -103,6 +103,10 @@ export class SessionAuthService {
     sessionData.set('userOrgNo', user.orgNo);
     sessionData.set('appNo', app.appNo);
     sessionData.set('appOrgNo', app.orgNo);
+
+    const twoFactorList = TwoFactorListBo.createFromUser(user);
+    sessionData.set('twoFactorAuth', user.twoFactorAuth && twoFactorList.hasTwoFactorAbility);
+
     sessionData.commit();
     await sessionData.save();
 

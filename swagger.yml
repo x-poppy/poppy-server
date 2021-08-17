@@ -5,22 +5,25 @@ info:
 
 tags:
 - name: "AppUI"
-  description: "App UI Resource"
+  description: "App UI service group serve for the client UI. This group of api should not cover by `Authorization`"
 
 - name: "Authorization"
-  description: "Authorization to `poppy server`"
+  description: "Authorization service group."
 
 - name: "Menu"
-  description: "Menu Entity (Need Session)"
+  description: "Menu service group. Include `HomeMenu` and `HeadMenu`"
 
 - name: "Org"
-  description: "Org Entity (Need Session)"
+  description: "Org service group."
 
-- name: "role"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
+- name: "Role"
+  description: "Role service group."
+
+- name: "User"
+  description: "User service group."
+
+- name: "App"
+  description: "App service group."
 
 consumes:
   - "application/json"
@@ -75,6 +78,17 @@ definitions:
       status:
         type: string
 
+  TwoFactorListBo:
+    type: object
+    properties:
+      email:
+        type:
+          - string
+          - "null"
+      optKey:
+        type:
+          - string
+          - "null"
 paths:
   /api/v1/app-ui/domain-info/{domain}:
     get:
@@ -149,7 +163,7 @@ paths:
         - "Authorization"
       parameters:
         - in: header
-          name: "session-token"
+          name: session-token
           required: true
           type: string
       responses:
@@ -164,6 +178,27 @@ paths:
           description: ""
       security:
         - accessToken: []
+
+  /api/v1/authorization/two-factor:
+    get:
+      tags:
+        - "Authorization"
+      parameters:
+        - in: query
+          name: userNo
+          type: string
+          required: true
+        - in: header
+          name: session-token
+          required: true
+          type: string
+      responses:
+        "200":
+          schema:
+            $ref: "#/definitions/TwoFactorListBo"
+          description: ""
+
+      deprecated: false
 
   /api/v1/menu/home-menu:
     get:
