@@ -4,7 +4,7 @@ import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
 import { SessionService } from '../../domain/service/SessionService';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
-import { KoaSessionTokenMiddleware } from '@augejs/koa-session-token';
+import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
 
 @Prefix('/api/v1/authorization/session')
 @Provider()
@@ -16,12 +16,12 @@ export class SessionController {
   private sessionService!: SessionService;
 
   @RequestMapping.Post('')
-  @KoaSessionTokenMiddleware('login')
+  @KoaStepTokenMiddleware('login', 'end')
   async create(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
     const accessData = await this.sessionService.createAccessData(ctx);
     ctx.set('Set-Authorization', accessData.token);
 
-    ctx.sessionData = null;
+    ctx.stepData = null;
 
     return {
       token: accessData.token,

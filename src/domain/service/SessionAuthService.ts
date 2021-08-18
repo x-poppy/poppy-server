@@ -16,7 +16,7 @@ import { UserRepository } from '@/infrastructure/repository/UserRepository';
 import { PasswordService } from '@/infrastructure/service/PasswordService';
 
 import { RolePermissionService } from './RolePermissionService';
-import { SessionData } from '@augejs/koa-session-token';
+import { StepData } from '@augejs/koa-step-token';
 import { TwoFactorListBo } from '../bo/TwoFactorListBo';
 
 @Provider()
@@ -45,7 +45,7 @@ export class SessionAuthService {
   @Inject(OrgRepository)
   orgRepository!: OrgRepository;
 
-  async auth(ctx: KoaContext, loginDto: LoginDto): Promise<SessionData> {
+  async auth(ctx: KoaContext, loginDto: LoginDto): Promise<StepData> {
     this.logger.info(`auth start. userName ${loginDto.userName} appNo: ${loginDto.appNo}`);
 
     const app = await this.appRepository.findByStatusNormal(loginDto.appNo);
@@ -97,21 +97,32 @@ export class SessionAuthService {
       throw new ClientValidationError(I18nMessageKeys.User_Name_Or_Password_Is_InCorrect);
     }
 
-    const sessionData = ctx.createSessionData('login');
-    sessionData.set('userNo', user.userNo);
-    sessionData.set('userRoleNo', userRole.roleNo);
-    sessionData.set('userOrgNo', user.orgNo);
-    sessionData.set('appNo', app.appNo);
-    sessionData.set('appOrgNo', app.orgNo);
-
     const twoFactorList = TwoFactorListBo.createFromUser(user);
-    sessionData.set('twoFactorAuth', user.twoFactorAuth && twoFactorList.hasTwoFactorAbility);
+    const twoFactorAuth = user.twoFactorAuth && twoFactorList.hasTwoFactorAbility;
 
-    sessionData.commit();
-    await sessionData.save();
+    const stepData = ctx.createStepData('login');
+    stepData.set('userNo', user.userNo);
+    stepData.set('userRoleNo', userRole.roleNo);
+    stepData.set('userOrgNo', user.orgNo);
+    stepData.set('appNo', app.appNo);
+    stepData.set('appOrgNo', app.orgNo);
+    stepData.set('twoFactorAuth', twoFactorAuth);
+
+    const twoFactorAuthSteps = [];
+    if (twoFactorAuth) {
+      stepData.set('twoFactorAuthList', {
+        email: twoFactorList.email,
+        opt: twoFactorList.opt,
+      });
+      twoFactorAuthSteps.push('twoFactorList', 'twoFactorAuth');
+    }
+
+    stepData.steps = [...twoFactorAuthSteps, 'end'].filter(Boolean) as string[];
+    stepData.commit();
+    await stepData.save();
 
     this.logger.info(`auth end. userName ${loginDto.userName} domain: ${loginDto.appNo}`);
 
-    return sessionData;
+    return stepData;
   }
 }

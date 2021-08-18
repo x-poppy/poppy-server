@@ -12,11 +12,10 @@ export class SessionAuthController {
 
   @RequestMapping.Post('')
   async auth(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(LoginDto) loginDTO: LoginDto): Promise<Record<string, string | boolean>> {
-    const sessionData = await this.authService.auth(ctx, loginDTO as LoginDto);
+    const stepData = await this.authService.auth(ctx, loginDTO as LoginDto);
     return {
-      token: sessionData.token,
-      userNo: sessionData.get<string>('userNo'),
-      twoFactorAuth: sessionData.get<boolean>('twoFactorAuth'),
+      token: stepData.token,
+      twoFactorAuth: stepData.get<boolean>('twoFactorAuth'),
     };
   }
 }

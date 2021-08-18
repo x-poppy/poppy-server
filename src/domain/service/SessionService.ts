@@ -9,7 +9,7 @@ import { AppConfigKeys } from '@/util/AppConfigKeys';
 
 import { AppConfigService } from './AppConfigService';
 import { RolePermissionService } from './RolePermissionService';
-import { SessionData } from '@augejs/koa-session-token';
+import { StepData } from '@augejs/koa-step-token';
 
 @Provider()
 export class SessionService {
@@ -41,10 +41,10 @@ export class SessionService {
   }
 
   async createAccessData(context: KoaContext): Promise<AccessData> | never {
-    const sessionData = context.sessionData as SessionData;
+    const stepData = context.stepData as StepData;
 
-    const userNo = sessionData.get<string>('userNo');
-    const userOrgNo = sessionData.get<string>('userRoleNo');
+    const userNo = stepData.get<string>('userNo');
+    const userOrgNo = stepData.get<string>('userRoleNo');
 
     this.logger.info(`createAccessData start. userNo: ${userNo}`);
 
@@ -55,10 +55,10 @@ export class SessionService {
     const accessData = context.createAccessData(userNo, process.env.NODE_ENV !== 'production' ? '2h' : undefined);
 
     accessData.set('userNo', userNo);
-    accessData.set('userRoleNo', sessionData.get('userRoleNo'));
-    accessData.set('userOrgNo', sessionData.get('userOrgNo'));
-    accessData.set('appNo', sessionData.get('appNo'));
-    accessData.set('appOrgNo', sessionData.get('appOrgNo'));
+    accessData.set('userRoleNo', stepData.get('userRoleNo'));
+    accessData.set('userOrgNo', stepData.get('userOrgNo'));
+    accessData.set('appNo', stepData.get('appNo'));
+    accessData.set('appOrgNo', stepData.get('appOrgNo'));
 
     accessData.set('userPermissions', userPermissions.toJson());
 

@@ -78,17 +78,20 @@ definitions:
       status:
         type: string
 
-  TwoFactorListBo:
+  TwoFactorAuthDto:
     type: object
     properties:
-      email:
+      code:
         type:
           - string
-          - "null"
-      optKey:
+
+      type:
         type:
           - string
-          - "null"
+        enum:
+          - opt
+          - email
+
 paths:
   /api/v1/app-ui/domain-info/{domain}:
     get:
@@ -163,7 +166,7 @@ paths:
         - "Authorization"
       parameters:
         - in: header
-          name: session-token
+          name: step-token
           required: true
           type: string
       responses:
@@ -179,26 +182,36 @@ paths:
       security:
         - accessToken: []
 
-  /api/v1/authorization/two-factor:
-    get:
+  /api/v1/authorization/two-factor/list:
+    post:
       tags:
         - "Authorization"
       parameters:
-        - in: query
-          name: userNo
-          type: string
-          required: true
         - in: header
-          name: session-token
+          name: step-token
           required: true
           type: string
       responses:
         "200":
-          schema:
-            $ref: "#/definitions/TwoFactorListBo"
           description: ""
 
-      deprecated: false
+  /api/v1/authorization/two-factor/auth:
+    post:
+      tags:
+        - "Authorization"
+      parameters:
+        - in: header
+          name: step-token
+          required: true
+          type: string
+        - in: body
+          name: twoFactorAuthDto
+          required: true
+          schema:
+            $ref: "#/definitions/TwoFactorAuthDto"
+      responses:
+        "200":
+          description: ""
 
   /api/v1/menu/home-menu:
     get:

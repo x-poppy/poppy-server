@@ -1,6 +1,6 @@
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
-import { KoaSessionTokenMiddleware } from '@augejs/koa-session-token';
+import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
 
 import { TwoFactorListBo } from '@/domain/bo/TwoFactorListBo';
 import { TwoFactorService } from '@/domain/service/TwoFactorService';
@@ -16,25 +16,26 @@ export class TwoFactorController {
   @Inject(TwoFactorService)
   twoFactorService!: TwoFactorService;
 
-  @RequestMapping.Get('')
-  list(@RequestParams.Query('userNo') userNo: string): Promise<TwoFactorListBo> {
-    if (!userNo) {
-      throw new ClientValidationError(I18nMessageKeys.User_No_Empty_Error);
-    }
-
-    return this.twoFactorService.list(userNo);
-  }
-
-  @KoaSessionTokenMiddleware(['login'])
-  @RequestMapping.Post('')
-  async auth(@RequestParams.Context() ctx: KoaContext, @RequestValidator(TwoFactorAuthDto) twoFactorAuthDto: TwoFactorAuthDto): Promise<Record<string, string>> {
-    const sessionData = await this.twoFactorService.auth(ctx, twoFactorAuthDto);
-
-    // remove the last
-    ctx.sessionData = null;
+  @KoaStepTokenMiddleware(['login'], 'twoFactorList')
+  @RequestMapping.Post()
+  async list(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
+    const stepData = await this.twoFactorService.list(ctx);
 
     return {
-      token: sessionData.token,
+      token: stepData.token,
+      list: stepData.get<Record<string, boolean>>('twoFactorAuthList'),
+    };
+  }
+
+  @KoaStepTokenMiddleware(['login'], 'twoFactorAuth')
+  @RequestMapping.Post()
+  async auth(
+    @RequestParams.Context() ctx: KoaContext,
+    @RequestParams.Body() @RequestValidator(TwoFactorAuthDto) twoFactorAuthDto: TwoFactorAuthDto,
+  ): Promise<Record<string, string>> {
+    const stepData = await this.twoFactorService.auth(ctx, twoFactorAuthDto);
+    return {
+      token: stepData.token,
     };
   }
 }
