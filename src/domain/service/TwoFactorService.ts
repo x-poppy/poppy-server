@@ -5,7 +5,7 @@ import { BusinessError, ClientValidationError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
-import { SessionData } from '@augejs/koa-session-token';
+import { StepData } from '@augejs/koa-step-token';
 import { TwoFactorListBo } from '../bo/TwoFactorListBo';
 
 @Provider()
@@ -19,20 +19,21 @@ export class TwoFactorService {
   @Inject(OneTimePasswordService)
   oneTimePasswordService!: OneTimePasswordService;
 
-  async list(userNo: string): Promise<TwoFactorListBo> {
-    const user = await this.userRepository.findByStatusNormal(userNo);
-    if (!user) {
-      this.logger.warn(`User_Is_Not_Exist. userNo: ${userNo}`);
-      throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
-    }
+  async list(ctx: KoaContext): Promise<StepData> {
+    const stepData = ctx.stepData as StepData;
 
-    return TwoFactorListBo.createFromUser(user);
+    const newStepData = ctx.createStepData(stepData.sessionName, stepData.maxAge, stepData.toJSON());
+    newStepData.popStep();
+    await newStepData.save();
+    ctx.stepData = newStepData;
+
+    return newStepData;
   }
 
-  async auth(ctx: KoaContext, twoFactorAuthDto: TwoFactorAuthDto): Promise<SessionData> {
-    const preSessionData = ctx.sessionData as SessionData;
+  async auth(ctx: KoaContext, twoFactorAuthDto: TwoFactorAuthDto): Promise<StepData> {
+    const stepData = ctx.stepData as StepData;
 
-    const userNo = preSessionData.get<string>('userNo');
+    const userNo = stepData.get<string>('userNo');
 
     const user = await this.userRepository.findByStatusNormal(userNo);
     if (!user) {
@@ -52,10 +53,11 @@ export class TwoFactorService {
       throw new ClientValidationError(I18nMessageKeys.User_Name_Or_Password_Is_InCorrect);
     }
 
-    const sessionData = ctx.createSessionData(preSessionData.sessionName, preSessionData.maxAge, preSessionData.toJSON());
-    sessionData.commit();
-    await sessionData.save();
+    const newStepData = ctx.createStepData(stepData.sessionName, stepData.maxAge, stepData.toJSON());
+    newStepData.popStep();
+    await newStepData.save();
+    ctx.stepData = newStepData;
 
-    return sessionData;
+    return newStepData;
   }
 }

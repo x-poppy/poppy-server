@@ -9,7 +9,7 @@ import { Log4js } from '@augejs/log4js';
 import { MailTransport } from '@augejs/mail';
 import { Typeorm } from '@augejs/typeorm';
 import { KoaAccessTokenManager } from '@augejs/koa-access-token';
-import { KoaSessionTokenManager } from '@augejs/koa-session-token';
+import { KoaStepTokenManager } from '@augejs/koa-step-token';
 import { Views } from '@augejs/views';
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 import { KoaSwagger } from '@augejs/koa-swagger';
@@ -34,7 +34,7 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @KoaSwagger()
 @RedisConnection()
 @KoaAccessTokenManager()
-@KoaSessionTokenManager()
+@KoaStepTokenManager()
 @KoaBodyParserMiddleware()
 @KoaSend()
 @Module({

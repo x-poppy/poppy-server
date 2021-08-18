@@ -15,13 +15,6 @@ redis:
 views:
   suffix: 'ejs'
 
-apidoc:
-  title: 'Poppy Server API Spec'
-  version: 0.3.0
-  description: 'poppy server'
-  header: |
-    `poppy server` is an app system.
-
 typeorm:
   type: mysql
   host: 106.14.147.173
