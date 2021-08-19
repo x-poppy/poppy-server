@@ -15,5 +15,5 @@ module.exports = {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
   testRegex: '.test.ts$',
-  moduleFileExtensions: ['ts', 'js'],
+  moduleFileExtensions: ['ts', 'js', 'node'],
 };
