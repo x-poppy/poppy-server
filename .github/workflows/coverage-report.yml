@@ -17,8 +17,7 @@ jobs:
       - run: npm ci
       - uses: artiomtr/jest-coverage-report-action@v2.0-rc.3
         with:
-          github-token: ${{ secrets.AUGEJS_GITHUB_TOKEN }}
-          threshold: 0 # optional parameter
           test-script: npm run test
         env:
+          TEST_COVERAGE_THRESHOLD: 0
           CI: true
