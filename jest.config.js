@@ -3,7 +3,17 @@
 const { pathsToModuleNameMapper } = require('ts-jest/utils');
 const { compilerOptions } = require('./tsconfig.json');
 
+const coverageThreshold = parseInt(process.env.TEST_COVERAGE_THRESHOLD) || 0;
+
 module.exports = {
+  coverageThreshold: {
+    global: {
+      branches: coverageThreshold,
+      functions: coverageThreshold,
+      lines: coverageThreshold,
+      statements: coverageThreshold,
+    },
+  },
   rootDir: '.',
   preset: 'ts-jest',
   testEnvironment: 'node',
