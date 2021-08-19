@@ -9,8 +9,8 @@
     "postbuild": "copyfiles config/** locales/** package.json LICENSE swagger.yml dist",
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
-    "test": "jest --passWithNoTests --coverage src",
-    "test:ci": "jest --passWithNoTests --silent --ci --coverage --coverageReporters=\"json\" --coverageReporters=\"text\" --coverageReporters=\"text-summary\" src",
+    "test": "jest --passWithNoTests --coverage --outputFile=result.json src",
+    "test:ci": "jest --silent --ci --coverage --testLocationInResults --json --outputFile=\"report.json\"",
     "test:dev": "jest --watch --coverage src",
     "prepare": "husky install"
   },

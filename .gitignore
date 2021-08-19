@@ -41,4 +41,4 @@ build/config\.gypi
 dist/
 tsconfig.tsbuildinfo
 
-public/apidoc
+report.json
