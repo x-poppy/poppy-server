@@ -18,7 +18,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   setupFiles: ['./src/jest.setup.ts'],
-  coverageDirectory: '../coverage',
+  coverageDirectory: 'coverage',
   collectCoverageFrom: ['**/*.(t|j)s'],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/' }),
   transform: {
