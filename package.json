@@ -10,6 +10,7 @@
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
     "test": "jest --passWithNoTests --coverage src",
+    "test:ci": "jest --passWithNoTests --silent --ci --coverage --coverageReporters=\"json\" --coverageReporters=\"text\" --coverageReporters=\"text-summary\" src",
     "test:dev": "jest --watch --coverage src",
     "prepare": "husky install"
   },
