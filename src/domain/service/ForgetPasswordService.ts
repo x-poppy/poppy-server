@@ -1,4 +1,3 @@
-import { ForgetPasswordDto } from '@/facade/dto/ForgetPasswordDto';
 import { LoginDto } from '@/facade/dto/LoginDto';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
