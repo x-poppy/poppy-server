@@ -1,7 +1,9 @@
+import { RequestValidator } from '@/util/decorator/RequestValidatorDecorator';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
-import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
+import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { OrgService } from '../../domain/service/OrgService';
+import { CreateOrgDto } from '../dto/CreateOrgDto';
 
 @Prefix('/api/v1/org')
 @Provider()
@@ -12,12 +14,14 @@ export class OrgController {
   @KoaAccessTokenMiddleware()
   @RequestMapping.Get('')
   async list(
-    @RequestParams.Context() context: KoaContext,
+    @RequestParams.Context() ctx: KoaContext,
     @RequestParams.Query('offset') @RequestParams((value: string) => parseInt(value)) offset: number,
     @RequestParams.Query('size') @RequestParams((value: string) => parseInt(value)) size: number,
   ): Promise<Record<string, unknown>> {
-    const parent = (context.accessData?.get('orgNo') as string) ?? null;
-    const appNo = (context.accessData?.get('appNo') as string) ?? null;
+    const accessData = ctx.accessData as AccessData;
+    const parent = accessData.get<string>('orgNo') ?? null;
+    const appNo = accessData.get<string>('appNo') ?? null;
+
     const [list, count] = await this.orgService.list({
       offset,
       size,
@@ -30,21 +34,21 @@ export class OrgController {
     };
   }
 
-  // @AccessTokenMiddleware()
-  // @RequestMapping.Post('/')
-  // async create(
-  //   @RequestParams.Context() context: KoaContext,
-  // ) {
-  //   const parent = context.accessData?.get('orgNo') as bigint;
+  @KoaAccessTokenMiddleware()
+  @RequestMapping.Post('/')
+  async create(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(CreateOrgDto) createOrgDto: CreateOrgDto): Promise<Record<string, unknown>> {
+    await this.orgService.create({
+      appNo: 'xxxx',
+      orgDisplayName: 'xxxx',
+      userAccountName: 'xxx',
+      userPassword: 'xxxx',
+      userDisplayName: 'xxx',
+      roleDisplayName: 'xxxx',
+    });
+    return {};
+  }
 
-  // }
-
-  // @AccessTokenMiddleware()
-  // @RequestMapping.Get('/:orgNo')
-  // async find() {
-  // }
-
-  // @AccessTokenMiddleware()
+  // @KoaAccessTokenMiddleware()
   // @RequestMapping.Put('/:orgNo')
   // async update() {
   // }

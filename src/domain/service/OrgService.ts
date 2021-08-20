@@ -3,6 +3,7 @@ import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
+import { KoaContext } from '@augejs/koa';
 import { getConnection } from '@augejs/typeorm';
 import { OrgRepository } from '../../infrastructure/repository/OrgRepository';
 import { BusinessError } from '../../util/BusinessError';
