@@ -10,6 +10,6 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "no-non-null-assertion": 0
+    "@typescript-eslint/no-non-null-assertion": "off"
   }
 }

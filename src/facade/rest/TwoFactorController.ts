@@ -1,13 +1,8 @@
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
-
-import { TwoFactorListBo } from '@/domain/bo/TwoFactorListBo';
 import { TwoFactorService } from '@/domain/service/TwoFactorService';
-import { ClientValidationError } from '@/util/BusinessError';
 import { RequestValidator } from '@/util/decorator/RequestValidatorDecorator';
-import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-
 import { TwoFactorAuthDto } from '../dto/TwoFactorAuthDto';
 
 @Prefix('/api/v1/authorization/two-factor')
@@ -17,7 +12,7 @@ export class TwoFactorController {
   twoFactorService!: TwoFactorService;
 
   @KoaStepTokenMiddleware(['login'], 'twoFactorList')
-  @RequestMapping.Post()
+  @RequestMapping.Get('')
   async list(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
     const stepData = await this.twoFactorService.list(ctx);
 
@@ -28,7 +23,7 @@ export class TwoFactorController {
   }
 
   @KoaStepTokenMiddleware(['login'], 'twoFactorAuth')
-  @RequestMapping.Post()
+  @RequestMapping.Post('')
   async auth(
     @RequestParams.Context() ctx: KoaContext,
     @RequestParams.Body() @RequestValidator(TwoFactorAuthDto) twoFactorAuthDto: TwoFactorAuthDto,

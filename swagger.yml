@@ -10,6 +10,9 @@ tags:
 - name: "Authorization"
   description: "Authorization service group."
 
+- name: "User"
+  description: "User service group."
+
 - name: "Menu"
   description: "Menu service group. Include `HomeMenu` and `HeadMenu`"
 
@@ -18,9 +21,6 @@ tags:
 
 - name: "Role"
   description: "Role service group."
-
-- name: "User"
-  description: "User service group."
 
 - name: "App"
   description: "App service group."
@@ -144,7 +144,7 @@ paths:
         "200":
           description: ""
 
-  /api/v1/authorization/session-auth:
+  /api/v1/authorization/session/auth:
     post:
       tags:
         - "Authorization"
@@ -182,8 +182,8 @@ paths:
       security:
         - accessToken: []
 
-  /api/v1/authorization/two-factor/list:
-    post:
+  /api/v1/authorization/two-factor:
+    get:
       tags:
         - "Authorization"
       parameters:
@@ -194,8 +194,6 @@ paths:
       responses:
         "200":
           description: ""
-
-  /api/v1/authorization/two-factor/auth:
     post:
       tags:
         - "Authorization"

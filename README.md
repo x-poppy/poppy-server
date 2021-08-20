@@ -10,19 +10,23 @@
 
 ## Description
 
-`poppy-server` is a web sever which is used for management system.
+`poppy-server` is a web admin sever.
 
-## glossary
+## Documents
 
-### Org
+https://github.com/x-poppy/x-poppy.github.io
 
-`Org` is a group of users and children organizations.
+## Maintainers
 
-### App
+[Alex Zhang](https://github.com/alex-zhang).
 
-`App` is a group of pages.
 
-### User
+## Contributing
 
-`User`
+Feel free to dive in! [Open an issue](https://github.com/x-poppy/poppy-server/issues) or submit PRs.
 
+`poppy-server` follows the [Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
+
+## License
+
+[MIT](LICENSE) © x-poppy

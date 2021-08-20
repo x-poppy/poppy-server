@@ -53,6 +53,12 @@ export class UserRepository {
     return userRepository.save(user);
   }
 
+  async updateUserPassword(userNo: string, passwd: string): Promise<void> {
+    await this.userRepository.update(userNo, {
+      passwd,
+    });
+  }
+
   async findByStatusNormal(userNo: string): Promise<UserEntity | undefined> {
     return await this.userRepository.findOne(userNo.toString(), {
       where: {
