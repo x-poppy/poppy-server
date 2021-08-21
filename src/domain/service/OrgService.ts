@@ -3,7 +3,7 @@ import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { KoaContext } from '@augejs/koa';
+import randomPassword from 'secure-random-password';
 import { getConnection } from '@augejs/typeorm';
 import { OrgRepository } from '../../infrastructure/repository/OrgRepository';
 import { BusinessError } from '../../util/BusinessError';
@@ -16,7 +16,7 @@ interface CreatOpts {
   roleDisplayName: string;
   roleDesc?: string | null;
   userAccountName: string;
-  userPassword: string;
+  userPassword?: string;
   userDisplayName?: string | null;
   userMobileNo?: string | null;
   userEmailAddr?: string | null;
@@ -108,13 +108,19 @@ export class OrgService {
 
       // step 3 admin user
       this.logger.info(`create the org start steps: creat org user entity start. appNo: ${opts.appNo} roleNo: ${createdRole.roleNo}`);
+      const userPassword =
+        opts.userPassword ??
+        randomPassword.randomPassword({
+          length: 32,
+          characters: [randomPassword.lower, randomPassword.digits, randomPassword.upper, randomPassword.symbols],
+        });
       const createdUser = await this.userRepository.create(
         {
           orgNo: createdOrg.orgNo,
           appNo: app.appNo,
           roleNo: createdRole.roleNo,
           accountName: opts.userAccountName,
-          password: opts.userPassword,
+          password: userPassword,
           displayName: opts.userDisplayName ?? opts.userAccountName,
           mobileNo: opts.userMobileNo ?? null,
           emailAddr: opts.userEmailAddr ?? null,

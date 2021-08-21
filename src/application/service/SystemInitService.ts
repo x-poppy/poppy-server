@@ -1,4 +1,3 @@
-import path from 'path';
 import crypto from 'crypto';
 import randomPassword from 'secure-random-password';
 

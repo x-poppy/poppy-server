@@ -1,1 +1,4 @@
-export class CreateOrgDto {}
+export class CreateOrgDto {
+  orgDisplayName!: string;
+  userAccountName!: string;
+}

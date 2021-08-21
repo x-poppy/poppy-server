@@ -37,13 +37,14 @@ export class OrgController {
   @KoaAccessTokenMiddleware()
   @RequestMapping.Post('/')
   async create(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(CreateOrgDto) createOrgDto: CreateOrgDto): Promise<Record<string, unknown>> {
+    const accessData = ctx.accessData as AccessData;
+    const appNo = accessData.get<string>('appNo');
+
     await this.orgService.create({
-      appNo: 'xxxx',
-      orgDisplayName: 'xxxx',
-      userAccountName: 'xxx',
-      userPassword: 'xxxx',
-      userDisplayName: 'xxx',
-      roleDisplayName: 'xxxx',
+      appNo,
+      orgDisplayName: createOrgDto.orgDisplayName,
+      userAccountName: createOrgDto.userAccountName,
+      roleDisplayName: 'Admin',
     });
     return {};
   }
