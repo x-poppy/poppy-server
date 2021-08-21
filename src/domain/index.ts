@@ -11,7 +11,6 @@ import { UserService } from './service/UserService';
 import { AppServerWebHookService } from './service/ServerWebHookService';
 import { AppServerProxyService } from './service/ServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
-import { SessionAuthService } from './service/SessionAuthService';
 import { HomeMenuService } from './service/HomeMenuService';
 import { HeadMenuService } from './service/HeadMenuService';
 import { AppThemeService } from './service/AppThemeService';
@@ -31,7 +30,6 @@ export const Providers = [
   RolePermissionService,
   SessionService,
   UserService,
-  SessionAuthService,
   HomeMenuService,
   HeadMenuService,
   AppThemeService,
