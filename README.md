@@ -25,10 +25,10 @@ Feel free to dive in! [Open an issue](https://github.com/x-poppy/poppy-server/is
 
 `poppy-server` follow below standards:
 
-+[Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
-+[The Standard of Code Review](https://google.github.io/eng-practices/review/reviewer/standard.html)
-+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
-+[Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
++ [Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
++ [The Standard of Code Review](https://google.github.io/eng-practices/review/reviewer/standard.html)
++ [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
++ [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
 
 ## License
 
