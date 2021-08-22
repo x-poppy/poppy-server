@@ -28,6 +28,8 @@ Feel free to dive in! [Open an issue](https://github.com/x-poppy/poppy-server/is
 
 `poppy-server` follows the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
+`poppy-server` follows the [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
+
 ## License
 
 [MIT](LICENSE) © x-poppy
