@@ -1,12 +1,13 @@
 # poppy-server
 
-[![npm version](https://badge.fury.io/js/%40augejs%2Fcore.svg)](https://www.npmjs.com/package/@augejs/core) [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
-
 :star2: Star us on GitHub — it helps! :clap:
 
 ## Table of Contents
 
 - [Description](#description)
+- [Documents](#documents)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Description
 
@@ -16,16 +17,16 @@
 
 https://github.com/x-poppy/x-poppy.github.io
 
-## Maintainers
-
-[Alex Zhang](https://github.com/alex-zhang).
-
 
 ## Contributing
 
 Feel free to dive in! [Open an issue](https://github.com/x-poppy/poppy-server/issues) or submit PRs.
 
 `poppy-server` follows the [Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
+
+`poppy-server` follows the [The Standard of Code Review](https://google.github.io/eng-practices/review/reviewer/standard.html)
+
+`poppy-server` follows the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ## License
 
