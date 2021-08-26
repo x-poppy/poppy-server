@@ -16,7 +16,7 @@ export class RestfulAPIHandlerService {
     this.logger.info(ctx.method + ' ' + ctx.url);
   }
 
-  async handlerError(ctx: KoaContext, err: any): Promise<void> {
+  async handlerError(ctx: KoaContext, err: unknown): Promise<void> {
     if (err instanceof ClientValidationError) {
       const errorMessage = this.i18n.formatMessage({ id: err.errorMessage }, err.errorMessageValues ?? {});
       ctx.status = HttpStatus.StatusCodes.BAD_REQUEST;

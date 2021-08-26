@@ -1,24 +1,28 @@
 import { UserEntity } from '../model/UserEntity';
 
-export class TwoFactorListBo {
-  static createFromUser(userEntity: UserEntity): TwoFactorListBo {
+interface TwoFactorListItemBo {
+  type: string;
+}
+
+export class TwoFactorListBo extends Array<TwoFactorListItemBo> {
+  static createFromUser(user: UserEntity): TwoFactorListBo {
     const twoFactorList = new TwoFactorListBo();
-    twoFactorList.email = !!userEntity.emailAddr;
-    twoFactorList.opt = !!userEntity.optKey;
+    const twoFactorAuth = user.twoFactorAuth;
+
+    if (twoFactorAuth) {
+      if (user.emailAddr) {
+        twoFactorList.push({
+          type: 'email',
+        });
+      }
+
+      if (user.optKey) {
+        twoFactorList.push({
+          type: 'opt',
+        });
+      }
+    }
+
     return twoFactorList;
-  }
-
-  static createFromJSON(json: Record<string, unknown>): TwoFactorListBo {
-    const twoFactorList = new TwoFactorListBo();
-    twoFactorList.email = !!json.email;
-    twoFactorList.opt = !!json.opt;
-    return twoFactorList;
-  }
-
-  email = false;
-  opt = false;
-
-  get hasTwoFactorAbility(): boolean {
-    return this.email || this.opt;
   }
 }

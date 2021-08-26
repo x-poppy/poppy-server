@@ -62,7 +62,6 @@ export class SystemInitService {
         characters: [randomPassword.lower, randomPassword.digits, randomPassword.upper, randomPassword.symbols],
       });
 
-      crypto.randomBytes(16).toString('hex');
       rootOrg = await this.orgService.create({
         appNo: rootApp.appNo,
         orgDisplayName: 'Root Org',

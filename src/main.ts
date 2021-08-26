@@ -51,6 +51,10 @@ class AppModule {
   async globalHandler(ctx: KoaContext, next: CallableFunction): Promise<void> {
     try {
       await next();
+
+      // mark as x-poppy
+      ctx.set('X-Powered-By', 'X-Poppy');
+
       if (ctx.body === null) {
         ctx.throw(HttpStatus.StatusCodes.NOT_FOUND);
       }

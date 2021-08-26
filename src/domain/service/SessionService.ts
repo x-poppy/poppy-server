@@ -102,7 +102,6 @@ export class SessionService {
     }
 
     const twoFactorList = TwoFactorListBo.createFromUser(user);
-    const twoFactorAuth = user.twoFactorAuth && twoFactorList.hasTwoFactorAbility;
 
     const stepData = ctx.createStepData('login');
     stepData.set('userNo', user.userNo);
@@ -110,17 +109,13 @@ export class SessionService {
     stepData.set('userOrgNo', user.orgNo);
     stepData.set('appNo', app.appNo);
     stepData.set('appOrgNo', app.orgNo);
-    stepData.set('twoFactorAuth', twoFactorAuth);
+    stepData.set('twoFactorAuth', twoFactorList.length > 0);
 
     const twoFactorAuthSteps = [];
-    if (twoFactorAuth) {
-      stepData.set('twoFactorAuthList', {
-        email: twoFactorList.email,
-        opt: twoFactorList.opt,
-      });
+    if (twoFactorList.length > 0) {
+      stepData.set('twoFactorAuthList', twoFactorList);
       twoFactorAuthSteps.push('twoFactorList', 'twoFactorAuth');
     }
-
     stepData.steps = [...twoFactorAuthSteps, 'end'].filter(Boolean) as string[];
     stepData.commit();
     await stepData.save();
