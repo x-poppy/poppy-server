@@ -23,12 +23,14 @@ export const Providers = [
   AppDomainRepository,
   AppRepository,
   AppServerProxyRepository,
+  AppThemeRepository,
+
   OperationLogRepository,
   OrgRepository,
-  RoleRepository,
-  RolePermissionRepository,
   PageRepository,
+
+  RolePermissionRepository,
   ResourceRepository,
+  RoleRepository,
   UserRepository,
-  AppThemeRepository,
 ];

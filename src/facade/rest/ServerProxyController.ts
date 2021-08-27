@@ -3,9 +3,9 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
-@Prefix('/api/v1/proxy')
+@Prefix('/api/v1/extension/server-proxy')
 @Provider()
-export class ProxyController {
+export class ServerProxyController {
   @Inject(AppServerProxyService)
   appServerProxyService!: AppServerProxyService;
 

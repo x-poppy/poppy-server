@@ -54,7 +54,7 @@ export class ForgetPasswordService {
     }
 
     const twoFactorList = TwoFactorListBo.createFromUser(user);
-    const twoFactorAuth = user.twoFactorAuth && twoFactorList.hasTwoFactorAbility;
+    const twoFactorAuth = true; //user.twoFactorAuth && twoFactorList.hasTwoFactorAbility;
 
     const hashPassword = await this.passwordService.hashPwd(user.userNo, user.nonce, forgetPasswordDto.password);
 
@@ -65,10 +65,10 @@ export class ForgetPasswordService {
 
     const twoFactorAuthSteps = [];
     if (twoFactorAuth) {
-      stepData.set('twoFactorAuthList', {
-        email: twoFactorList.email,
-        opt: twoFactorList.opt,
-      });
+      // stepData.set('twoFactorAuthList', {
+      //   email: twoFactorList.email,
+      //   opt: twoFactorList.opt,
+      // });
       twoFactorAuthSteps.push('twoFactorList', 'twoFactorAuth');
     }
 

@@ -211,7 +211,7 @@ paths:
         "200":
           description: ""
 
-  /api/v1/menu/home-menu:
+  /api/v1/resource/home-menu:
     get:
       summary: "Get the app menu tree for current user"
       tags:
@@ -222,11 +222,22 @@ paths:
       security:
         - accessToken: []
 
-  /api/v1/menu/head-menu:
+  /api/v1/resource/head-menu:
     get:
       summary: "Get the app head icon for current user"
       tags:
         - "Menu"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/role/role:
+    get:
+      summary: "Get Role list for current user"
+      tags:
+        - "Role"
       responses:
         "200":
           description: ""
@@ -243,9 +254,6 @@ paths:
           description: ""
       security:
         - accessToken: []
-
-
-      deprecated: false
 
 externalDocs:
   description: "http://swagger.io"

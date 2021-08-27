@@ -1,7 +1,7 @@
 import { ResourceStatus } from '@/domain/model/ResourceEntity';
 import { RoleEntity } from '@/domain/model/RoleEntity';
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
+import { EntityManager, getRepository, LessThanOrEqual, Repository } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
@@ -19,8 +19,8 @@ interface ListOpts {
   offset: number;
   size: number;
   appNo: string;
-  orgNo?: string | null;
-  parent?: string | null;
+  level: number;
+  orgNo: string;
 }
 
 @Provider()
@@ -57,16 +57,20 @@ export class RoleRepository {
 
   async list(opts: ListOpts): Promise<[RoleEntity[], number]> {
     return this.roleRepository.findAndCount({
+      skip: opts.offset,
+      take: opts.size,
       where: {
-        skip: opts.offset,
-        take: opts.size,
         appNo: opts.appNo,
         orgNo: opts.orgNo,
-        parent: opts.parent,
+        level: LessThanOrEqual(opts.level),
       },
       order: {
         createAt: 'DESC',
       },
     });
+  }
+
+  async delete(roleNo: string): Promise<void> {
+    await this.roleRepository.delete(roleNo);
   }
 }

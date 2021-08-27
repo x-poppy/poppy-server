@@ -3,9 +3,9 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
-@Prefix('/api/v1/role/role')
+@Prefix('/api/v1/app/app')
 @Provider()
-export class RoleController {
+export class AppController {
   @Inject(RoleService)
   roleService!: RoleService;
 

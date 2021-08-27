@@ -1,5 +1,5 @@
 import { Provider } from '@augejs/core';
-import { EntityManager, FindConditions, FindOneOptions, getRepository, Repository } from '@augejs/typeorm';
+import { EntityManager, FindConditions, getRepository, Repository } from '@augejs/typeorm';
 import { AppDomainEntity, AppDomainStatus } from '../../domain/model/AppDomainEntity';
 
 interface CreateOpts {

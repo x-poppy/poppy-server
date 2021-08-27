@@ -1,7 +1,6 @@
 import { AppConfigService } from './service/AppConfigService';
 import { AppDomainService } from './service/AppDomainService';
 import { AppService } from './service/AppService';
-import { PasswordService } from '../infrastructure/service/PasswordService';
 import { OperationLogService } from './service/OperationLogService';
 import { OrgService } from './service/OrgService';
 import { PageService } from './service/PageService';
@@ -16,23 +15,30 @@ import { HeadMenuService } from './service/HeadMenuService';
 import { AppThemeService } from './service/AppThemeService';
 import { AppUIService } from './service/AppUIService';
 import { TwoFactorService } from './service/TwoFactorService';
+import { RoleService } from './service/RoleService';
+import { ForgetPasswordService } from './service/ForgetPasswordService';
 
 export const Providers = [
   AppConfigService,
   AppDomainService,
+  AppResourceService,
   AppServerProxyService,
   AppServerWebHookService,
   AppService,
+  AppThemeService,
+  AppUIService,
+  ForgetPasswordService,
+
+  HomeMenuService,
+  HeadMenuService,
+
   OperationLogService,
   OrgService,
   PageService,
-  AppResourceService,
+
   RolePermissionService,
+  RoleService,
   SessionService,
-  UserService,
-  HomeMenuService,
-  HeadMenuService,
-  AppThemeService,
-  AppUIService,
   TwoFactorService,
+  UserService,
 ];

@@ -49,13 +49,15 @@ export class OrgController {
     return {};
   }
 
-  // @KoaAccessTokenMiddleware()
-  // @RequestMapping.Put('/:orgNo')
-  // async update() {
-  // }
+  @KoaAccessTokenMiddleware()
+  @RequestMapping.Put('/:orgNo')
+  async update(): Promise<Record<string, unknown>> {
+    return {};
+  }
 
-  // @AccessTokenMiddleware()
-  // @RequestMapping.Delete('/:orgNo')
-  // async delete() {
-  // }
+  @KoaAccessTokenMiddleware()
+  @RequestMapping.Delete('/:orgNo')
+  async delete(@RequestParams.Params('orgNo') orgNo: string): Promise<Record<string, unknown>> {
+    return {};
+  }
 }

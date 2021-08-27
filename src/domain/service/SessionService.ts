@@ -105,10 +105,19 @@ export class SessionService {
 
     const stepData = ctx.createStepData('login');
     stepData.set('userNo', user.userNo);
+    stepData.set('userDisplayName', user.displayName);
+    stepData.set('userHeaderImg', user.headerImg);
+
+    stepData.set('userOrgNo', userOrg.orgNo);
+    stepData.set('userOrgLevel', userOrg.level);
+
     stepData.set('userRoleNo', userRole.roleNo);
-    stepData.set('userOrgNo', user.orgNo);
+    stepData.set('userRoleLevel', userRole.level);
+
     stepData.set('appNo', app.appNo);
     stepData.set('appOrgNo', app.orgNo);
+    stepData.set('appLevel', app.level);
+
     stepData.set('twoFactorAuth', twoFactorList.length > 0);
 
     const twoFactorAuthSteps = [];
@@ -154,11 +163,19 @@ export class SessionService {
 
     const accessData = ctx.createAccessData(userNo, process.env.NODE_ENV !== 'production' ? '2h' : undefined);
 
-    accessData.set('userNo', userNo);
-    accessData.set('userRoleNo', stepData.get('userRoleNo'));
+    accessData.set('userNo', stepData.get('userNo'));
+    accessData.set('userDisplayName', stepData.get('userDisplayName'));
+    accessData.set('userHeaderImg', stepData.get('userHeaderImg'));
+
     accessData.set('userOrgNo', stepData.get('userOrgNo'));
+    accessData.set('userOrgLevel', stepData.get('userOrgLevel'));
+
+    accessData.set('userRoleNo', stepData.get('userRoleNo'));
+    accessData.set('userRoleLevel', stepData.get('userRoleLevel'));
+
     accessData.set('appNo', stepData.get('appNo'));
     accessData.set('appOrgNo', stepData.get('appOrgNo'));
+    accessData.set('appLevel', stepData.get('appLevel'));
 
     accessData.set('userPermissions', userPermissions.toJson());
 
