@@ -13,6 +13,7 @@ import { KoaStepTokenManager } from '@augejs/koa-step-token';
 import { Views } from '@augejs/views';
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 import { KoaSwagger } from '@augejs/koa-swagger';
+import { KoaSecurityMiddleware } from '@augejs/koa-security';
 
 import { Providers as ApplicationLayerProviders } from './application';
 import { Providers as DomainLayerProviders } from './domain';
@@ -36,6 +37,7 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @KoaAccessTokenManager()
 @KoaStepTokenManager()
 @KoaBodyParserMiddleware()
+@KoaSecurityMiddleware()
 @KoaSend()
 @Module({
   providers: [...FacadeLayerProviders, ...ApplicationLayerProviders, ...DomainLayerProviders, ...InfrastructureLayerProviders],
@@ -49,19 +51,7 @@ class AppModule {
 
   @MiddlewareHandler()
   async globalHandler(ctx: KoaContext, next: CallableFunction): Promise<void> {
-    try {
-      await next();
-
-      // mark as x-poppy
-      ctx.set('X-Powered-By', 'X-Poppy');
-
-      if (ctx.body === null) {
-        ctx.throw(HttpStatus.StatusCodes.NOT_FOUND);
-      }
-      this.restfulAPIHandlerService.handlerSuccess(ctx);
-    } catch (err) {
-      this.restfulAPIHandlerService.handlerError(ctx, err);
-    }
+    await this.restfulAPIHandlerService.globalHandler(ctx, next);
   }
 
   async onAppDidReady(): Promise<void> {

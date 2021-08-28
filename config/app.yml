@@ -15,6 +15,10 @@ redis:
 views:
   suffix: 'ejs'
 
+security:
+  cors:
+    origin: "*"
+
 typeorm:
   type: mysql
   host: 106.14.147.173
