@@ -1,18 +1,19 @@
 import { Provider, Value } from '@augejs/core';
-import { UniqueID } from 'nodejs-snowflake';
+import FlakeId from 'flake-idgen';
+import intformat from 'biguint-format';
 
 @Provider()
 export class UniqueIdService {
   @Value('/snowflake')
   private config!: Record<string, unknown> | null;
 
-  private snowflakeInst!: UniqueID;
+  private snowflakeInst!: FlakeId;
 
   onInit(): void {
-    this.snowflakeInst = new UniqueID(this.config ?? {});
+    this.snowflakeInst = new FlakeId(this.config ?? {});
   }
 
   async getUniqueId(): Promise<string> {
-    return (await this.snowflakeInst.asyncGetUniqueID()) as string;
+    return intformat(this.snowflakeInst.next(), 'dec');
   }
 }
