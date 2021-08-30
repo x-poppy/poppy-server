@@ -1,4 +1,4 @@
-import { Module, boot, GetLogger, ILogger, Inject } from '@augejs/core';
+import { Module, boot, GetLogger, ILogger, Inject, Cluster } from '@augejs/core';
 import { HttpStatus, KoaContext, MiddlewareHandler, WebServer } from '@augejs/koa';
 import { KoaStatic, KoaFavicon, KoaSend } from '@augejs/koa-static';
 import { I18nConfig } from '@augejs/i18n';
@@ -22,6 +22,10 @@ import { Providers as InfrastructureLayerProviders } from './infrastructure';
 
 import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandlerService';
 
+@Cluster({
+  workers: 0,
+  enable: process.env.NODE_ENV === 'production',
+})
 @I18nConfig()
 @Typeorm()
 @MailTransport()
