@@ -1,6 +1,6 @@
 {
   "name": "@x-poppy/poppy-server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/main.js",
   "bin": {
     "poppy-server": "dist/main.js"
@@ -68,7 +68,7 @@
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.4",
-    "ts-node": "^10.1.0",
+    "ts-node": "^10.2.1",
     "tsconfig-paths": "^3.10.1",
     "tslib": "^2.3.0",
     "typescript": "^4.3.5",
