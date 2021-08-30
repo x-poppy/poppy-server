@@ -20,10 +20,6 @@
   "files": [
     "dist"
   ],
-  "publishConfig": {
-    "registry":"https://npm.pkg.github.com",
-    "access": "public"
-  },
   "author": "X-Poppy",
   "license": "MIT",
   "dependencies": {
