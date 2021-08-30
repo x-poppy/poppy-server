@@ -20,6 +20,9 @@
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "X-Poppy",
   "license": "MIT",
   "dependencies": {
