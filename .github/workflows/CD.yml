@@ -14,11 +14,6 @@ jobs:
       matrix:
         node-version: [14.x]
     steps:
-    - name: Parse Version From Commit Message
-      id: parse-version
-      run: |
-        ReleaseVer=`echo "${{ github.event.head_commit.message }}" | awk -F' ' '{print $2}'`
-        echo "::set-output name=RELEASE_VERSION::${ReleaseVer: 1}"
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
@@ -32,8 +27,35 @@ jobs:
         TEST_COVERAGE_THRESHOLD: 0
         CI: true
     - run: npm run build --if-present
-    - uses: JS-DevTools/npm-publish@v1
+    - uses: actions/upload-artifact@v2
       with:
-        token: ${{ secrets.PKG_TOKEN }}
-        registry: https://npm.pkg.github.com
-        access: public
+        name: poppy-server-dist
+        path: dist
+        retention-days: 5
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download a single artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: poppy-server-dist
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build container image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            docker.pkg.github.com/${{ github.repository }}/poppy-server:${{ github.sha }}
+            docker.pkg.github.com/${{ github.repository }}/poppy-server:${{ github.ref }}
