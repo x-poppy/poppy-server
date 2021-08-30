@@ -10,25 +10,14 @@ node_modules/
 *.code-workspace
 
 # bundle
-packages/**/*.d.ts
-packages/**/*.js
 
 # misc
 .DS_Store
-lerna-debug.log
 npm-debug.log
 yarn-error.log
 /**/npm-debug.log
-/packages/**/.npmignore
-/packages/**/LICENSE
-
-# example
-/quick-start
-/example_dist
-/example
 
 # tests
-/test
 /benchmarks/memory
 /coverage
 /.nyc_output
@@ -38,7 +27,8 @@ build/config\.gypi
 
 *.log
 
-dist/
+dist
+
 tsconfig.tsbuildinfo
 
 report.json
