@@ -70,4 +70,4 @@ jobs:
         with:
           push: true
           tags: |
-            docker.pkg.github.com/${{ github.repository }}/poppy-server:${{ needs.check.outputs.committed-version }}
+            docker.pkg.github.com/${{ github.repository }}:${{ needs.check.outputs.committed-version }}
