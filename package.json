@@ -2,6 +2,9 @@
   "name": "@x-poppy/poppy-server",
   "version": "0.0.1",
   "main": "dist/main.js",
+  "bin": {
+    "poppy-server": "dist/main.js"
+  },
   "scripts": {
     "start": "nodemon --exec 'ts-node -r tsconfig-paths/register ./src/main.ts --files'",
     "prebuild": "rimraf dist",
