@@ -1,6 +1,6 @@
 {
   "name": "@x-poppy/poppy-server",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "dist/main.js",
   "bin": {
     "poppy-server": "dist/main.js"
@@ -8,15 +8,14 @@
   "scripts": {
     "start": "nodemon --exec 'ts-node -r tsconfig-paths/register --files ./src/main.ts'",
     "prebuild": "rimraf dist",
-    "build2": "tsc --build ./tsconfig.json",
-    "build": "esbuild src/main.ts --platform=node --target=node14 --tsconfig=tsconfig.json --outdir=dist",
+    "build": "tsc --build ./tsconfig.json",
     "postbuild": "copyfiles config/** public/** views/** locales/** LICENSE swagger.yml dist",
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
     "test": "jest --passWithNoTests --coverage --outputFile=result.json src",
     "test:ci": "jest --silent --ci --coverage --testLocationInResults --json --outputFile=\"report.json\"",
     "test:dev": "jest --watch --coverage src",
-    "prepare": "husky install"
+    "prepare": "husky install & ts-patch install -s"
   },
   "files": [
     "dist"
@@ -73,6 +72,8 @@
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.2.1",
+    "ts-patch": "^1.4.4",
+    "ts-transformer-minify-privates": "^0.3.0",
     "tsconfig-paths": "^3.10.1",
     "typescript": "^4.3.5",
     "typescript-transform-paths": "^3.3.1"
