@@ -18,26 +18,43 @@ import { SecurityCenterController } from './rest/SecurityCenterController';
 import { OperationLogController } from './rest/OperationLogController';
 import { ResourceController } from './rest/ResourceController';
 import { ServerHookController } from './rest/ServerHookController';
+import { Inject, Module } from '@augejs/core';
+import { KoaContext, MiddlewareHandler } from '@augejs/koa';
+import { RestfulAPIHandlerService } from '@/application/service/RestfulAPIHandlerService';
+import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
+import { HomeController } from './web/HomeController';
+@Module({
+  providers: [
+    AppController,
+    AppConfigController,
+    AppDomainController,
+    AppThemeController,
+    AppUIController,
+    ForgetPasswordController,
+    HomeMenuController,
+    HeadMenuController,
+    OrgController,
+    OperationLogController,
+    PageController,
+    ServerHookController,
+    ServerProxyController,
+    ResourceController,
+    RestPasswordController,
+    SecurityCenterController,
+    SessionController,
+    TwoFactorController,
+    UserController,
+    RoleController,
+    HomeController,
+  ],
+})
+@KoaBodyParserMiddleware()
+export class FacadeLayerModule {
+  @Inject(RestfulAPIHandlerService)
+  restfulAPIHandlerService!: RestfulAPIHandlerService;
 
-export const Providers = [
-  AppController,
-  AppConfigController,
-  AppDomainController,
-  AppThemeController,
-  AppUIController,
-  ForgetPasswordController,
-  HomeMenuController,
-  HeadMenuController,
-  OrgController,
-  OperationLogController,
-  PageController,
-  ServerHookController,
-  ServerProxyController,
-  ResourceController,
-  RestPasswordController,
-  SecurityCenterController,
-  SessionController,
-  TwoFactorController,
-  UserController,
-  RoleController,
-];
+  @MiddlewareHandler()
+  async globalHandler(ctx: KoaContext, next: CallableFunction): Promise<void> {
+    await this.restfulAPIHandlerService.globalHandler(ctx, next);
+  }
+}

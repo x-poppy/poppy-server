@@ -25,19 +25,6 @@ export class SystemInitService {
   @GetLogger()
   logger!: ILogger;
 
-  @RequestMapping.Get('/')
-  home(): string {
-    return 'It Works.';
-  }
-
-  @RequestMapping.Get('/LICENSE')
-  async license(@RequestParams.Context() context: KoaContext): Promise<void> {
-    context.type = 'text';
-    await context.sendFile('./LICENSE', {
-      root: __appRootDir,
-    });
-  }
-
   async onAppWillReady(): Promise<void> {
     this.logger.info('System Prepare Data for init start.');
     let rootApp = await this.appRepository.findRoot();

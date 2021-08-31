@@ -1,5 +1,6 @@
-import { Module, boot, GetLogger, ILogger, Inject, Cluster } from '@augejs/core';
-import { HttpStatus, KoaContext, MiddlewareHandler, WebServer } from '@augejs/koa';
+import path from 'path';
+import { Module, boot, GetLogger, ILogger, Cluster, __appRootDir } from '@augejs/core';
+import { WebServer } from '@augejs/koa';
 import { KoaStatic, KoaFavicon, KoaSend } from '@augejs/koa-static';
 import { I18nConfig } from '@augejs/i18n';
 import { AxiosConfig } from '@augejs/axios';
@@ -11,17 +12,13 @@ import { Typeorm } from '@augejs/typeorm';
 import { KoaAccessTokenManager } from '@augejs/koa-access-token';
 import { KoaStepTokenManager } from '@augejs/koa-step-token';
 import { Views } from '@augejs/views';
-import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 import { KoaSwagger } from '@augejs/koa-swagger';
+
+import { ApplicationLayerModule } from './application';
+import { DomainLayerModule } from './domain';
+import { FacadeLayerModule } from './facade';
+import { InfrastructureLayerModule } from './infrastructure';
 import { KoaSecurityMiddleware } from '@augejs/koa-security';
-
-import { Providers as ApplicationLayerProviders } from './application';
-import { Providers as DomainLayerProviders } from './domain';
-import { Providers as FacadeLayerProviders } from './facade';
-import { Providers as InfrastructureLayerProviders } from './infrastructure';
-
-import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandlerService';
-
 @Cluster({
   workers: 0,
   enable: process.env.NODE_ENV === 'production',
@@ -33,33 +30,29 @@ import { RestfulAPIHandlerService } from './application/service/RestfulAPIHandle
 @YAMLConfig()
 @KoaFavicon()
 @AxiosConfig()
-@KoaStatic()
+@KoaSecurityMiddleware({
+  contentSecurityPolicy: false,
+})
+@KoaStatic({
+  prefix: '',
+  dir: path.join(__appRootDir, './node_modules/@x-poppy/poppy-web/build'),
+})
 @WebServer()
 @Views()
 @KoaSwagger()
 @RedisConnection()
 @KoaAccessTokenManager()
 @KoaStepTokenManager()
-@KoaBodyParserMiddleware()
-@KoaSecurityMiddleware()
 @KoaSend()
 @Module({
-  providers: [...FacadeLayerProviders, ...ApplicationLayerProviders, ...DomainLayerProviders, ...InfrastructureLayerProviders],
+  subModules: [FacadeLayerModule, ApplicationLayerModule, DomainLayerModule, InfrastructureLayerModule],
 })
 class AppModule {
   @GetLogger()
   logger!: ILogger;
 
-  @Inject(RestfulAPIHandlerService)
-  restfulAPIHandlerService!: RestfulAPIHandlerService;
-
-  @MiddlewareHandler()
-  async globalHandler(ctx: KoaContext, next: CallableFunction): Promise<void> {
-    await this.restfulAPIHandlerService.globalHandler(ctx, next);
-  }
-
   async onAppDidReady(): Promise<void> {
-    this.logger.info('server is running!');
+    this.logger.info('server is running! ' + __appRootDir);
   }
 }
 

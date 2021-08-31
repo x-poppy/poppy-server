@@ -13,24 +13,27 @@ import { UniqueIdService } from './service/UniqueIdService';
 import { AppThemeRepository } from './repository/AppThemeRepository';
 import { PasswordService } from './service/PasswordService';
 import { OneTimePasswordService } from './service/OneTimePasswordService';
+import { Module } from '@augejs/core';
+@Module({
+  providers: [
+    UniqueIdService,
+    PasswordService,
+    OneTimePasswordService,
 
-export const Providers = [
-  UniqueIdService,
-  PasswordService,
-  OneTimePasswordService,
+    AppConfigRepository,
+    AppDomainRepository,
+    AppRepository,
+    AppServerProxyRepository,
+    AppThemeRepository,
 
-  AppConfigRepository,
-  AppDomainRepository,
-  AppRepository,
-  AppServerProxyRepository,
-  AppThemeRepository,
+    OperationLogRepository,
+    OrgRepository,
+    PageRepository,
 
-  OperationLogRepository,
-  OrgRepository,
-  PageRepository,
-
-  RolePermissionRepository,
-  ResourceRepository,
-  RoleRepository,
-  UserRepository,
-];
+    RolePermissionRepository,
+    ResourceRepository,
+    RoleRepository,
+    UserRepository,
+  ],
+})
+export class InfrastructureLayerModule {}

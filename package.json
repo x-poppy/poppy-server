@@ -1,6 +1,6 @@
 {
   "name": "@x-poppy/poppy-server",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "dist/main.js",
   "bin": {
     "poppy-server": "dist/main.js"
@@ -9,7 +9,7 @@
     "start": "nodemon --exec 'ts-node -r tsconfig-paths/register --files ./src/main.ts'",
     "prebuild": "rimraf dist",
     "build": "tsc --build ./tsconfig.json",
-    "postbuild": "copyfiles config/** public/** views/** locales/** LICENSE swagger.yml dist",
+    "postbuild": "copyfiles config/** views/** locales/** LICENSE swagger.yml dist",
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
     "test": "jest --passWithNoTests --coverage --outputFile=result.json src",
@@ -40,6 +40,7 @@
     "@augejs/typeorm": "1.6.1",
     "@augejs/validator": "1.6.1",
     "@augejs/views": "1.6.1",
+    "@x-poppy/poppy-web": "0.0.3",
     "bcrypt": "^5.0.1",
     "biguint-format": "^1.0.2",
     "ejs": "^3.1.6",
@@ -47,8 +48,8 @@
     "mysql": "2.18.1",
     "otplib": "^12.0.1",
     "secure-random-password": "^0.2.3",
-    "validator": "^13.6.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "validator": "^13.6.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",

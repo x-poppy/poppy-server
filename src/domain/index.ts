@@ -17,28 +17,32 @@ import { AppUIService } from './service/AppUIService';
 import { TwoFactorService } from './service/TwoFactorService';
 import { RoleService } from './service/RoleService';
 import { ForgetPasswordService } from './service/ForgetPasswordService';
+import { Module } from '@augejs/core';
 
-export const Providers = [
-  AppConfigService,
-  AppDomainService,
-  AppResourceService,
-  AppServerProxyService,
-  AppServerWebHookService,
-  AppService,
-  AppThemeService,
-  AppUIService,
-  ForgetPasswordService,
+@Module({
+  providers: [
+    AppConfigService,
+    AppDomainService,
+    AppResourceService,
+    AppServerProxyService,
+    AppServerWebHookService,
+    AppService,
+    AppThemeService,
+    AppUIService,
+    ForgetPasswordService,
 
-  HomeMenuService,
-  HeadMenuService,
+    HomeMenuService,
+    HeadMenuService,
 
-  OperationLogService,
-  OrgService,
-  PageService,
+    OperationLogService,
+    OrgService,
+    PageService,
 
-  RolePermissionService,
-  RoleService,
-  SessionService,
-  TwoFactorService,
-  UserService,
-];
+    RolePermissionService,
+    RoleService,
+    SessionService,
+    TwoFactorService,
+    UserService,
+  ],
+})
+export class DomainLayerModule {}
