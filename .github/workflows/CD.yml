@@ -34,7 +34,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run lint
-    - run: npm test
+    - run: npm run test:ci
       env:
         TEST_COVERAGE_THRESHOLD: 0
         CI: true
