@@ -8,7 +8,8 @@
   "scripts": {
     "start": "nodemon --exec 'ts-node -r tsconfig-paths/register --files ./src/main.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --build ./tsconfig.json",
+    "build2": "tsc --build ./tsconfig.json",
+    "build": "esbuild src/main.ts --platform=node --target=node14 --tsconfig=tsconfig.json --outdir=dist",
     "postbuild": "copyfiles config/** public/** views/** locales/** LICENSE swagger.yml dist",
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
@@ -61,6 +62,7 @@
     "@typescript-eslint/parser": "^4.29.0",
     "commitlint": "^13.1.0",
     "copyfiles": "^2.4.1",
+    "esbuild": "^0.12.24",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.1",
