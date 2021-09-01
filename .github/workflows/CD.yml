@@ -74,4 +74,9 @@ jobs:
           username: ${{ secrets.DEPLOY_SERVER_USER_NAME }}
           password: ${{ secrets.DEPLOY_SERVER_PWD }}
           port: ${{ secrets.DEPLOY_SERVER_PORT }}
-          script: whoami
+          script: |
+            ls -la
+            cd /opt/ops/poppy-devops
+            git pull -r
+            docker pull docker.pkg.github.com/x-poppy/poppy-server/poppy-server:${{ needs.check.outputs.committed-version }}
+            docker service update --image docker.pkg.github.com/x-poppy/poppy-server/poppy-server:${{ needs.check.outputs.committed-version }} poppy_poppy-server
