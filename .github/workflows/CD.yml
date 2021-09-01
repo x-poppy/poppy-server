@@ -67,4 +67,11 @@ jobs:
     needs: [check, build]
     runs-on: ubuntu-latest
     steps:
-      - run: echo 'deploy to server'
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_SERVER_HOST }}
+          username: ${{ secrets.DEPLOY_SERVER_USER_NAME }}
+          password: ${{ secrets.DEPLOY_SERVER_DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_SERVER_PORT }}
+          script: whoami
