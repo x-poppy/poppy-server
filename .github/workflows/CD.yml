@@ -78,5 +78,9 @@ jobs:
             ls -la
             cd /opt/ops/poppy-devops
             git pull -r
+            docker images
+            docker service ls
             docker pull docker.pkg.github.com/x-poppy/poppy-server/poppy-server:${{ needs.check.outputs.committed-version }}
             docker service update --image docker.pkg.github.com/x-poppy/poppy-server/poppy-server:${{ needs.check.outputs.committed-version }} --with-registry-auth poppy_poppy-server
+            docker images
+            docker service ls
