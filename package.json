@@ -9,7 +9,7 @@
     "start": "nodemon --exec 'ts-node -r tsconfig-paths/register --files ./src/main.ts'",
     "prebuild": "rimraf dist",
     "build": "tsc --build ./tsconfig.json",
-    "postbuild": "copyfiles config/** views/** locales/** LICENSE swagger.yml dist",
+    "postbuild": "copyfiles config/** views/** locales/** LICENSE package.json package-lock.json swagger.yml dist",
     "lint": "eslint src --ext .ts",
     "format": "prettier src --write",
     "test": "jest --passWithNoTests --coverage --outputFile=result.json src",
