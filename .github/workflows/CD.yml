@@ -72,6 +72,7 @@ jobs:
       - name: Push container image to github
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
           tags: |
             docker.pkg.github.com/${{ github.repository }}/poppy-server:${{ needs.check.outputs.committed-version }}
