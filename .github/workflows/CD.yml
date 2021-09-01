@@ -55,6 +55,7 @@ jobs:
         push: true
         tags: |
           docker.pkg.github.com/${{ github.repository }}/poppy-server:${{ needs.check.outputs.committed-version }}
+          docker.pkg.github.com/${{ github.repository }}/poppy-server:latest
     - uses: JS-DevTools/npm-publish@v1
       with:
         registry: https://registry.npmjs.org/
