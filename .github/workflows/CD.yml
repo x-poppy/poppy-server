@@ -72,6 +72,6 @@ jobs:
         with:
           host: ${{ secrets.DEPLOY_SERVER_HOST }}
           username: ${{ secrets.DEPLOY_SERVER_USER_NAME }}
-          password: ${{ secrets.DEPLOY_SERVER_DEPLOY_KEY }}
+          password: ${{ secrets.DEPLOY_SERVER_PWD }}
           port: ${{ secrets.DEPLOY_SERVER_PORT }}
           script: whoami
