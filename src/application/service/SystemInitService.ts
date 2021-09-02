@@ -1,12 +1,10 @@
-import crypto from 'crypto';
 import randomPassword from 'secure-random-password';
 
 import { AppService } from '@/domain/service/AppService';
 import { OrgService } from '@/domain/service/OrgService';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { OrgRepository } from '@/infrastructure/repository/OrgRepository';
-import { GetLogger, ILogger, Inject, Provider, __appRootDir } from '@augejs/core';
-import { KoaContext, RequestMapping, RequestParams } from '@augejs/koa';
+import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 
 @Provider()
 export class SystemInitService {

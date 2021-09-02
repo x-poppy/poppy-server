@@ -4,6 +4,7 @@ info:
   title: "Poppy Server API Specification"
 
 tags:
+- name: "Health"
 - name: "AppUI"
   description: "App UI service group serve for the client UI. This group of api should not cover by `Authorization`"
 
@@ -93,6 +94,14 @@ definitions:
           - email
 
 paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: "Get Server health info"
+      responses:
+        "200":
+          description: ""
+
   /api/v1/app-ui/domain-info/{domain}:
     get:
       tags:
