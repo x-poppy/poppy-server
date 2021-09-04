@@ -13,7 +13,6 @@ interface CreateOpts {
   password: string | null;
   mobileNo: string | null;
   emailAddr: string | null;
-  displayName: string;
 }
 @Provider()
 export class UserRepository {
@@ -48,7 +47,6 @@ export class UserRepository {
     user.mobileNo = opts.mobileNo;
     user.emailAddr = opts.emailAddr;
     user.passwd = hashPassword;
-    user.displayName = opts.displayName;
 
     return userRepository.save(user);
   }
@@ -59,8 +57,12 @@ export class UserRepository {
     });
   }
 
+  async find(userNo: string): Promise<UserEntity | undefined> {
+    return await this.userRepository.findOne(userNo);
+  }
+
   async findByStatusNormal(userNo: string): Promise<UserEntity | undefined> {
-    return await this.userRepository.findOne(userNo.toString(), {
+    return await this.userRepository.findOne(userNo, {
       where: {
         status: UserStatus.NORMAL,
       },

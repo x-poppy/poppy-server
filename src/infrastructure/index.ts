@@ -14,6 +14,7 @@ import { AppThemeRepository } from './repository/AppThemeRepository';
 import { PasswordService } from './service/PasswordService';
 import { OneTimePasswordService } from './service/OneTimePasswordService';
 import { Module } from '@augejs/core';
+import { SystemInitRepository } from './repository/SystemInitRepository';
 @Module({
   providers: [
     UniqueIdService,
@@ -34,6 +35,8 @@ import { Module } from '@augejs/core';
     ResourceRepository,
     RoleRepository,
     UserRepository,
+
+    SystemInitRepository,
   ],
 })
 export class InfrastructureLayerModule {}

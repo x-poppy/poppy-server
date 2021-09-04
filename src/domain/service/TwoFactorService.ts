@@ -59,4 +59,8 @@ export class TwoFactorService {
 
     return newStepData;
   }
+
+  async verify(): Promise<boolean> {
+    return true;
+  }
 }

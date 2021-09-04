@@ -121,7 +121,6 @@ export class OrgService {
           roleNo: createdRole.roleNo,
           accountName: opts.userAccountName,
           password: userPassword,
-          displayName: opts.userDisplayName ?? opts.userAccountName,
           mobileNo: opts.userMobileNo ?? null,
           emailAddr: opts.userEmailAddr ?? null,
         },

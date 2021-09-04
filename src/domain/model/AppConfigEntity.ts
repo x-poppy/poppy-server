@@ -25,18 +25,19 @@ export class AppConfigEntity {
   appNo!: string;
 
   @Column({
-    length: 80,
-    comment: 'display name',
-  })
-  displayName!: string;
-
-  @Column({
     type: 'enum',
     enum: AppConfigUIType,
     default: AppConfigUIType.TEXT,
     comment: 'ui name',
   })
   uiType: AppConfigUIType = AppConfigUIType.TEXT;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+    default: null,
+  })
+  value: string | null = null;
 
   @Column({
     type: 'text',
