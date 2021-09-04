@@ -4,9 +4,9 @@ import { Mail, MAIL_IDENTIFIER } from '@augejs/mail';
 @Provider()
 export class MailService {
   @Inject(MAIL_IDENTIFIER)
-  mail!: Mail;
+  private mail!: Mail;
 
-  send() {
-    this.mail.sendMail({});
+  async send(opts: Mail.Options): Promise<void> {
+    this.mail.sendMail(opts);
   }
 }

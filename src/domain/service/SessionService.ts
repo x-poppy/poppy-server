@@ -105,7 +105,7 @@ export class SessionService {
 
     const stepData = ctx.createStepData('login');
     stepData.set('userNo', user.userNo);
-    stepData.set('userDisplayName', user.displayName);
+    stepData.set('accountName', user.accountName);
     stepData.set('userHeaderImg', user.headerImg);
 
     stepData.set('userOrgNo', userOrg.orgNo);
@@ -134,12 +134,13 @@ export class SessionService {
     return stepData;
   }
 
-  private async kickOffOnlineUsers(context: KoaContext, userNo: string): Promise<void> {
-    const maxOnlineUserCountStr = (await this.appConfigService.get(AppConfigKeys.Max_Online_User_Count)) ?? '';
-    const maxOnlineUserCount = parseInt(maxOnlineUserCountStr) || 2;
-    const accessDataList = await context.findAccessDataListByUserId(userNo.toString(), {
+  private async kickOffOnlineUsers(context: KoaContext, userNo: string, userAppNo: string): Promise<void> {
+    const maxOnlineUserCount = await this.appConfigService.getMaxOnlineUserCount(userAppNo);
+
+    const accessDataList = await context.findAccessDataListByUserId(userNo, {
       skipCount: maxOnlineUserCount - 1,
     });
+
     // after verify the pwd then kick the before session.
     for (const accessData of accessDataList) {
       accessData.isDeadNextTime = true;
@@ -154,12 +155,13 @@ export class SessionService {
 
     const userNo = stepData.get<string>('userNo');
     const userOrgNo = stepData.get<string>('userRoleNo');
+    const userAppNo = stepData.get<string>('appNo');
 
     this.logger.info(`createAccessData start. userNo: ${userNo}`);
 
     const userPermissions = await this.rolePermissionService.findPermissionsByRoleNo(userOrgNo);
 
-    await this.kickOffOnlineUsers(ctx, userNo);
+    await this.kickOffOnlineUsers(ctx, userNo, userAppNo);
 
     const accessData = ctx.createAccessData(userNo, process.env.NODE_ENV !== 'production' ? '2h' : undefined);
 

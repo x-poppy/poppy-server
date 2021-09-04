@@ -26,7 +26,6 @@ export class AppConfigRepository {
     const appRepository = manager?.getRepository(AppConfigEntity) ?? this.appRepository;
     const app = new AppConfigEntity();
     app.appNo = opts.appNo;
-    app.displayName = opts.displayName;
     app.uiType = opts.uiType;
     app.desc = opts.desc ?? null;
     return appRepository.save(app);

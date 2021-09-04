@@ -220,6 +220,30 @@ paths:
         "200":
           description: ""
 
+  /api/v1/authorization/rest-password/auth:
+    post:
+      tags:
+        - "Authorization"
+      responses:
+        "200":
+          description: ""
+
+  /api/v1/authorization/rest-password/verify:
+    post:
+      tags:
+        - "Authorization"
+      responses:
+        "200":
+          description: ""
+
+  /api/v1/authorization/rest-password:
+    put:
+      tags:
+        - "Authorization"
+      responses:
+        "200":
+          description: ""
+
   /api/v1/resource/home-menu:
     get:
       summary: "Get the app menu tree for current user"

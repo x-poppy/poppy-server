@@ -89,13 +89,6 @@ export class UserEntity {
   twoFactorAuth = false;
 
   @Column({
-    length: 80,
-    comment: 'user display nick name',
-  })
-  @Index()
-  displayName!: string;
-
-  @Column({
     type: 'varchar',
     length: 200,
     comment: 'user header image (abs)path',

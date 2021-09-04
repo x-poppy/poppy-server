@@ -18,6 +18,8 @@ import { TwoFactorService } from './service/TwoFactorService';
 import { RoleService } from './service/RoleService';
 import { ForgetPasswordService } from './service/ForgetPasswordService';
 import { Module } from '@augejs/core';
+import { ResetPasswordService } from './service/ResetPasswordService';
+import { ChangePasswordService } from './service/ChangePasswordService';
 
 @Module({
   providers: [
@@ -29,7 +31,10 @@ import { Module } from '@augejs/core';
     AppService,
     AppThemeService,
     AppUIService,
+
     ForgetPasswordService,
+    ResetPasswordService,
+    ChangePasswordService,
 
     HomeMenuService,
     HeadMenuService,
