@@ -24,7 +24,9 @@ import { KoaSecurityMiddleware } from '@augejs/koa-security';
   enable: process.env.NODE_ENV === 'production',
 })
 @I18nConfig()
-@Typeorm()
+@Typeorm({
+  synchronize: process.env.NODE_ENV !== 'production',
+})
 @MailTransport()
 @Log4js()
 @YAMLConfig()

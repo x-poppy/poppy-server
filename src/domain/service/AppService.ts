@@ -9,10 +9,9 @@ import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { AppEntity } from '../model/AppEntity';
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
-import { AppUIInfoBo } from '../bo/AppUIInfoBo';
 
 interface CreateOpts {
-  userNo: string | null; // the creator user maybe empty
+  userNo: string;
   roleDisplayName: string;
   roleDesc?: string | null;
   appDisplayName: string;
@@ -43,24 +42,20 @@ export class AppService {
   @Inject(UserRepository)
   private userRepository!: UserRepository;
 
-  @Inject(AppDomainRepository)
-  private appDomainRepository!: AppDomainRepository;
-
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
   async create(opts: CreateOpts): Promise<AppEntity> {
-    const isTopApp = !opts.userNo;
-    this.logger.info(`create the app validate start. userNo ${opts.userNo} isTopApp: ${isTopApp}`);
+    this.logger.info(`create the app validate start. userNo ${opts.userNo}`);
 
     const creatorUser = !opts.userNo ? null : await this.userRepository.findByStatusNormal(opts.userNo);
-    if (!isTopApp && !creatorUser) {
+    if (!creatorUser) {
       this.logger.warn(`create the app error. userNo: ${opts.userNo} is not exist!`);
       throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
     }
 
     const creatorApp = creatorUser ? await this.appRepository.findByStatusNormal(creatorUser.appNo) : null;
-    if (!isTopApp && !creatorApp) {
+    if (!creatorApp) {
       this.logger.warn(`create the app error. parent app: ${creatorUser?.appNo} is not exist!`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
@@ -125,25 +120,15 @@ export class AppService {
       );
       this.logger.info(`create the app start steps: creat app entity end. appNo: ${createdApp.appNo}`);
 
-      if (isTopApp && process.env.NODE_ENV !== 'production') {
-        this.logger.info(`create the app start steps: creat the default appDomain entity start. appNo: ${createdApp.appNo}`);
-        const domain = `http:/127.0.0.1:${this.serverPort}`;
-        await this.appDomainRepository.create({
-          appNo: createdApp.appNo,
-          domain,
-        });
-        this.logger.info(`create the app start steps: creat the default appDomain entity end. domain: ${domain}`);
-      }
-
       await queryRunner.commitTransaction();
       this.logger.info(`create the app: commitTransaction. userNo: ${opts.userNo}`);
-
       return createdApp;
     } catch (err) {
       await queryRunner.rollbackTransaction();
       this.logger.warn(`create the app error: rollbackTransaction. userNo: ${opts.userNo}`);
-
       throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 

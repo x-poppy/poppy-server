@@ -1,10 +1,10 @@
 import crypto from 'crypto';
 
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { SystemInitRepository } from '@/infrastructure/repository/SystemInitRepository';
-import { getConnection, getManager } from 'typeorm';
+import { getConnection, getRepository } from 'typeorm';
 import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
 import { Commands, REDIS_IDENTIFIER } from '@augejs/redis';
+import { SystemInitEntity } from '@/domain/model/SystemInitEntity';
 
 interface SystemInitSqlParameters {
   roleNo: string;
@@ -20,8 +20,32 @@ interface SystemInitSqlParameters {
 
 function getSystemInitSql(parameters: SystemInitSqlParameters) {
   return `
-  INSERT INTO poppy.pp_role (roleNo, parent, inherited, orgNo, appNo, hasAppResPerms, \`level\`, displayName, \`desc\`) VALUES(${parameters.roleNo}, NULL, 1, NULL, ${parameters.appNo}, 1, 0, '_root', 'The _root role for the system');
-  INSERT INTO poppy.pp_app (appNo, parent, \`level\`, orgNo, roleNo, \`locale\`, displayName, \`desc\`) VALUES(${parameters.appNo}, NULL, 0, NULL, ${parameters.roleNo}, 'en_US', 'Poppy System', 'The poppy System');
+  -- root role
+    INSERT INTO poppy.pp_role (roleNo, parent, inherited, orgNo, appNo, hasAppResPerms, \`level\`, displayName, \`desc\`)
+    VALUES(${parameters.roleNo}, NULL, 1, NULL, ${parameters.appNo}, 1, 0, '_root', 'The _root role for the system');
+
+    -- root app
+    INSERT INTO poppy.pp_app (appNo, parent, \`level\`, orgNo, roleNo, \`locale\`, expireAt,  displayName, \`desc\`)
+    VALUES(${parameters.appNo}, NULL, 0, NULL, ${parameters.roleNo}, 'en_US', date_add(now(), INTERVAL 99 YEAR) ,'Poppy System', 'The poppy System');
+
+    INSERT INTO poppy.pp_app_domain (\`domain\`, appNo)
+    VALUES('${parameters.appDomain}', ${parameters.appNo});
+
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
+    VALUES('Setting', NULL, ${parameters.appNo}, 0, 'homeMenu', NULL, 1, 0, 'Setting');
+
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
+    VALUES('Setting-1', 'Setting', ${parameters.appNo}, 0, 'homeMenu', NULL, 1, 0, 'Setting-1');
+
+    -- root org
+    INSERT INTO poppy.pp_org (orgNo, appNo, parent, \`level\`, icon, displayName, \`desc\`)
+    VALUES(${parameters.orgNo}, ${parameters.appNo}, NULL, 0, NULL, 'Root Org', 'The root org for the system');
+
+    INSERT INTO poppy.pp_role (roleNo, parent, inherited, orgNo, appNo, hasAppResPerms, \`level\`, displayName, \`desc\`)
+    VALUES(${parameters.orgRoleNo}, ${parameters.roleNo}, 1, ${parameters.orgNo}, ${parameters.appNo}, 0, 1, 'root', 'The root role for the system');
+
+    INSERT INTO poppy.pp_user (userNo, orgNo, appNo, roleNo, nonce, accountName, mobileNo, emailAddr, passwd, optKey, registerIP)
+    VALUES(${parameters.orgUserNo}, ${parameters.orgNo}, ${parameters.appNo}, ${parameters.orgRoleNo}, '${parameters.orgUserNonce}', '${parameters.orgUserName}', NULL, NULL, '${parameters.orgUserPassword}', NULL, '127.0.0.1');
   `;
 }
 
@@ -33,14 +57,11 @@ export class SystemInitService {
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  @Inject(SystemInitRepository)
-  systemInitRepository!: SystemInitRepository;
-
   @Inject(REDIS_IDENTIFIER)
   redis!: Commands;
 
   async onAppWillReady(): Promise<void> {
-    const systemHasInitialized = await this.systemInitRepository.has();
+    const systemHasInitialized = await getRepository(SystemInitEntity).findOne(0);
     if (systemHasInitialized) {
       this.logger.info('System has Initialized. Skip');
       return;
@@ -77,9 +98,28 @@ export class SystemInitService {
       orgUserNonce,
     });
 
-    await getConnection().query(sql);
-    await this.systemInitRepository.add(sql);
+    const sqlStatements = sql
+      .split(';')
+      .map((sqlStatement) => sqlStatement.trim())
+      .filter(Boolean)
+      .map((sqlStatement) => `${sqlStatement};\n`);
 
+    const queryRunner = getConnection().createQueryRunner('master');
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      for (const sqlStatement of sqlStatements) {
+        await queryRunner.query(sqlStatement);
+      }
+      await queryRunner.query(`INSERT INTO poppy.pp_system_init (id, initSql) VALUES(0, '${Buffer.from(sql).toString('base64')}');`);
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      this.logger.info('System Prepare Data failed rollback.');
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
     this.logger.info('System Prepare Data for init end.');
   }
 }

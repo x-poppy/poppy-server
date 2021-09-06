@@ -84,6 +84,13 @@ export class AppEntity {
   @Index()
   status!: AppStatus;
 
+  @Column({
+    type: 'datetime',
+    width: 6,
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  expireAt!: Date;
+
   @CreateDateColumn()
   createAt!: Date;
 

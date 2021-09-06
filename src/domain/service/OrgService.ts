@@ -135,6 +135,8 @@ export class OrgService {
       await queryRunner.rollbackTransaction();
       this.logger.warn(`create the org error: rollbackTransaction. appNo: ${app.appNo}`);
       throw err;
+    } finally {
+      await queryRunner.release();
     }
   }
 

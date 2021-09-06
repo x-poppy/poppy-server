@@ -10,11 +10,4 @@ export class SystemInitRepository {
     const systemInit = await this.systemInitRepository.findOne(0);
     return !!systemInit;
   }
-
-  async add(initSql: string): Promise<void> {
-    await this.systemInitRepository.insert({
-      id: 0,
-      initSql,
-    });
-  }
 }
