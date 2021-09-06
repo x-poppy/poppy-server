@@ -27,7 +27,6 @@ typeorm:
   username: root
   password: example
   maxQueryExecutionTime: 10000
-  synchronize: true
   logging:
     - error
     - query

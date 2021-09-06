@@ -7,6 +7,8 @@ export class AppUIInfoBo {
     appUIInfoBo.displayName = app.displayName;
     appUIInfoBo.icp = app.icp;
     appUIInfoBo.icon = app.icon;
+    appUIInfoBo.status = app.status;
+    appUIInfoBo.isExpired = Date.now() > app.expireAt.getTime();
     return appUIInfoBo;
   }
 
@@ -14,4 +16,6 @@ export class AppUIInfoBo {
   displayName = '';
   icon: string | null = null;
   icp: string | null = null;
+  status = '';
+  isExpired = false;
 }

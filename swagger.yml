@@ -78,6 +78,8 @@ definitions:
         type: string
       status:
         type: string
+      isExpired:
+        type: boolean
 
   TwoFactorAuthDto:
     type: object
