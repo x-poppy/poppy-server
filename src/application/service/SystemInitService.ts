@@ -37,6 +37,12 @@ function getSystemInitSql(parameters: SystemInitSqlParameters) {
     INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
     VALUES('Setting-1', 'Setting', ${parameters.appNo}, 0, 'homeMenu', NULL, 1, 0, 'Setting-1');
 
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
+    VALUES('Head', NULL, ${parameters.appNo}, 0, 'headMenu', NULL, 0, 0, 'Head');
+
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
+    VALUES('Head-1', 'Head', ${parameters.appNo}, 0, 'headMenu', NULL, 0, 0, 'Head-1');
+
     -- root org
     INSERT INTO poppy.pp_org (orgNo, appNo, parent, \`level\`, icon, displayName, \`desc\`)
     VALUES(${parameters.orgNo}, ${parameters.appNo}, NULL, 0, NULL, 'Root Org', 'The root org for the system');
