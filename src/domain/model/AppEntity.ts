@@ -96,4 +96,8 @@ export class AppEntity {
 
   @UpdateDateColumn()
   updateAt!: Date;
+
+  get isExpired(): boolean {
+    return Date.now() > this.expireAt.getTime();
+  }
 }

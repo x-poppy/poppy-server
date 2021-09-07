@@ -8,7 +8,10 @@ export class AppUIInfoBo {
     appUIInfoBo.icp = app.icp;
     appUIInfoBo.icon = app.icon;
     appUIInfoBo.status = app.status;
-    appUIInfoBo.isExpired = Date.now() > app.expireAt.getTime();
+    appUIInfoBo.isExpired = app.isExpired;
+
+    // eslint-disable-next-line no-debugger
+    debugger;
     return appUIInfoBo;
   }
 

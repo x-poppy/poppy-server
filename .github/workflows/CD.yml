@@ -74,6 +74,7 @@ jobs:
           username: ${{ secrets.DEPLOY_SERVER_USER_NAME }}
           password: ${{ secrets.DEPLOY_SERVER_PWD }}
           port: ${{ secrets.DEPLOY_SERVER_PORT }}
+          command_timeout: 30m
           script: |
             ls -la
             cd /opt/ops/poppy-devops
