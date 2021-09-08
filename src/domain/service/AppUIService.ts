@@ -31,7 +31,7 @@ export class AppUIService {
 
   async themeInfo(appNo: string): Promise<Record<string, string | null>> {
     const themeProperties: Record<string, string | null> = {};
-    const appThemes = await this.appThemeRepository.listAllByNormalStatus({ appNo });
+    const appThemes = await this.appThemeRepository.listAllByNormalStatus(appNo);
     for (const appTheme of appThemes) {
       themeProperties[appTheme.key] = appTheme.value;
     }

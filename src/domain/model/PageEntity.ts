@@ -6,20 +6,33 @@ export enum PageStatus {
 }
 
 export enum PageType {
-  HTML = 'html',
-  MARKDOWN = 'markdown',
+  BUILD_IN = ' buildIn',
+  HTML_URL = 'htmlUrl',
+  HTML_SOURCE = 'htmlSource',
+  MARK_DOWN = 'markdown',
 }
 
 @Entity('pp_page')
 export class PageEntity {
   @PrimaryColumn({
     length: 80,
-    comment: 'unique page name',
+    comment: 'unique page code for page can be equals to resource code',
   })
-  pageName!: string;
+  pageCode!: string;
 
-  @Column('simple-json')
-  schema!: Record<string, unknown>;
+  @Column({
+    type: 'bigint',
+    comment: 'appNo',
+  })
+  @Index()
+  appNo!: string;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+    select: false,
+  })
+  content: string | null = null;
 
   @Column({
     type: 'enum',
@@ -32,10 +45,16 @@ export class PageEntity {
   @Column({
     type: 'enum',
     enum: PageType,
-    default: PageType.HTML,
+    default: PageType.HTML_URL,
   })
   @Index()
   type!: PageType;
+
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  desc: string | null = null;
 
   @CreateDateColumn()
   createAt!: Date;

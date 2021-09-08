@@ -14,6 +14,13 @@ interface CreateOpts {
   mobileNo: string | null;
   emailAddr: string | null;
 }
+
+interface ListOpts {
+  appNo: string;
+  offset: number;
+  size: number;
+}
+
 @Provider()
 export class UserRepository {
   @Inject(UniqueIdService)
@@ -26,6 +33,20 @@ export class UserRepository {
 
   async findAllUsers(): Promise<UserEntity[]> {
     return this.userRepository.find();
+  }
+
+  async list(opts: ListOpts): Promise<[UserEntity[], number]> {
+    return this.userRepository.findAndCount({
+      skip: opts.offset,
+      take: opts.size,
+      select: ['userNo', 'orgNo', 'appNo', 'roleNo', 'accountName', 'headerImg', 'mobileNo', 'emailAddr', 'twoFactorAuth', 'status', 'createAt', 'updateAt'],
+      where: {
+        appNo: opts.appNo,
+      },
+      order: {
+        createAt: 'DESC',
+      },
+    });
   }
 
   async create(opts: CreateOpts, manager?: EntityManager): Promise<UserEntity> {

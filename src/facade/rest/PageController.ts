@@ -1,9 +1,13 @@
+import { PageEntity } from '@/domain/model/PageEntity';
+import { RequestValidator } from '@/util/decorator/RequestValidatorDecorator';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
+import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { RenderFunction, VIEWS_IDENTIFIER } from '@augejs/views';
 import { PageService } from '../../domain/service/PageService';
+import { CreatePageDto } from '../dto/CreatePageDto';
 
-@Prefix('/page')
+@Prefix('/api/v1/page/page')
 @Provider()
 export class PageController {
   @Inject(VIEWS_IDENTIFIER)
@@ -12,18 +16,45 @@ export class PageController {
   @Inject(PageService)
   private pageService!: PageService;
 
-  @RequestMapping.Get('/:pageName')
-  async find(@RequestParams.Context() context: KoaContext, @RequestParams.Params('pageName') pageName: string): Promise<string> {
-    context.type = 'html';
+  @RequestMapping.Get('/:pageCode')
+  async find(@RequestParams.Params('pageCode') pageCode: string): Promise<PageEntity | null> {
+    const page = await this.pageService.find(pageCode);
+    return page ?? null;
+  }
 
-    const page = await this.pageService.find(pageName);
-    const pageSchema = page?.schema;
+  @KoaAccessTokenMiddleware()
+  @RequestMapping.Post('/')
+  async create(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(CreatePageDto) createPageDto: CreatePageDto): Promise<Record<string, unknown>> {
+    const accessData = ctx.accessData as AccessData;
+    const appNo = accessData.get<string>('appNo');
 
-    // here is 404 page
-    if (!pageSchema) {
-      return await this.render('page404.ejs');
-    }
+    await this.pageService.create({
+      appNo,
+      ...createPageDto,
+    });
 
-    return await this.render('page.ejs', { pageSchema: JSON.stringify(pageSchema) });
+    return {};
+  }
+
+  @KoaAccessTokenMiddleware()
+  @RequestMapping.Get('')
+  async list(
+    @RequestParams.Context() ctx: KoaContext,
+    @RequestParams.Query('offset') @RequestParams((value: string) => ~~value) offset: number,
+    @RequestParams.Query('size') @RequestParams((value: string) => ~~value) size: number,
+  ): Promise<Record<string, unknown>> {
+    const accessData = ctx.accessData as AccessData;
+    const appNo = accessData.get<string>('appNo') ?? null;
+
+    const [list, count] = await this.pageService.list({
+      offset,
+      size,
+      appNo,
+    });
+
+    return {
+      list,
+      count,
+    };
   }
 }

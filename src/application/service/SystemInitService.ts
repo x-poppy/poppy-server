@@ -31,17 +31,17 @@ function getSystemInitSql(parameters: SystemInitSqlParameters) {
     INSERT INTO poppy.pp_app_domain (\`domain\`, appNo)
     VALUES('${parameters.appDomain}', ${parameters.appNo});
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
-    VALUES('Setting', NULL, ${parameters.appNo}, 0, 'homeMenu', NULL, 1, 0, 'Setting');
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, position, icon, hasPermission, priority, label)
+    VALUES('Setting', NULL, ${parameters.appNo}, 0, 'menu', 'home', NULL, 1, 0, 'Setting');
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
-    VALUES('Setting-1', 'Setting', ${parameters.appNo}, 0, 'homeMenu', NULL, 1, 0, 'Setting-1');
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, position, icon, hasPermission, priority, label)
+    VALUES('Setting-1', 'Setting', ${parameters.appNo}, 0, 'menu', 'home', NULL, 1, 0, 'Setting-1');
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
-    VALUES('Head', NULL, ${parameters.appNo}, 0, 'headMenu', NULL, 0, 0, 'Head');
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`,position, icon, hasPermission, priority, label)
+    VALUES('Head', NULL, ${parameters.appNo}, 0, 'menu', 'head', NULL, 0, 0, 'Head');
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, icon, hasPermission, priority, label)
-    VALUES('Head-1', 'Head', ${parameters.appNo}, 0, 'headMenu', NULL, 0, 0, 'Head-1');
+    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`,position, icon, hasPermission, priority, label)
+    VALUES('Head-1', 'Head', ${parameters.appNo}, 0, 'menu', 'head', NULL, 0, 0, 'Head-1');
 
     -- root org
     INSERT INTO poppy.pp_org (orgNo, appNo, parent, \`level\`, icon, displayName, \`desc\`)
@@ -52,6 +52,20 @@ function getSystemInitSql(parameters: SystemInitSqlParameters) {
 
     INSERT INTO poppy.pp_user (userNo, orgNo, appNo, roleNo, nonce, accountName, mobileNo, emailAddr, passwd, optKey, registerIP)
     VALUES(${parameters.orgUserNo}, ${parameters.orgNo}, ${parameters.appNo}, ${parameters.orgRoleNo}, '${parameters.orgUserNonce}', '${parameters.orgUserName}', NULL, NULL, '${parameters.orgUserPassword}', NULL, '127.0.0.1');
+
+    -- root app theme
+    INSERT INTO poppy.pp_app_theme (appNo, \`key\`, \`value\`, \`desc\`)
+    VALUES(${parameters.appNo}, '--login-page-bg', 'azure', 'background for login page');
+
+    INSERT INTO poppy.pp_app_theme (appNo, \`key\`, \`value\`, \`desc\`)
+    VALUES(${parameters.appNo}, '--home-page-bg', 'border-box', 'background for home page');
+
+    INSERT INTO poppy.pp_app_theme (appNo, \`key\`, \`value\`, \`desc\`)
+    VALUES(${parameters.appNo}, '--default-page-bg', 'cadetblue', 'background for default page');
+
+    -- root page
+    INSERT INTO poppy.pp_page (appNo, pageCode,\`type\`, \`content\`, \`desc\`)
+    VALUES(${parameters.appNo}, 'test', 'htmlUrl', 'test', 'for test');
   `;
 }
 

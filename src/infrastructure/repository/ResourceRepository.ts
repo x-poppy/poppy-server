@@ -1,4 +1,4 @@
-import { ResourceEntity, ResourceStatus, ResourceType } from '@/domain/model/ResourceEntity';
+import { ResourceEntity, ResourcePosition, ResourceStatus } from '@/domain/model/ResourceEntity';
 import { Provider } from '@augejs/core';
 import { getRepository, LessThan, Repository } from '@augejs/typeorm';
 @Provider()
@@ -29,7 +29,7 @@ export class ResourceRepository {
     return await this.resourceRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
-        type: ResourceType.HOME_MENU,
+        position: ResourcePosition.HOME,
         status: ResourceStatus.NORMAL,
       },
       order: {
@@ -42,7 +42,7 @@ export class ResourceRepository {
     return await this.resourceRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
-        type: ResourceType.HEAD_MENU,
+        position: ResourcePosition.HEAD,
         status: ResourceStatus.NORMAL,
       },
       order: {
@@ -54,7 +54,7 @@ export class ResourceRepository {
   async findMenuByResourceCode(resourceCode: string): Promise<ResourceEntity | undefined> {
     return await this.resourceRepository.findOne(resourceCode, {
       where: {
-        type: ResourceType.HOME_MENU,
+        position: ResourcePosition.HOME,
       },
     });
   }

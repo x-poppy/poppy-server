@@ -71,9 +71,9 @@ export class AppRepository {
 
   async list(opts: ListOpts): Promise<[AppEntity[], number]> {
     return this.appRepository.findAndCount({
+      skip: opts.offset,
+      take: opts.size,
       where: {
-        skip: opts.offset,
-        take: opts.size,
         orgNo: opts.orgNo,
       },
       order: {

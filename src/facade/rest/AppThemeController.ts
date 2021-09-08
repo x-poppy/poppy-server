@@ -1,32 +1,32 @@
-import { RoleService } from '@/domain/service/RoleService';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
+import { AppThemeService } from '@/domain/service/AppThemeService';
+
 @Prefix('/api/v1/app/app-theme')
 @Provider()
 export class AppThemeController {
+  @Inject(AppThemeService)
+  private appThemeService!: AppThemeService;
+
   @KoaAccessTokenMiddleware()
   @RequestMapping.Get('')
   async list(
     @RequestParams.Context() ctx: KoaContext,
-    @RequestParams.Query('offset') @RequestParams((value: string) => parseInt(value)) offset: number,
-    @RequestParams.Query('size') @RequestParams((value: string) => parseInt(value)) size: number,
+    @RequestParams.Query('offset') @RequestParams((value: string) => ~~value) offset: number,
+    @RequestParams.Query('size') @RequestParams((value: string) => ~~value) size: number,
   ): Promise<Record<string, unknown>> {
     const accessData = ctx.accessData as AccessData;
-    // const userOrgNo = accessData.get<string>('userOrgNo');
-    // const appNo = accessData.get<string>('appNo');
-    // const userRoleLevel = accessData.get<number>('userRoleLevel');
-    // const [list, count] = await this.roleService.list({
-    //   offset,
-    //   size,
-    //   appNo,
-    //   orgNo: userOrgNo,
-    //   roleLevel: userRoleLevel,
-    // });
+    const appNo = accessData.get<string>('appNo');
+    const [list, count] = await this.appThemeService.list({
+      offset,
+      size,
+      appNo,
+    });
     return {
-      list: [],
-      count: 0,
+      list,
+      count,
     };
   }
 

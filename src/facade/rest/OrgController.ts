@@ -5,7 +5,7 @@ import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { OrgService } from '../../domain/service/OrgService';
 import { CreateOrgDto } from '../dto/CreateOrgDto';
 
-@Prefix('/api/v1/org')
+@Prefix('/api/v1/org/org')
 @Provider()
 export class OrgController {
   @Inject(OrgService)
@@ -28,6 +28,7 @@ export class OrgController {
       appNo,
       parent,
     });
+
     return {
       list,
       count,

@@ -6,9 +6,16 @@ export enum ResourceStatus {
 }
 
 export enum ResourceType {
-  HOME_MENU = 'homeMenu',
-  HEAD_MENU = 'headMenu',
-  FUNCTION = 'func',
+  FUNCTION = 'function',
+  PAGE = 'page',
+  PERM = 'perm',
+  MENU = 'menu',
+}
+
+export enum ResourcePosition {
+  HOME = 'home',
+  HEAD = 'head',
+  None = 'none',
 }
 
 @Entity('pp_resource')
@@ -49,7 +56,21 @@ export class ResourceEntity {
     enum: ResourceType,
   })
   @Index()
-  type: ResourceType = ResourceType.HOME_MENU;
+  type!: ResourceType;
+
+  @Column({
+    type: 'enum',
+    enum: ResourcePosition,
+  })
+  @Index()
+  position!: ResourcePosition;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    default: null,
+  })
+  linkUrl: string | null = null;
 
   @Column({
     type: 'varchar',

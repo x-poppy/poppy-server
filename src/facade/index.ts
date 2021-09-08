@@ -14,7 +14,6 @@ import { AppThemeController } from './rest/AppThemeController';
 import { ForgetPasswordController } from './rest/ForgetPasswordController';
 import { ServerProxyController } from './rest/ServerProxyController';
 import { RestPasswordController } from './rest/RestPasswordController';
-import { SecurityCenterController } from './rest/SecurityCenterController';
 import { OperationLogController } from './rest/OperationLogController';
 import { ResourceController } from './rest/ResourceController';
 import { ServerHookController } from './rest/ServerHookController';
@@ -40,7 +39,6 @@ import { HomeController } from './web/HomeController';
     ServerProxyController,
     ResourceController,
     RestPasswordController,
-    SecurityCenterController,
     SessionController,
     TwoFactorController,
     UserController,

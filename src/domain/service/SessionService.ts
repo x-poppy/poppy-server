@@ -5,8 +5,6 @@ import { I18N_IDENTIFIER, I18n } from '@augejs/i18n';
 
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 
-import { AppConfigKeys } from '@/util/AppConfigKeys';
-
 import { AppConfigService } from './AppConfigService';
 import { RolePermissionService } from './RolePermissionService';
 import { StepData } from '@augejs/koa-step-token';

@@ -26,6 +26,9 @@ tags:
 - name: "App"
   description: "App service group."
 
+- name: "Page"
+  description: "Page service group."
+
 consumes:
   - "application/json"
   - "application/x-www-form-urlencoded"
@@ -195,6 +198,7 @@ paths:
 
   /api/v1/authorization/two-factor:
     get:
+      summary: "Two factor list for current user"
       tags:
         - "Authorization"
       parameters:
@@ -224,6 +228,7 @@ paths:
 
   /api/v1/authorization/rest-password/auth:
     post:
+      summary: "Two factor auth for current user"
       tags:
         - "Authorization"
       responses:
@@ -248,7 +253,7 @@ paths:
 
   /api/v1/resource/home-menu:
     get:
-      summary: "Get the app menu tree for current user"
+      summary: "Home menu for current user"
       tags:
         - "Menu"
       responses:
@@ -259,7 +264,7 @@ paths:
 
   /api/v1/resource/head-menu:
     get:
-      summary: "Get the app head icon for current user"
+      summary: "Head menu list for current user"
       tags:
         - "Menu"
       responses:
@@ -268,9 +273,20 @@ paths:
       security:
         - accessToken: []
 
+  /api/v1/user/user:
+    get:
+      summary: "User list current user"
+      tags:
+        - "User"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
   /api/v1/role/role:
     get:
-      summary: "Get Role list for current user"
+      summary: "Role list for current user"
       tags:
         - "Role"
       responses:
@@ -279,11 +295,60 @@ paths:
       security:
         - accessToken: []
 
-  /api/v1/org:
+  /api/v1/org/org:
     get:
-      summary: "Get org list for current user"
+      summary: "Org list for current user"
       tags:
         - "Org"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/app/app:
+    get:
+      summary: "App list for current user"
+      tags:
+        - "App"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/app/app-theme:
+    get:
+      summary: "App theme list for current user"
+      tags:
+        - "App"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/page/page:
+    get:
+      summary: "Page list for current user"
+      tags:
+        - "Page"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/page/page/{appCode}:
+    get:
+      summary: "Page info for current user"
+      tags:
+        - "Page"
+      parameters:
+        - in: path
+          name: appCode
+          type: string
+          required: true
       responses:
         "200":
           description: ""
