@@ -13,7 +13,7 @@ export class ChangePasswordController {
 
   @RequestMapping.Post('auth')
   async auth(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body('password') password: string): Promise<Record<string, string | boolean>> {
-    const stepData = await this.changePasswordService.auth(ctx, password);
+    const stepData = await this.changePasswordService.auth(ctx, {} as LoginDto);
     return {
       token: stepData.token,
       twoFactorAuth: stepData.get<boolean>('twoFactorAuth'),
