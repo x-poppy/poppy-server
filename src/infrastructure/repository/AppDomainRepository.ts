@@ -54,4 +54,17 @@ export class AppDomainRepository {
       },
     });
   }
+
+  async findAppDomainAddressByAppNo(appNo: string): Promise<string | undefined> {
+    const appDomain = await this.appDomainRepository.findOne({
+      where: {
+        appNo,
+        status: AppDomainStatus.NORMAL,
+      },
+    });
+
+    if (!appDomain) return undefined;
+
+    return appDomain.domain;
+  }
 }

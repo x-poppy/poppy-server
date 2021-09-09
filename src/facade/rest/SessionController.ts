@@ -31,9 +31,7 @@ export class SessionController {
   async create(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
     const accessData = await this.sessionService.createAccessData(ctx);
     ctx.set('Set-Authorization', accessData.token);
-
     ctx.stepData = null;
-
     return {
       token: accessData.token,
     };

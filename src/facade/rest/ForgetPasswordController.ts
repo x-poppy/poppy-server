@@ -5,7 +5,7 @@ import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
 import { LoginDto } from '../dto/LoginDto';
 
-@Prefix('/api/v1/authorization/forget-password')
+@Prefix('/api/v1/user/forget-password')
 @Provider()
 export class ForgetPasswordController {
   @Inject(ForgetPasswordService)
@@ -29,6 +29,8 @@ export class ForgetPasswordController {
   @RequestMapping.Put('')
   async update(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, string | boolean>> {
     await this.forgetPasswordService.update(ctx);
+    // rm the step token
+    ctx.stepData = null;
     return {};
   }
 }

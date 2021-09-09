@@ -62,6 +62,25 @@ definitions:
       - password
       - appNo
 
+  ChangePasswordDto:
+    type: object
+    properties:
+      oldPassword:
+        type: string
+      password:
+        type: string
+    required:
+      - "oldPassword"
+      - "password"
+
+  RestPasswordInviteDto:
+    type: object
+    properties:
+      userNo:
+        type: string
+    required:
+      - "userNo"
+
   AppDomainUIInfoBo:
     type: object
     properties:
@@ -101,7 +120,7 @@ definitions:
 paths:
   /health:
     get:
-      tags: [Health]
+      tags: [ Health ]
       summary: "Get Server health info"
       responses:
         "200":
@@ -226,31 +245,6 @@ paths:
         "200":
           description: ""
 
-  /api/v1/authorization/rest-password/auth:
-    post:
-      summary: "Two factor auth for current user"
-      tags:
-        - "Authorization"
-      responses:
-        "200":
-          description: ""
-
-  /api/v1/authorization/rest-password/verify:
-    post:
-      tags:
-        - "Authorization"
-      responses:
-        "200":
-          description: ""
-
-  /api/v1/authorization/rest-password:
-    put:
-      tags:
-        - "Authorization"
-      responses:
-        "200":
-          description: ""
-
   /api/v1/resource/home-menu:
     get:
       summary: "Home menu for current user"
@@ -278,6 +272,104 @@ paths:
       summary: "User list current user"
       tags:
         - "User"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/user/change-password/auth:
+    post:
+      summary: "change password"
+      tags:
+        - "User"
+      parameters:
+        - in: body
+          name: changePasswordDto
+          required: true
+          schema:
+            $ref: "#/definitions/ChangePasswordDto"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/user/change-password:
+    put:
+      summary: "change password"
+      tags:
+        - "User"
+      parameters:
+        - in: header
+          name: step-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/user/forget-password/auth:
+    post:
+      summary: "forget password"
+      tags:
+        - "User"
+      parameters:
+        - in: body
+          name: loginDto
+          required: true
+          schema:
+            $ref: "#/definitions/LoginDto"
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/user/forget-password:
+    put:
+      summary: "forget password"
+      tags:
+        - "User"
+      parameters:
+        - in: header
+          name: step-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
+  /api/v1/user/rest-password-invite/auth:
+    post:
+      summary: "Reset password auth for current user"
+      tags:
+        - "User"
+      parameters:
+        - in: body
+          name: restPasswordInviteDto
+          required: true
+          schema:
+            $ref: "#/definitions/RestPasswordInviteDto"
+      responses:
+        "200":
+          description: "From a login user to create a link for target user for reset password"
+      security:
+        - accessToken: []
+
+  /api/v1/user/rest-password-invite:
+    post:
+      tags:
+        - "User"
+      parameters:
+        - in: header
+          name: step-token
+          required: true
+          type: string
       responses:
         "200":
           description: ""

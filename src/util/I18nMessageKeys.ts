@@ -27,4 +27,10 @@ export enum I18nMessageKeys {
 
   Proxy_Server_Is_Not_Exist = 'Proxy_Server_Is_Not_Exist',
   Proxy_Server_Url_Error = 'Proxy_Server_Url_Error',
+
+  Chang_Password_Same_Password_Error = 'Chang_Password_Same_Password_Error',
+
+  Forget_Password_Missing_Two_Factor_Error = 'Forget_Password_Missing_Two_Factor_Error',
+
+  Reset_Password_Invite_User_No_Empty_Error = 'Reset_Password_Invite_User_No_Empty_Error',
 }

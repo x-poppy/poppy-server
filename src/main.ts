@@ -32,9 +32,7 @@ import { KoaSecurityMiddleware } from '@augejs/koa-security';
 @YAMLConfig()
 @KoaFavicon()
 @AxiosConfig()
-@KoaSecurityMiddleware({
-  contentSecurityPolicy: false,
-})
+@KoaSecurityMiddleware()
 @KoaStatic({
   prefix: '',
   dir: path.join(__appRootDir, './node_modules/@x-poppy/poppy-web/build'),
@@ -43,7 +41,7 @@ import { KoaSecurityMiddleware } from '@augejs/koa-security';
 @Views()
 @KoaSwagger()
 @RedisConnection()
-@KoaAccessTokenManager()
+@KoaAccessTokenManager({})
 @KoaStepTokenManager()
 @KoaSend()
 @Module({

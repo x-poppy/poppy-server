@@ -13,7 +13,7 @@ import { AppDomainController } from './rest/AppDomainController';
 import { AppThemeController } from './rest/AppThemeController';
 import { ForgetPasswordController } from './rest/ForgetPasswordController';
 import { ServerProxyController } from './rest/ServerProxyController';
-import { RestPasswordController } from './rest/RestPasswordController';
+import { RestPasswordInviteController } from './rest/RestPasswordInviteController';
 import { OperationLogController } from './rest/OperationLogController';
 import { ResourceController } from './rest/ResourceController';
 import { ServerHookController } from './rest/ServerHookController';
@@ -22,6 +22,7 @@ import { KoaContext, MiddlewareHandler } from '@augejs/koa';
 import { RestfulAPIHandlerService } from '@/application/service/RestfulAPIHandlerService';
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 import { HomeController } from './web/HomeController';
+import { ChangePasswordController } from './rest/ChangePasswordController';
 @Module({
   providers: [
     AppController,
@@ -38,7 +39,8 @@ import { HomeController } from './web/HomeController';
     ServerHookController,
     ServerProxyController,
     ResourceController,
-    RestPasswordController,
+    RestPasswordInviteController,
+    ChangePasswordController,
     SessionController,
     TwoFactorController,
     UserController,

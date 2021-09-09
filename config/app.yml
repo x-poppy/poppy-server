@@ -12,10 +12,18 @@ redis:
   host: 106.14.147.173
   port: 6379
 
+accessToken:
+  maxAge: 1h
+  autoKeepActive: true
+  fingerPrintOptions:
+    userAgent: true
+    ip: true
+
 views:
   suffix: 'ejs'
 
 security:
+  contentSecurityPolicy: false
   cors:
     origin: "*"
 

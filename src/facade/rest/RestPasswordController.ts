@@ -1,36 +1,33 @@
-import { ResetPasswordService } from '@/domain/service/ResetPasswordService';
+import { ResetPasswordInviteService } from '@/domain/service/ResetPasswordInviteService';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
-import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
 
-@Prefix('/api/v1/authorization/rest-password')
+@Prefix('/api/v1/user/rest-password')
 @Provider()
-export class RestPasswordController {
-  @Inject(ResetPasswordService)
-  resetPasswordService!: ResetPasswordService;
+export class RestPasswordInviteController {
+  @Inject(ResetPasswordInviteService)
+  resetPasswordService!: ResetPasswordInviteService;
 
-  @KoaAccessTokenMiddleware()
+  @KoaStepTokenMiddleware('resetPassword', 'auth')
   @RequestMapping.Post('auth')
-  async auth(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body('userNo') userNo: string): Promise<Record<string, unknown>> {
-    const stepData = await this.resetPasswordService.auth(ctx, userNo);
-    return {
-      token: stepData.token,
-      twoFactorAuth: stepData.get<boolean>('twoFactorAuth'),
-    };
-  }
-
-  @RequestMapping.Put('verify')
-  @KoaStepTokenMiddleware('resetPassword', 'verify')
-  async verify(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
-    await this.resetPasswordService.verify(ctx);
+  async auth(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
+    // const stepData = await this.resetPasswordService.auth(ctx, userNo);
+    // return {
+    //   token: stepData.token,
+    //   twoFactorAuth: stepData.get<boolean>('twoFactorAuth'),
+    // };
+    // rm the step token
+    ctx.stepData = null;
     return {};
   }
 
   @RequestMapping.Put('')
   @KoaStepTokenMiddleware('resetPassword', 'end')
   async update(@RequestParams.Context() ctx: KoaContext): Promise<Record<string, unknown>> {
-    await this.resetPasswordService.update(ctx);
+    // await this.resetPasswordService.update(ctx);
+    // rm the step token
+    ctx.stepData = null;
     return {};
   }
 }
