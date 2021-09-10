@@ -1,60 +1,71 @@
 import ejs from 'ejs';
 
 import { MailService } from '@/infrastructure/service/MailService';
-import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
+import { GetLogger, ILogger, Inject, Provider, Value } from '@augejs/core';
 
 import { AppEntity } from '../model/AppEntity';
 import { UserEntity } from '../model/UserEntity';
 import { AppConfigService } from './AppConfigService';
+import { RenderFunction, VIEWS_IDENTIFIER } from '@augejs/views';
+
+interface SendResetPasswordLinkOpts {
+  operatorAppNo: string;
+  operatorAppName: string;
+  targetUserNo: string;
+  targetUserAccountName: string;
+  targetUserEmail: string;
+  resetPasswordLinkAddress: string;
+}
 
 @Provider()
 export class UserNoticeService {
   @GetLogger()
-  logger!: ILogger;
+  private logger!: ILogger;
+
+  @Value('/mail.auth.user')
+  private mailFrom!: string;
+
+  @Inject(VIEWS_IDENTIFIER)
+  private render!: RenderFunction;
 
   @Inject(MailService)
-  mailService!: MailService;
+  private mailService!: MailService;
 
   @Inject(AppConfigService)
-  appConfigService!: AppConfigService;
+  private appConfigService!: AppConfigService;
 
-  async sendResetPasswordLink(useNo: string, resetPasswordLink: string): Promise<void> {
-    const user = {} as UserEntity;
+  async sendResetPasswordLink(opts: SendResetPasswordLinkOpts): Promise<void> {
+    const emailAddr = opts.targetUserEmail;
 
-    const app = {} as AppEntity;
-
-    const emailAddr = user.emailAddr;
-    if (!emailAddr) return;
-
-    const subjectTemplate = (await this.appConfigService.getResetPasswordEmailSubjectTemplate(app.appNo)) ?? '';
+    let subjectTemplate = (await this.appConfigService.getResetPasswordEmailSubjectTemplate(opts.operatorAppNo)) ?? '';
     if (!subjectTemplate) {
-      this.logger.info(`useNo: ${user.userNo} appNo: ${user.appNo} getResetPasswordEmailSubjectTemplate is empty!`);
-      return;
+      subjectTemplate = '[<%= teamName%>] Reset Your Password';
     }
-
     const emailSubject = ejs.render(subjectTemplate, {
-      appName: app.displayName,
+      teamName: opts.operatorAppName,
     });
 
-    const emailContentTemplate = await this.appConfigService.getResetPasswordEmailContentTemplate(app.appNo);
+    const emailContentTemplate = await this.appConfigService.getResetPasswordEmailContentTemplate(opts.operatorAppNo);
+    const emailContentState = {
+      accountName: opts.targetUserAccountName,
+      teamName: opts.operatorAppName,
+      resetPasswordLink: opts.resetPasswordLinkAddress,
+    };
+    let emailContent = '';
     if (!emailContentTemplate) {
-      this.logger.info(`useNo: ${user.userNo} appNo: ${user.appNo} getResetPasswordEmailContentTemplate is empty!`);
-      return;
+      emailContent = await this.render('email/resetPasswordEmail.ejs', emailContentState);
+    } else {
+      emailContent = ejs.render(emailContentTemplate, emailContentState);
     }
-
-    const emailContent = ejs.render(emailContentTemplate, {
-      userName: user.accountName,
-      appName: app.displayName,
-      resetPasswordLink: resetPasswordLink,
-    });
 
     await this.mailService.send({
+      from: this.mailFrom,
       to: emailAddr,
       subject: emailSubject,
       html: emailContent,
     });
 
-    this.logger.info(`useNo: ${user.userNo} appNo: ${user.appNo} sendCreateAccountLink`);
+    this.logger.info(`targetUserAccountName: ${opts.targetUserAccountName} targetUserNo: ${opts.targetUserNo} operatorAppNo: ${opts.operatorAppNo} sendResetPasswordLink.`);
   }
 
   async sendCaptcha(useNo: string, captcha: string): Promise<void> {
@@ -88,6 +99,7 @@ export class UserNoticeService {
     });
 
     await this.mailService.send({
+      from: this.mailFrom,
       to: emailAddr,
       subject: emailSubject,
       html: emailContent,

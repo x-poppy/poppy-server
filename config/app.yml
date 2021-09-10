@@ -51,8 +51,8 @@ log4js:
 
 mail:
   host: "smtp.163.com"
-  port: 25
-  secure: false
+  port: 465
+  secure: true
   auth:
-    user: xxxxx@xx.com
-    pass: 'xxx'
+    user: poppy_dev_20210910@163.com
+    pass: JKUWGIFYNVHTFODW

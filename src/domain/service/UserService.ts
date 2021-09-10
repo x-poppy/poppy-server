@@ -1,7 +1,6 @@
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { UserEntity, UserStatus } from '../model/UserEntity';
 import { UserRepository } from '../../infrastructure/repository/UserRepository';
-import { LoginDto } from '@/facade/dto/LoginDto';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
 import { BusinessError } from '@/util/BusinessError';
@@ -16,6 +15,11 @@ interface ListOpts {
   appNo: string;
   offset: number;
   size: number;
+}
+
+interface FindAndVerifyLoginUserOpt {
+  userName: string;
+  appNo: string;
 }
 
 @Provider()
@@ -42,44 +46,44 @@ export class UserService {
     return this.userRepository.list(opts);
   }
 
-  async findAndVerifyLoginUser(loginDto: LoginDto): Promise<{
+  async findAndVerifyLoginUser(opts: FindAndVerifyLoginUserOpt): Promise<{
     app: AppEntity;
     user: UserEntity;
     userOrg: OrgEntity;
     userRole: RoleEntity;
   }> {
-    const app = await this.appRepository.findByStatusNormal(loginDto.appNo);
+    const app = await this.appRepository.findByStatusNormal(opts.appNo);
     if (!app) {
-      this.logger.info(`App_Is_Not_Exist. appNo: ${loginDto.appNo}`);
+      this.logger.info(`App_Is_Not_Exist. appNo: ${opts.appNo}`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
     const isTopApp = !app.parent;
     const appOrg = isTopApp ? null : await this.orgRepository.findByStatusNormal(app.orgNo as string);
     if (!isTopApp && !appOrg) {
-      this.logger.warn(`App_Is_Not_Exist. appOrgNo: ${app.orgNo}`);
+      this.logger.warn(`Org_Is_Not_Exist. appOrgNo: ${app.orgNo}`);
       throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);
     }
 
-    const user = await this.userRepository.findByAccountNameAndAppNo(loginDto.userName, loginDto.appNo);
+    const user = await this.userRepository.findByAccountNameAndAppNo(opts.userName, opts.appNo);
     if (!user) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${opts.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
     }
 
     if (user.status === UserStatus.DISABLED) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${opts.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
     }
 
     if (user.status === UserStatus.LOCKED) {
-      this.logger.warn(`User_Is_Locked. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
+      this.logger.warn(`User_Is_Locked. userName: ${opts.userName} appNo: ${opts.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
     }
 
     const userOrg = await this.orgRepository.findByStatusNormal(user.orgNo);
     if (!userOrg) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${loginDto.userName} appNo: ${loginDto.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${opts.appNo}`);
       throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);
     }
 

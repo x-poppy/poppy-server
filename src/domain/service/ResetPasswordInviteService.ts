@@ -1,4 +1,3 @@
-import path from 'path';
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
@@ -10,8 +9,8 @@ import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
 import { TwoFactorListBo } from '../bo/TwoFactorListBo';
 import { AppConfigService } from './AppConfigService';
-import { ChangePasswordDto } from '@/facade/dto/ChangePasswordDto';
 import { RestPasswordInviteDto } from '@/facade/dto/RestPasswordInviteDto';
+import { UserNoticeService } from './UserNoticeService';
 
 @Provider()
 export class ResetPasswordInviteService {
@@ -29,6 +28,9 @@ export class ResetPasswordInviteService {
 
   @Inject(AppConfigService)
   appConfigService!: AppConfigService;
+
+  @Inject(UserNoticeService)
+  userNoticeService!: UserNoticeService;
 
   async auth(ctx: KoaContext, restPasswordInviteDto: RestPasswordInviteDto): Promise<StepData> {
     const accessData = ctx.accessData as PoppyAccessData;
@@ -70,8 +72,10 @@ export class ResetPasswordInviteService {
 
     stepData.set('userNo', user.userNo);
     stepData.set('userAccountName', user.accountName);
+    stepData.set('userAppNo', userApp.appNo);
     stepData.set('userAppName', userApp.displayName);
 
+    stepData.set('targetUserNo', targetUser.userNo);
     stepData.set('targetUserAccountName', targetUser.accountName);
     stepData.set('targetUserAppNo', targetUserApp.appNo);
 
@@ -100,10 +104,12 @@ export class ResetPasswordInviteService {
     const stepData = ctx.stepData as StepData;
 
     const userNo = stepData.get<string>('userNo');
+    const userAppNo = stepData.get<string>('userAppNo');
     const userAccountName = stepData.get<string>('userAccountName');
     const userAppName = stepData.get<string>('userAppName');
 
     const targetUserAccountName = stepData.get<string>('targetUserAccountName');
+    const targetUserNo = stepData.get<string>('targetUserNo');
     const targetUserAppNo = stepData.get<string>('targetUserAppNo');
     const targetUserEmail = stepData.get<string>('targetUserEmail');
     const targetUserResetPasswordAddress = stepData.get<string>('targetUserAppDomainAddress');
@@ -111,18 +117,48 @@ export class ResetPasswordInviteService {
 
     const newStepData = ctx.createStepData('resetPassword', targetUserPasswordLinkExpireTime);
     newStepData.set('operatorUserNo', userNo);
+    newStepData.set('operatorAppNo', userAppNo);
+    newStepData.set('operatorAppName', userAppName);
+
+    stepData.set('targetUserNo', targetUserNo);
     newStepData.set('targetUserAccountName', targetUserAccountName);
     newStepData.set('targetUserAppNo', targetUserAppNo);
-    const resetPasswordLinkAddress = targetUserResetPasswordAddress + `/#/resetPassword?inviteToken=${newStepData.token}`;
+    const resetPasswordLinkAddressUrl = new URL(targetUserResetPasswordAddress);
+    resetPasswordLinkAddressUrl.searchParams.append('inviteToken', newStepData.token);
+    resetPasswordLinkAddressUrl.searchParams.append('accountName', targetUserAccountName);
+
+    const resetPasswordLinkAddress = resetPasswordLinkAddressUrl.toString();
     newStepData.set('resetPasswordLinkAddress', resetPasswordLinkAddress);
+    newStepData.steps = ['end'];
+
     await newStepData.save();
 
     if (targetUserEmail) {
       // send the email
-      this.logger.info(`send the reset password email to user. ${userAccountName} ${userAppName} ${targetUserAccountName}`);
+      this.userNoticeService
+        .sendResetPasswordLink({
+          operatorAppNo: userAppNo,
+          operatorAppName: userAppName,
+          targetUserAccountName,
+          targetUserNo,
+          targetUserEmail,
+          resetPasswordLinkAddress,
+        })
+        .catch((err) => {
+          this.logger.warn(`send the reset password email to user failed. ${err}`);
+        });
+
+      this.logger.info(
+        `send the reset password email to user. operatorUserAccountName: ${userAccountName} operatorUserAppName: ${userAppName} targetUserAccountName: ${targetUserAccountName}`,
+      );
     }
 
     stepData.set('resetPasswordLinkAddress', resetPasswordLinkAddress);
+
+    this.logger.info(
+      `reset password invite end. targetUserAccountName: ${targetUserAccountName} operatorUserAccountName: ${userAccountName} targetUserAccountName: ${targetUserAccountName}`,
+    );
+
     return stepData;
   }
 }

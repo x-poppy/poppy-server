@@ -376,6 +376,21 @@ paths:
       security:
         - accessToken: []
 
+  /api/v1/user/rest-password:
+    post:
+      tags:
+        - "User"
+      parameters:
+        - in: header
+          name: step-token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
   /api/v1/role/role:
     get:
       summary: "Role list for current user"

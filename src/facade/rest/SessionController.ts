@@ -18,7 +18,12 @@ export class SessionController {
   private sessionService!: SessionService;
 
   @RequestMapping.Post('auth')
-  async auth(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(LoginDto) loginDTO: LoginDto): Promise<Record<string, string | boolean>> {
+  async auth(
+    @RequestParams.Context() ctx: KoaContext,
+    @RequestParams.Body()
+    @RequestValidator(LoginDto)
+    loginDTO: LoginDto,
+  ): Promise<Record<string, string | boolean>> {
     const stepData = await this.sessionService.auth(ctx, loginDTO as LoginDto);
     return {
       token: stepData.token,

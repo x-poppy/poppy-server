@@ -7,6 +7,6 @@ export class MailService {
   private mail!: Mail;
 
   async send(opts: Mail.Options): Promise<void> {
-    this.mail.sendMail(opts);
+    await this.mail.sendMail(opts);
   }
 }

@@ -7,6 +7,7 @@ export enum AppConfigStatus {
 
 export enum AppConfigUIType {
   TEXT = 'text',
+  HTML = 'html',
 }
 
 @Entity('pp_app_config')
@@ -34,10 +35,8 @@ export class AppConfigEntity {
 
   @Column({
     type: 'text',
-    nullable: true,
-    default: null,
   })
-  value: string | null = null;
+  value!: string;
 
   @Column({
     type: 'text',

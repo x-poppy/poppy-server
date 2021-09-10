@@ -4,7 +4,6 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
-import { ChangePasswordDto } from '../dto/ChangePasswordDto';
 import { RestPasswordInviteDto } from '../dto/RestPasswordInviteDto';
 
 @Prefix('/api/v1/user/rest-password-invite')

@@ -20,6 +20,8 @@ import { ForgetPasswordService } from './service/ForgetPasswordService';
 import { Module } from '@augejs/core';
 import { ResetPasswordInviteService } from './service/ResetPasswordInviteService';
 import { ChangePasswordService } from './service/ChangePasswordService';
+import { ResetPasswordService } from './service/ResetPasswordService';
+import { UserNoticeService } from './service/UserNoticeService';
 
 @Module({
   providers: [
@@ -35,6 +37,9 @@ import { ChangePasswordService } from './service/ChangePasswordService';
     ForgetPasswordService,
     ResetPasswordInviteService,
     ChangePasswordService,
+    ResetPasswordService,
+
+    UserNoticeService,
 
     HomeMenuService,
     HeadMenuService,

@@ -53,4 +53,16 @@ export class AppConfigRepository {
 
     return results;
   }
+
+  async findValueByStatusNormal(appNo: string, key: string): Promise<string | undefined> {
+    const result = await this.appRepository.findOne({
+      where: {
+        key: key,
+        appNo: appNo,
+        status: AppConfigStatus.NORMAL,
+      },
+      select: ['value'],
+    });
+    return result?.value;
+  }
 }

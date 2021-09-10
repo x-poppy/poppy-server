@@ -14,11 +14,13 @@ import { AppThemeRepository } from './repository/AppThemeRepository';
 import { PasswordService } from './service/PasswordService';
 import { OneTimePasswordService } from './service/OneTimePasswordService';
 import { Module } from '@augejs/core';
+import { MailService } from './service/MailService';
 @Module({
   providers: [
     UniqueIdService,
     PasswordService,
     OneTimePasswordService,
+    MailService,
 
     AppConfigRepository,
     AppDomainRepository,

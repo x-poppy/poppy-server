@@ -23,6 +23,7 @@ import { RestfulAPIHandlerService } from '@/application/service/RestfulAPIHandle
 import { KoaBodyParserMiddleware } from '@augejs/koa-bodyparser';
 import { HomeController } from './web/HomeController';
 import { ChangePasswordController } from './rest/ChangePasswordController';
+import { RestPasswordController } from './rest/RestPasswordController';
 @Module({
   providers: [
     AppController,
@@ -40,6 +41,7 @@ import { ChangePasswordController } from './rest/ChangePasswordController';
     ServerProxyController,
     ResourceController,
     RestPasswordInviteController,
+    RestPasswordController,
     ChangePasswordController,
     SessionController,
     TwoFactorController,
