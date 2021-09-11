@@ -19,6 +19,8 @@ import { DomainLayerModule } from './domain';
 import { FacadeLayerModule } from './facade';
 import { InfrastructureLayerModule } from './infrastructure';
 import { KoaSecurityMiddleware } from '@augejs/koa-security';
+import { decryptConfigValues } from './util/decryptConfigValue';
+
 @Cluster({
   workers: 0,
   enable: process.env.NODE_ENV === 'production',
@@ -29,7 +31,11 @@ import { KoaSecurityMiddleware } from '@augejs/koa-security';
 })
 @MailTransport()
 @Log4js()
-@YAMLConfig()
+@YAMLConfig({
+  processor(result: Record<string, any>) {
+    return decryptConfigValues(result);
+  },
+})
 @KoaFavicon()
 @AxiosConfig()
 @KoaSecurityMiddleware()

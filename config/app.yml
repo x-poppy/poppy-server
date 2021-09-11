@@ -8,9 +8,9 @@ i18n:
   defaultLocale: en
 
 redis:
-  keyPrefix: 'poppy:'
-  host: 106.14.147.173
-  port: 6379
+  keyPrefix: JFX/+tPh96M4P7NczusqjpRyxHNire8kwyxRZeiSF66hTRtBJdUbX8JVzgi4ABFo3jsNS+WeiKbiNN4WDm8o1g==
+  host: Dmex7i67VR73qLM+V64fjxoDoZQzpgRov1TxpdiJxtl+1yd2q0F2uHqYPZInFI9H5EkneN53FvQcoQDV9/oYIw==
+  port: TsDS/oOk1QPLzSiI+kkBttmSewYpwvFRujdDt5ggLTNNBFDq4qDZhJiNu8lS3E9B31pDNRuF2RcfDuJT529Ahg==
 
 accessToken:
   maxAge: 1h
@@ -28,12 +28,12 @@ security:
     origin: "*"
 
 typeorm:
-  type: mysql
-  host: 106.14.147.173
-  port: 3306
-  database: poppy
-  username: root
-  password: example
+  type: NKw2Iwc+v6U6YkhU6o7UXmlLSnYKl1hGIr6J2+3yOjdZPpe5TMOpHKA8/OlYGl39WjFZgAMUyJ5OKpg0PpIEjA==
+  host: Dmex7i67VR73qLM+V64fjxoDoZQzpgRov1TxpdiJxtl+1yd2q0F2uHqYPZInFI9H5EkneN53FvQcoQDV9/oYIw==
+  port: n/wxQcZ0tdPNs2fzTpzeg2v1/gAWN1Qq6bB6rB/9ccEEiiMVMe5AxNLKwAHs6XbN4ds4b6ILPZ3PkSW6vfj20Q==
+  database: SYAzkjtlefwIfOXLoraJWQazA485l9m99TlMg0TQeFd0KnlOLjsMak9slBVLiNtcBJvj4fXceND2kcBRe7zyxw==
+  username: MZ0MxXe88vEGF781jpdUfx/DQSERZ+PJpYD2JLHnfhIwNWqFrxfFpukDJ2XPl+qMABGU5I2iKZP0huWunRKUWA==
+  password: K8lyvf0FS+bBqOW77Dzu0kjVXbgpodcK2Oi+ubf8vBn8ZJmmCsSGT4s6TOzKrFY4phJKfEYb0GQtr0vQ3ZOqSQ==
   maxQueryExecutionTime: 10000
   logging:
     - error
@@ -50,9 +50,12 @@ log4js:
       level: 'all'
 
 mail:
-  host: "smtp.163.com"
-  port: 465
+  host: "Gd4FyZv3NlCewRS2FFRIZ22+avr31AqtgBUjNWFlWTyjjEgyjv6o/oCCPL5XwPiB6wmsjfQQDJph/Lan55fzxw=="
+  port: c/MZQQYTucumjdA4+fh7hNMP3solPHVkdr4LL7aHEKlc/MLJRXklRnriPU1+fevMdHsyg+IVcaeijgu6U06oZQ==
   secure: true
   auth:
-    user: poppy_dev_20210910@163.com
-    pass: JKUWGIFYNVHTFODW
+    user: XBvJ+92AavJyg89Op+8nIrnC35VjHOqx0yHKEmeE6s2jj3N6mZm/OTE+450eFBdL34sCLF+rTuTf1kVzp5RhfQ==
+    pass: dZK0QIh9jEAFbhJXSJi4ddp5yZstLVm+l5YxIxCvMREcgaVrmSUDgPpNXuGOnERdZCzvpQdNz8xz7dqu1rEOQw==
+
+poppy:
+  configDecryptKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKNRtGfEJRMnBbQmdPzXIsA4ubFTElenR8oEAK0Y/auFgVQ+XQmJnizFbrMzr/yPTde9wvn5A0/quZkYNHhjGxECAwEAAQ==
