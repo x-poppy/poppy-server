@@ -5,7 +5,7 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
-@Prefix('/api/v1/resource/head-menu')
+@Prefix('/api/v1/menu/head-menu')
 @Provider()
 export class HeadMenuController {
   @Inject(HeadMenuService)

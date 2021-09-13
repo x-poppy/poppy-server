@@ -18,7 +18,7 @@ import { ApplicationLayerModule } from './application';
 import { DomainLayerModule } from './domain';
 import { FacadeLayerModule } from './facade';
 import { InfrastructureLayerModule } from './infrastructure';
-import { KoaSecurityMiddleware } from '@augejs/koa-security';
+import { KoaSecurity } from '@augejs/koa-security';
 import { decryptConfigValues } from './util/decryptConfigValue';
 
 @Cluster({
@@ -38,7 +38,7 @@ import { decryptConfigValues } from './util/decryptConfigValue';
 })
 @KoaFavicon()
 @AxiosConfig()
-@KoaSecurityMiddleware()
+@KoaSecurity()
 @KoaStatic({
   prefix: '',
   dir: path.join(__appRootDir, './node_modules/@x-poppy/poppy-web/build'),

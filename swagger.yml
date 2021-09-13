@@ -245,7 +245,7 @@ paths:
         "200":
           description: ""
 
-  /api/v1/resource/home-menu:
+  /api/v1/menu/home-menu:
     get:
       summary: "Home menu for current user"
       tags:
@@ -256,7 +256,7 @@ paths:
       security:
         - accessToken: []
 
-  /api/v1/resource/head-menu:
+  /api/v1/menu/head-menu:
     get:
       summary: "Head menu list for current user"
       tags:
