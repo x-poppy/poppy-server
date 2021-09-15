@@ -18,7 +18,7 @@ export class HomeMenuController {
     const appNo = (context.accessData?.get('appNo') as string) ?? null;
     const permissionsJson = context.accessData?.get<Record<string, boolean>>('userPermissions') ?? null;
     const permissions = PermissionsBo.fromJSON(permissionsJson);
-    const menuTrees = await this.menuService.findMenuTreesByAppNo(appNo, permissions, ResourcePosition.HEAD);
+    const menuTrees = await this.menuService.findMenuTreesByAppNo(appNo, permissions, ResourcePosition.HOME);
     return menuTrees;
   }
 }
