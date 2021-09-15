@@ -3,12 +3,12 @@ import { ResourceRepository } from '@/infrastructure/repository/ResourceReposito
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { HomeMenuTreeBo } from '../bo/HomeMenuTreeBo';
+import { MenuTreeBo } from '../bo/MenuTreeBo';
 import { PermissionsBo } from '../bo/PermissionsBo';
-import { ResourceEntity } from '../model/ResourceEntity';
+import { ResourceEntity, ResourcePosition } from '../model/ResourceEntity';
 
 @Provider()
-export class HomeMenuService {
+export class MenuService {
   @GetLogger()
   logger!: ILogger;
 
@@ -18,24 +18,30 @@ export class HomeMenuService {
   @Inject(AppRepository)
   private appRepository!: AppRepository;
 
-  async findMenuTreeByAppNo(appNo: string, permissionsBo: PermissionsBo): Promise<null | HomeMenuTreeBo> {
+  async findMenuTreesByAppNo(appNo: string, permissionsBo: PermissionsBo, position?: ResourcePosition.HEAD | ResourcePosition.HOME): Promise<MenuTreeBo[]> {
     const app = (await this.appRepository.findByStatusNormal(appNo)) ?? null;
     if (!app) {
       this.logger.warn(`the appNo: ${appNo} is not exist!`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
-    let resources = await this.resourceRepository.findAllMenusByStatusNormal(app.level);
+    let resources = await this.resourceRepository.findAllMenusByStatusNormal(app.level, position);
 
     // from top tp bottom
-    if (!resources || resources.length === 0) return null;
+    if (!resources || resources.length === 0) return [];
     resources = this.filterResourcesByPermission(resources, permissionsBo);
 
     // find the first root resource
-    const rootResource = resources.find((resource) => resource.parent === null);
-    if (!rootResource) return null;
+    const rootResources = resources.filter((resource) => resource.parent === null);
+    if (!rootResources) return [];
 
-    return this.buildMenuTree(new HomeMenuTreeBo(rootResource), resources);
+    const results: MenuTreeBo[] = [];
+    for (const rootResource of rootResources) {
+      const menuTreeBo = this.buildMenuTree(new MenuTreeBo(rootResource), resources);
+      results.push(menuTreeBo);
+    }
+
+    return results;
   }
 
   private filterResourcesByPermission(resources: ResourceEntity[], permissionsBo: PermissionsBo): ResourceEntity[] {
@@ -54,10 +60,10 @@ export class HomeMenuService {
     return results;
   }
 
-  private buildMenuTree(menu: HomeMenuTreeBo, resources: ResourceEntity[]): HomeMenuTreeBo {
+  private buildMenuTree(menu: MenuTreeBo, resources: ResourceEntity[]): MenuTreeBo {
     const childrenResources = this.findChildrenMenus(resources, menu.node.resourceCode);
     for (const childrenResource of childrenResources) {
-      const childMenu = this.buildMenuTree(new HomeMenuTreeBo(childrenResource), resources);
+      const childMenu = this.buildMenuTree(new MenuTreeBo(childrenResource), resources);
       menu.addChild(childMenu);
     }
     return menu;

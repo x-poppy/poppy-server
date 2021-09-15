@@ -1,15 +1,15 @@
 import { ResourceEntity } from '../model/ResourceEntity';
 
-export class HomeMenuTreeBo {
+export class MenuTreeBo {
   node: ResourceEntity;
-  children: HomeMenuTreeBo[] | null;
+  children: MenuTreeBo[] | null;
 
   constructor(node: ResourceEntity) {
     this.node = node;
     this.children = null;
   }
 
-  addChild(child: HomeMenuTreeBo): void {
+  addChild(child: MenuTreeBo): void {
     if (!this.children) {
       this.children = [];
     }

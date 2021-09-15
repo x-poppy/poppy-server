@@ -25,12 +25,14 @@ export class ResourceRepository {
     });
   }
 
-  async findAllMenusByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
+  async findAllMenusByStatusNormal(appLevel: number, position?: ResourcePosition.HEAD | ResourcePosition.HOME): Promise<ResourceEntity[] | undefined> {
     return await this.resourceRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
-        position: ResourcePosition.HOME,
         status: ResourceStatus.NORMAL,
+        ...(position && {
+          position,
+        }),
       },
       order: {
         priority: 'DESC',
@@ -38,18 +40,18 @@ export class ResourceRepository {
     });
   }
 
-  async findAllHeadMenusByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
-    return await this.resourceRepository.find({
-      where: {
-        appLevel: LessThan(appLevel + 1),
-        position: ResourcePosition.HEAD,
-        status: ResourceStatus.NORMAL,
-      },
-      order: {
-        priority: 'DESC',
-      },
-    });
-  }
+  // async findAllHeadMenusByStatusNormal(appLevel: number): Promise<ResourceEntity[] | undefined> {
+  //   return await this.resourceRepository.find({
+  //     where: {
+  //       appLevel: LessThan(appLevel + 1),
+  //       position: ResourcePosition.HEAD,
+  //       status: ResourceStatus.NORMAL,
+  //     },
+  //     order: {
+  //       priority: 'DESC',
+  //     },
+  //   });
+  // }
 
   async findMenuByResourceCode(resourceCode: string): Promise<ResourceEntity | undefined> {
     return await this.resourceRepository.findOne(resourceCode, {

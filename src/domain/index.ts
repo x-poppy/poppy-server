@@ -10,8 +10,7 @@ import { UserService } from './service/UserService';
 import { AppServerWebHookService } from './service/ServerWebHookService';
 import { AppServerProxyService } from './service/ServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
-import { HomeMenuService } from './service/HomeMenuService';
-import { HeadMenuService } from './service/HeadMenuService';
+import { MenuService } from './service/MenuService';
 import { AppThemeService } from './service/AppThemeService';
 import { AppUIService } from './service/AppUIService';
 import { TwoFactorService } from './service/TwoFactorService';
@@ -41,8 +40,7 @@ import { UserNoticeService } from './service/UserNoticeService';
 
     UserNoticeService,
 
-    HomeMenuService,
-    HeadMenuService,
+    MenuService,
 
     OperationLogService,
     OrgService,
