@@ -4,7 +4,6 @@ import { AppService } from './service/AppService';
 import { OperationLogService } from './service/OperationLogService';
 import { OrgService } from './service/OrgService';
 import { PageService } from './service/PageService';
-import { AppResourceService } from './service/ResourceService';
 import { SessionService } from './service/SessionService';
 import { UserService } from './service/UserService';
 import { AppServerWebHookService } from './service/ServerWebHookService';
@@ -26,7 +25,6 @@ import { UserNoticeService } from './service/UserNoticeService';
   providers: [
     AppConfigService,
     AppDomainService,
-    AppResourceService,
     AppServerProxyService,
     AppServerWebHookService,
     AppService,

@@ -5,7 +5,7 @@ export enum PageStatus {
   NORMAL = 'normal',
 }
 
-export enum PageType {
+export enum PageContentType {
   BUILD_IN = ' buildIn',
   HTML_URL = 'htmlUrl',
   HTML_SOURCE = 'htmlSource',
@@ -15,10 +15,10 @@ export enum PageType {
 @Entity('pp_page')
 export class PageEntity {
   @PrimaryColumn({
-    length: 80,
-    comment: 'unique page code for page can be equals to resource code',
+    type: 'bigint',
+    comment: 'pk SnowflakeNo format',
   })
-  pageCode!: string;
+  pageNo!: string;
 
   @Column({
     type: 'bigint',
@@ -26,6 +26,12 @@ export class PageEntity {
   })
   @Index()
   appNo!: string;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+  })
+  title!: string;
 
   @Column({
     type: 'text',
@@ -44,11 +50,11 @@ export class PageEntity {
 
   @Column({
     type: 'enum',
-    enum: PageType,
-    default: PageType.HTML_URL,
+    enum: PageContentType,
+    default: PageContentType.HTML_URL,
   })
   @Index()
-  type!: PageType;
+  contentType!: PageContentType;
 
   @Column({
     type: 'text',

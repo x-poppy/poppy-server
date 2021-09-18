@@ -1,30 +1,31 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
-export enum ResourceStatus {
+export enum MenuStatus {
   DISABLED = 'disabled',
   NORMAL = 'normal',
 }
 
-export enum ResourceType {
-  FUNCTION = 'function',
-  PAGE = 'page',
-  PERM = 'perm',
+export enum MenuType {
   MENU = 'menu',
+  MENU_GROUP = 'menuGroup',
+  MENU_ITEM = 'menuItem',
+  MENU_ITEM_WIDGET = 'menuItemWidget',
 }
 
-export enum ResourcePosition {
+export enum MenuPosition {
   HOME = 'home',
   HEAD = 'head',
-  None = 'none',
+  EXTEND = 'extend',
 }
 
-@Entity('pp_resource')
-export class ResourceEntity {
+@Entity('pp_menu')
+export class MenuEntity {
   @PrimaryColumn({
     length: 80,
-    comment: 'resource code',
+    comment: 'menu code',
+    unique: true,
   })
-  resourceCode!: string;
+  menuCode!: string;
 
   @Column({
     type: 'bigint',
@@ -32,6 +33,14 @@ export class ResourceEntity {
   })
   @Index()
   appNo!: string;
+
+  @Column({
+    type: 'bigint',
+    comment: 'pageNo',
+    nullable: true,
+    default: null,
+  })
+  pageNo: string | null = null;
 
   @Column({
     type: 'smallint',
@@ -53,22 +62,23 @@ export class ResourceEntity {
 
   @Column({
     type: 'enum',
-    enum: ResourceType,
+    enum: MenuType,
   })
   @Index()
-  type!: ResourceType;
+  type!: MenuType;
 
   @Column({
     type: 'enum',
-    enum: ResourcePosition,
+    enum: MenuPosition,
   })
   @Index()
-  position!: ResourcePosition;
+  position!: MenuPosition;
 
   @Column({
     type: 'varchar',
     length: 255,
     default: null,
+    comment: 'used for navigation',
   })
   linkUrl: string | null = null;
 
@@ -82,7 +92,7 @@ export class ResourceEntity {
 
   @Column({
     type: 'boolean',
-    comment: 'is resource is cover by permission',
+    comment: 'is menu is cover by permission',
     default: true,
   })
   @Index()
@@ -115,11 +125,11 @@ export class ResourceEntity {
 
   @Column({
     type: 'enum',
-    enum: ResourceStatus,
-    default: ResourceStatus.NORMAL,
+    enum: MenuStatus,
+    default: MenuStatus.NORMAL,
   })
   @Index()
-  status: ResourceStatus = ResourceStatus.NORMAL;
+  status: MenuStatus = MenuStatus.NORMAL;
 
   @CreateDateColumn()
   createAt!: Date;

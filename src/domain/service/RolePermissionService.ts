@@ -1,6 +1,6 @@
 import { Inject, Provider } from '@augejs/core';
 
-import { ResourceRepository } from '@/infrastructure/repository/ResourceRepository';
+import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { RolePermissionRepository } from '@/infrastructure/repository/RolePermissionRepository';
 import { RoleEntity } from '../model/RoleEntity';
@@ -12,8 +12,8 @@ export class RolePermissionService {
   @Inject(RoleRepository)
   private roleRepository!: RoleRepository;
 
-  @Inject(ResourceRepository)
-  private resourceRepository!: ResourceRepository;
+  @Inject(MenuRepository)
+  private resourceRepository!: MenuRepository;
 
   @Inject(RolePermissionRepository)
   private rolePermissionRepository!: RolePermissionRepository;
@@ -51,7 +51,7 @@ export class RolePermissionService {
       return new PermissionsBo();
     }
 
-    const resources = await this.resourceRepository.findAllGlobalPermissionsByAppLevel(app.level);
+    const resources = await this.resourceRepository.findAllPermissionsByAppLevel(app.level);
     return PermissionsBo.fromResources(resources);
   }
 

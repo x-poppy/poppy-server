@@ -1,4 +1,4 @@
-import { ResourceEntity } from '../model/ResourceEntity';
+import { MenuEntity } from '../model/MenuEntity';
 import { RolePermissionEntity } from '../model/RolePermissionEntity';
 
 export class PermissionBo {
@@ -18,11 +18,11 @@ export class PermissionsBo {
     return permissions;
   }
 
-  static fromResources(resources: ResourceEntity[] | null | undefined): PermissionsBo {
+  static fromResources(resources: MenuEntity[] | null | undefined): PermissionsBo {
     const permissions = new PermissionsBo();
     if (resources) {
       for (const resource of resources) {
-        const permissionName = resource.resourceCode;
+        const permissionName = resource.menuCode;
         const permission = new PermissionBo(permissionName);
         permissions.set(permission);
       }

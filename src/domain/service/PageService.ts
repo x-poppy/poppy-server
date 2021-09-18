@@ -1,11 +1,15 @@
 import { Inject, Provider } from '@augejs/core';
-import { PageEntity } from '../model/PageEntity';
+import { PageContentType, PageEntity } from '../model/PageEntity';
 import { PageRepository } from '../../infrastructure/repository/PageRepository';
+import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
+import { HttpStatus, KoaContext } from '@augejs/koa';
+import { PoppyAccessData } from '@/types/PoppyAccessData';
 
 interface CreateOpt {
   appNo: string;
-  resourceCode: string;
+  title: string;
   content: string | null;
+  contentType: PageContentType;
   desc: string | null;
 }
 
@@ -22,10 +26,6 @@ export class PageService {
 
   async create(opts: CreateOpt): Promise<void> {
     return await this.pageRepository.create(opts);
-  }
-
-  async find(pageCode: string): Promise<PageEntity | undefined> {
-    return await this.pageRepository.find(pageCode);
   }
 
   async list(opts: ListOpts): Promise<[PageEntity[], number]> {

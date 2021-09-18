@@ -31,16 +31,16 @@ function getSystemInitSql(parameters: SystemInitSqlParameters) {
     INSERT INTO poppy.pp_app_domain (\`domain\`, appNo)
     VALUES('${parameters.appDomain}', ${parameters.appNo});
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, position, icon, hasPermission, priority, label)
+    INSERT INTO poppy.pp_menu (menuCode, parent, appNo, appLevel, \`type\`, position, icon, hasPermission, priority, label)
     VALUES('Setting', NULL, ${parameters.appNo}, 0, 'menu', 'home', NULL, 1, 0, 'Setting');
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`, position, icon, hasPermission, priority, label)
+    INSERT INTO poppy.pp_menu (menuCode, parent, appNo, appLevel, \`type\`, position, icon, hasPermission, priority, label)
     VALUES('Setting-1', 'Setting', ${parameters.appNo}, 0, 'menu', 'home', NULL, 1, 0, 'Setting-1');
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`,position, icon, hasPermission, priority, label)
+    INSERT INTO poppy.pp_menu (menuCode, parent, appNo, appLevel, \`type\`,position, icon, hasPermission, priority, label)
     VALUES('Head', NULL, ${parameters.appNo}, 0, 'menu', 'head', NULL, 0, 0, 'Head');
 
-    INSERT INTO poppy.pp_resource (resourceCode, parent, appNo, appLevel, \`type\`,position, icon, hasPermission, priority, label)
+    INSERT INTO poppy.pp_menu (menuCode, parent, appNo, appLevel, \`type\`,position, icon, hasPermission, priority, label)
     VALUES('Head-1', 'Head', ${parameters.appNo}, 0, 'menu', 'head', NULL, 0, 0, 'Head-1');
 
     -- root org

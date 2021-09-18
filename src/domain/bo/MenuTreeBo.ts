@@ -1,10 +1,10 @@
-import { ResourceEntity } from '../model/ResourceEntity';
+import { MenuEntity } from '../model/MenuEntity';
 
 export class MenuTreeBo {
-  node: ResourceEntity;
+  node: MenuEntity;
   children: MenuTreeBo[] | null;
 
-  constructor(node: ResourceEntity) {
+  constructor(node: MenuEntity) {
     this.node = node;
     this.children = null;
   }

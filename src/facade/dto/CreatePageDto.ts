@@ -1,5 +1,8 @@
+import { PageContentType } from '@/domain/model/PageEntity';
+
 export class CreatePageDto {
-  resourceCode!: string;
+  title!: string;
   content!: string | null;
+  contentType!: PageContentType;
   desc!: string | null;
 }

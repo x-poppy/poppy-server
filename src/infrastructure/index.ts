@@ -5,7 +5,7 @@ import { AppServerProxyRepository } from './repository/ServerProxyRepository';
 import { OperationLogRepository } from './repository/OperationLogRepository';
 import { OrgRepository } from './repository/OrgRepository';
 import { PageRepository } from './repository/PageRepository';
-import { ResourceRepository } from './repository/ResourceRepository';
+import { MenuRepository } from './repository/MenuRepository';
 import { RolePermissionRepository } from './repository/RolePermissionRepository';
 import { RoleRepository } from './repository/RoleRepository';
 import { UserRepository } from './repository/UserRepository';
@@ -33,7 +33,7 @@ import { MailService } from './service/MailService';
     PageRepository,
 
     RolePermissionRepository,
-    ResourceRepository,
+    MenuRepository,
     RoleRepository,
     UserRepository,
   ],

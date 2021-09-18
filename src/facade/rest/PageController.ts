@@ -16,12 +16,6 @@ export class PageController {
   @Inject(PageService)
   private pageService!: PageService;
 
-  @RequestMapping.Get('/:pageCode')
-  async find(@RequestParams.Params('pageCode') pageCode: string): Promise<PageEntity | null> {
-    const page = await this.pageService.find(pageCode);
-    return page ?? null;
-  }
-
   @KoaAccessTokenMiddleware()
   @RequestMapping.Post('/')
   async create(@RequestParams.Context() ctx: KoaContext, @RequestParams.Body() @RequestValidator(CreatePageDto) createPageDto: CreatePageDto): Promise<Record<string, unknown>> {

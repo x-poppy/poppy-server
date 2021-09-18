@@ -267,6 +267,22 @@ paths:
       security:
         - accessToken: []
 
+  /api/v1/menu/page/{menuCode}:
+    get:
+      summary: "show page data by menu code"
+      tags:
+        - "Menu"
+      parameters:
+        - in: path
+          name: menuCode
+          type: string
+          required: true
+      responses:
+        "200":
+          description: ""
+      security:
+        - accessToken: []
+
   /api/v1/user/user:
     get:
       summary: "User list current user"
@@ -440,22 +456,6 @@ paths:
       summary: "Page list for current user"
       tags:
         - "Page"
-      responses:
-        "200":
-          description: ""
-      security:
-        - accessToken: []
-
-  /api/v1/page/page/{appCode}:
-    get:
-      summary: "Page info for current user"
-      tags:
-        - "Page"
-      parameters:
-        - in: path
-          name: appCode
-          type: string
-          required: true
       responses:
         "200":
           description: ""

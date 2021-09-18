@@ -1,4 +1,4 @@
-import { ResourceStatus } from '@/domain/model/ResourceEntity';
+import { MenuStatus } from '@/domain/model/MenuEntity';
 import { RoleEntity } from '@/domain/model/RoleEntity';
 import { Inject, Provider } from '@augejs/core';
 import { EntityManager, getRepository, LessThanOrEqual, Repository } from '@augejs/typeorm';
@@ -50,7 +50,7 @@ export class RoleRepository {
   async findByStatusNormal(roleNo: string): Promise<RoleEntity | undefined> {
     return await this.roleRepository.findOne(roleNo, {
       where: {
-        status: ResourceStatus.NORMAL,
+        status: MenuStatus.NORMAL,
       },
     });
   }

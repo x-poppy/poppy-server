@@ -1,8 +1,8 @@
-import { ResourceEntity } from '../model/ResourceEntity';
+import { MenuEntity } from '../model/MenuEntity';
 
 export class HeadMenuBo {
-  node: ResourceEntity;
-  constructor(node: ResourceEntity) {
+  node: MenuEntity;
+  constructor(node: MenuEntity) {
     this.node = node;
   }
 }

@@ -1,31 +1,38 @@
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
-import { ResourceRepository } from '@/infrastructure/repository/ResourceRepository';
+import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
+import { PageRepository } from '@/infrastructure/repository/PageRepository';
+import { PoppyAccessData } from '@/types/PoppyAccessData';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
+import { HttpStatus, KoaContext } from '@augejs/koa';
 import { MenuTreeBo } from '../bo/MenuTreeBo';
 import { PermissionsBo } from '../bo/PermissionsBo';
-import { ResourceEntity, ResourcePosition } from '../model/ResourceEntity';
+import { MenuEntity, MenuPosition } from '../model/MenuEntity';
+import { PageEntity } from '../model/PageEntity';
 
 @Provider()
 export class MenuService {
   @GetLogger()
   logger!: ILogger;
 
-  @Inject(ResourceRepository)
-  private resourceRepository!: ResourceRepository;
+  @Inject(PageRepository)
+  private pageRepository!: PageRepository;
+
+  @Inject(MenuRepository)
+  private menuRepository!: MenuRepository;
 
   @Inject(AppRepository)
   private appRepository!: AppRepository;
 
-  async findMenuTreesByAppNo(appNo: string, permissionsBo: PermissionsBo, position?: ResourcePosition.HEAD | ResourcePosition.HOME): Promise<MenuTreeBo[]> {
+  async findMenuTreesByAppNo(appNo: string, permissionsBo: PermissionsBo, position?: MenuPosition.HEAD | MenuPosition.HOME): Promise<MenuTreeBo[]> {
     const app = (await this.appRepository.findByStatusNormal(appNo)) ?? null;
     if (!app) {
       this.logger.warn(`the appNo: ${appNo} is not exist!`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
-    let resources = await this.resourceRepository.findAllMenusByStatusNormal(app.level, position);
+    let resources = await this.menuRepository.findAllMenusByNormalStatus(app.level, position);
 
     // from top tp bottom
     if (!resources || resources.length === 0) return [];
@@ -44,14 +51,14 @@ export class MenuService {
     return results;
   }
 
-  private filterResourcesByPermission(resources: ResourceEntity[], permissionsBo: PermissionsBo): ResourceEntity[] {
+  private filterResourcesByPermission(resources: MenuEntity[], permissionsBo: PermissionsBo): MenuEntity[] {
     return resources.filter((resource) => {
-      return permissionsBo.has(resource.resourceCode);
+      return permissionsBo.has(resource.menuCode);
     });
   }
 
-  private findChildrenMenus(resources: ResourceEntity[], parent: string): ResourceEntity[] {
-    const results: ResourceEntity[] = [];
+  private findChildrenMenus(resources: MenuEntity[], parent: string): MenuEntity[] {
+    const results: MenuEntity[] = [];
     resources.forEach((resource) => {
       if (resource.parent === parent) {
         results.push(resource);
@@ -60,12 +67,31 @@ export class MenuService {
     return results;
   }
 
-  private buildMenuTree(menu: MenuTreeBo, resources: ResourceEntity[]): MenuTreeBo {
-    const childrenResources = this.findChildrenMenus(resources, menu.node.resourceCode);
+  private buildMenuTree(menu: MenuTreeBo, resources: MenuEntity[]): MenuTreeBo {
+    const childrenResources = this.findChildrenMenus(resources, menu.node.menuCode);
     for (const childrenResource of childrenResources) {
       const childMenu = this.buildMenuTree(new MenuTreeBo(childrenResource), resources);
       menu.addChild(childMenu);
     }
     return menu;
+  }
+
+  async showPage(ctx: KoaContext, menuCode: string): Promise<PageEntity | undefined> {
+    // h  ere if we visit the page from menu we need to check the state and permission
+    const menu = await this.menuRepository.findMenuByNormalStatus(menuCode);
+    if (!menu) {
+      return;
+    }
+
+    const accessData = ctx.accessData as PoppyAccessData;
+    const userPermissions = accessData.get<Record<string, boolean>>('userPermissions');
+    if (!userPermissions[menu.menuCode]) {
+      ctx.throw(HttpStatus.StatusCodes.FORBIDDEN);
+    }
+
+    if (!menu.pageNo) return;
+
+    const page = await this.pageRepository.findByNormalStatus(menu.pageNo);
+    return page;
   }
 }

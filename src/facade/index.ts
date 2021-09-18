@@ -1,5 +1,4 @@
-import { HeadMenuController } from './rest/HeadMenuController';
-import { HomeMenuController } from './rest/HomeMenuController';
+import { MenuController } from './rest/MenuController';
 import { OrgController } from './rest/OrgController';
 import { PageController } from './rest/PageController';
 import { SessionController } from './rest/SessionController';
@@ -32,8 +31,7 @@ import { RestPasswordController } from './rest/RestPasswordController';
     AppThemeController,
     AppUIController,
     ForgetPasswordController,
-    HomeMenuController,
-    HeadMenuController,
+    MenuController,
     OrgController,
     OperationLogController,
     PageController,
