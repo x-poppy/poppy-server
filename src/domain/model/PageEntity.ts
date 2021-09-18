@@ -6,10 +6,11 @@ export enum PageStatus {
 }
 
 export enum PageContentType {
-  BUILD_IN = ' buildIn',
+  BuildIn = ' buildIn',
   HTML_URL = 'htmlUrl',
-  HTML_SOURCE = 'htmlSource',
-  MARK_DOWN = 'markdown',
+  HTML_SRC = 'htmlSource',
+  Markdown = 'markdown',
+  Editor = 'editor',
 }
 
 @Entity('pp_page')
