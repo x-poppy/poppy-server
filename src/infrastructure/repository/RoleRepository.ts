@@ -7,7 +7,6 @@ import { UniqueIdService } from '../service/UniqueIdService';
 interface CreateOpt {
   parent: string | null;
   appNo: string;
-  orgNo: string | null;
   level: number;
   inherited: boolean;
   displayName: string;
@@ -20,7 +19,6 @@ interface ListOpts {
   size: number;
   appNo: string;
   level: number;
-  orgNo: string;
 }
 
 @Provider()
@@ -36,7 +34,6 @@ export class RoleRepository {
     const roleNo = await this.uniqueIdService.getUniqueId();
     const role = new RoleEntity();
     role.roleNo = roleNo;
-    role.orgNo = opts.orgNo;
     role.parent = opts.parent;
     role.level = opts.level;
     role.inherited = opts.inherited;
@@ -61,7 +58,6 @@ export class RoleRepository {
       take: opts.size,
       where: {
         appNo: opts.appNo,
-        orgNo: opts.orgNo,
         level: LessThanOrEqual(opts.level),
       },
       order: {

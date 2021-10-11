@@ -7,7 +7,6 @@ import { BusinessError } from '../../util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { AppEntity } from '../model/AppEntity';
-import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
 
 interface CreateOpts {
@@ -91,7 +90,6 @@ export class AppService {
           parent: creatorRoleNo,
           level: creatorRole ? creatorRole.level + 1 : 0,
           appNo: creatorUser?.appNo ?? createdAppNo,
-          orgNo: creatorUser?.orgNo ?? null,
           displayName: opts.roleDisplayName,
           desc: opts.roleDesc ?? null,
           inherited: true,
@@ -108,7 +106,6 @@ export class AppService {
       const createdApp = await this.appRepository.create(
         {
           appNo: createdAppNo,
-          orgNo: creatorUser?.orgNo ?? null,
           roleNo: createdRole.roleNo,
           parent: creatorApp?.appNo ?? null,
           level: creatorApp ? creatorApp.level + 1 : 0,

@@ -1,7 +1,8 @@
 import { UserService } from '@/domain/service/UserService';
+import { PoppyAccessData } from '@/types/PoppyAccessData';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
-import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
+import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { UserEntity } from '../../domain/model/UserEntity';
 
 @Prefix('/api/v1/user/user')
@@ -20,7 +21,7 @@ export class UserController {
     @RequestParams.Query('offset') @RequestParams((value: string) => parseInt(value)) offset: number,
     @RequestParams.Query('size') @RequestParams((value: string) => parseInt(value)) size: number,
   ): Promise<Record<string, unknown>> {
-    const accessData = ctx.accessData as AccessData;
+    const accessData = ctx.accessData as PoppyAccessData;
     const appNo = accessData.get<string>('appNo') ?? null;
 
     const [list, count] = await this.userService.list({

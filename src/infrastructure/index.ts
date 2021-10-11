@@ -3,7 +3,6 @@ import { AppDomainRepository } from './repository/AppDomainRepository';
 import { AppRepository } from './repository/AppRepository';
 import { AppServerProxyRepository } from './repository/ServerProxyRepository';
 import { OperationLogRepository } from './repository/OperationLogRepository';
-import { OrgRepository } from './repository/OrgRepository';
 import { PageRepository } from './repository/PageRepository';
 import { MenuRepository } from './repository/MenuRepository';
 import { RolePermissionRepository } from './repository/RolePermissionRepository';
@@ -29,7 +28,6 @@ import { MailService } from './service/MailService';
     AppThemeRepository,
 
     OperationLogRepository,
-    OrgRepository,
     PageRepository,
 
     RolePermissionRepository,

@@ -17,13 +17,6 @@ export class UserEntity {
 
   @Column({
     type: 'bigint',
-    comment: 'orgNo SnowflakeNo format',
-  })
-  @Index()
-  orgNo!: string;
-
-  @Column({
-    type: 'bigint',
     comment: 'appNo for user for search',
   })
   @Index()

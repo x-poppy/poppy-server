@@ -17,9 +17,6 @@ tags:
 - name: "Menu"
   description: "Menu service group. Include `HomeMenu` and `HeadMenu`"
 
-- name: "Org"
-  description: "Org service group."
-
 - name: "Role"
   description: "Role service group."
 
@@ -245,38 +242,11 @@ paths:
         "200":
           description: ""
 
-  /api/v1/menu/home-menu:
+  /api/v1/menu/menu-tree:
     get:
-      summary: "Home menu for current user"
+      summary: "Menu tree for current user"
       tags:
         - "Menu"
-      responses:
-        "200":
-          description: ""
-      security:
-        - accessToken: []
-
-  /api/v1/menu/head-menu:
-    get:
-      summary: "Head menu list for current user"
-      tags:
-        - "Menu"
-      responses:
-        "200":
-          description: ""
-      security:
-        - accessToken: []
-
-  /api/v1/menu/page/{menuCode}:
-    get:
-      summary: "show page data by menu code"
-      tags:
-        - "Menu"
-      parameters:
-        - in: path
-          name: menuCode
-          type: string
-          required: true
       responses:
         "200":
           description: ""
@@ -412,17 +382,6 @@ paths:
       summary: "Role list for current user"
       tags:
         - "Role"
-      responses:
-        "200":
-          description: ""
-      security:
-        - accessToken: []
-
-  /api/v1/org/org:
-    get:
-      summary: "Org list for current user"
-      tags:
-        - "Org"
       responses:
         "200":
           description: ""

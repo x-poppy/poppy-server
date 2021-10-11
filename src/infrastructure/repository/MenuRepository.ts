@@ -1,4 +1,4 @@
-import { MenuEntity, MenuPosition, MenuStatus } from '@/domain/model/MenuEntity';
+import { MenuEntity, MenuStatus } from '@/domain/model/MenuEntity';
 import { Provider } from '@augejs/core';
 import { getRepository, LessThan, Repository } from '@augejs/typeorm';
 @Provider()
@@ -25,14 +25,11 @@ export class MenuRepository {
     });
   }
 
-  async findAllMenusByNormalStatus(appLevel: number, position?: MenuPosition): Promise<MenuEntity[] | undefined> {
+  async findAllMenusByNormalStatus(appLevel: number): Promise<MenuEntity[] | undefined> {
     return await this.menuRepository.find({
       where: {
         appLevel: LessThan(appLevel + 1),
         status: MenuStatus.NORMAL,
-        ...(position && {
-          position,
-        }),
       },
       order: {
         priority: 'DESC',

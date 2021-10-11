@@ -29,13 +29,6 @@ export class RoleEntity {
 
   @Column({
     type: 'bigint',
-    comment: 'orgNo for user',
-    nullable: true,
-  })
-  orgNo!: string | null;
-
-  @Column({
-    type: 'bigint',
     comment: 'appNo for role',
   })
   appNo!: string;

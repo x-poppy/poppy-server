@@ -7,15 +7,8 @@ export enum MenuStatus {
 
 export enum MenuType {
   MENU = 'menu',
-  MENU_GROUP = 'menuGroup',
   MENU_ITEM = 'menuItem',
   MENU_ITEM_WIDGET = 'menuItemWidget',
-}
-
-export enum MenuPosition {
-  HOME = 'home',
-  HEAD = 'head',
-  EXTEND = 'extend',
 }
 
 @Entity('pp_menu')
@@ -33,14 +26,6 @@ export class MenuEntity {
   })
   @Index()
   appNo!: string;
-
-  @Column({
-    type: 'bigint',
-    comment: 'pageNo',
-    nullable: true,
-    default: null,
-  })
-  pageNo: string | null = null;
 
   @Column({
     type: 'smallint',
@@ -68,15 +53,8 @@ export class MenuEntity {
   type!: MenuType;
 
   @Column({
-    type: 'enum',
-    enum: MenuPosition,
-  })
-  @Index()
-  position!: MenuPosition;
-
-  @Column({
     type: 'varchar',
-    length: 255,
+    length: 512,
     default: null,
     comment: 'used for navigation',
   })

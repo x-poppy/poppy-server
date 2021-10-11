@@ -7,7 +7,6 @@ interface ListOpts {
   size: number;
   appNo: string;
   roleLevel: number;
-  orgNo: string;
 }
 
 @Provider()
@@ -21,7 +20,6 @@ export class RoleService {
       size: opts.size,
       appNo: opts.appNo,
       level: opts.roleLevel,
-      orgNo: opts.orgNo,
     });
   }
 

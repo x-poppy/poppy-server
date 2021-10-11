@@ -31,29 +31,23 @@ export class AppEntity {
 
   @Column({
     type: 'bigint',
-    comment: 'orgNo for app, null means no org',
-    nullable: true,
-  })
-  orgNo: string | null = null;
-
-  @Column({
-    type: 'bigint',
     comment: 'role no for app',
   })
   roleNo!: string;
 
   @Column({
     type: 'varchar',
-    length: 80,
-    default: 'en_US',
-    comment: 'locale for app',
+    length: 6,
+    default: null,
+    comment: 'locale for app if this value is null and the local will decide by client',
+    nullable: true,
   })
-  locale = 'en_US';
+  locale: string | null = null;
 
   @Column({
     type: 'varchar',
     length: 200,
-    comment: 'app icon image (abs)path',
+    comment: 'app icon image (abs)path 300 * 300',
     nullable: true,
   })
   icon: string | null = null;
@@ -71,7 +65,9 @@ export class AppEntity {
   desc: string | null = null;
 
   @Column({
-    type: 'text',
+    type: 'varchar',
+    length: 128,
+    comment: 'The ICP for app',
     nullable: true,
   })
   icp: string | null = null;

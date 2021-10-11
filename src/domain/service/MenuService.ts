@@ -1,15 +1,12 @@
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
 import { PageRepository } from '@/infrastructure/repository/PageRepository';
-import { PoppyAccessData } from '@/types/PoppyAccessData';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { HttpStatus, KoaContext } from '@augejs/koa';
 import { MenuTreeBo } from '../bo/MenuTreeBo';
 import { PermissionsBo } from '../bo/PermissionsBo';
-import { MenuEntity, MenuPosition } from '../model/MenuEntity';
-import { PageEntity } from '../model/PageEntity';
+import { MenuEntity } from '../model/MenuEntity';
 
 @Provider()
 export class MenuService {
@@ -25,26 +22,26 @@ export class MenuService {
   @Inject(AppRepository)
   private appRepository!: AppRepository;
 
-  async findMenuTreesByAppNo(appNo: string, permissionsBo: PermissionsBo, position?: MenuPosition.HEAD | MenuPosition.HOME): Promise<MenuTreeBo[]> {
+  async findMenuTreesByAppNo(appNo: string, permissionsBo: PermissionsBo): Promise<MenuTreeBo[]> {
     const app = (await this.appRepository.findByStatusNormal(appNo)) ?? null;
     if (!app) {
       this.logger.warn(`the appNo: ${appNo} is not exist!`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
-    let resources = await this.menuRepository.findAllMenusByNormalStatus(app.level, position);
+    let menus = await this.menuRepository.findAllMenusByNormalStatus(app.level);
 
     // from top tp bottom
-    if (!resources || resources.length === 0) return [];
-    resources = this.filterResourcesByPermission(resources, permissionsBo);
+    if (!menus || menus.length === 0) return [];
+    menus = this.filterResourcesByPermission(menus, permissionsBo);
 
     // find the first root resource
-    const rootResources = resources.filter((resource) => resource.parent === null);
-    if (!rootResources) return [];
+    const rootMenus = menus.filter((resource) => resource.parent === null);
+    if (!rootMenus) return [];
 
     const results: MenuTreeBo[] = [];
-    for (const rootResource of rootResources) {
-      const menuTreeBo = this.buildMenuTree(new MenuTreeBo(rootResource), resources);
+    for (const rootMenu of rootMenus) {
+      const menuTreeBo = this.buildMenuTree(new MenuTreeBo(rootMenu), menus);
       results.push(menuTreeBo);
     }
 
@@ -74,24 +71,5 @@ export class MenuService {
       menu.addChild(childMenu);
     }
     return menu;
-  }
-
-  async showPage(ctx: KoaContext, menuCode: string): Promise<PageEntity | undefined> {
-    // h  ere if we visit the page from menu we need to check the state and permission
-    const menu = await this.menuRepository.findMenuByNormalStatus(menuCode);
-    if (!menu) {
-      return;
-    }
-
-    const accessData = ctx.accessData as PoppyAccessData;
-    const userPermissions = accessData.get<Record<string, boolean>>('userPermissions');
-    if (!userPermissions[menu.menuCode]) {
-      ctx.throw(HttpStatus.StatusCodes.FORBIDDEN);
-    }
-
-    if (!menu.pageNo) return;
-
-    const page = await this.pageRepository.findByNormalStatus(menu.pageNo);
-    return page;
   }
 }

@@ -37,7 +37,7 @@ export class SessionService {
   async auth(ctx: KoaContext, loginDto: LoginDto): Promise<StepData> {
     this.logger.info(`auth start. userName ${loginDto.userName} appNo: ${loginDto.appNo}`);
 
-    const { app, user, userOrg, userRole } = await this.userService.findAndVerifyLoginUser(loginDto);
+    const { app, user, userRole } = await this.userService.findAndVerifyLoginUser(loginDto);
 
     const verifyPwdResult = await this.passwordService.verify(user.userNo, user.nonce, loginDto.password, user.passwd);
     if (!verifyPwdResult) {
@@ -52,16 +52,11 @@ export class SessionService {
     const stepData = ctx.createStepData('login');
     stepData.set('userNo', user.userNo);
     stepData.set('accountName', user.accountName);
-    stepData.set('userHeaderImg', user.headerImg);
-
-    stepData.set('userOrgNo', userOrg.orgNo);
-    stepData.set('userOrgLevel', userOrg.level);
 
     stepData.set('userRoleNo', userRole.roleNo);
     stepData.set('userRoleLevel', userRole.level);
 
     stepData.set('appNo', app.appNo);
-    stepData.set('appOrgNo', app.orgNo);
     stepData.set('appLevel', app.level);
 
     stepData.set('twoFactorAuth', needTwoFactorAuth);
@@ -115,31 +110,29 @@ export class SessionService {
     const stepData = ctx.stepData as StepData;
 
     const userNo = stepData.get<string>('userNo');
-    const userOrgNo = stepData.get<string>('userRoleNo');
-    const userAppNo = stepData.get<string>('appNo');
+    const accountName = stepData.get<string>('accountName');
+    const userRoleNo = stepData.get<string>('userRoleNo');
+    const userRoleLevel = stepData.get('userRoleLevel');
+
+    const appNo = stepData.get<string>('appNo');
+    const appLevel = stepData.get('appLevel');
 
     this.logger.info(`createAccessData start. userNo: ${userNo}`);
 
-    const userPermissions = await this.rolePermissionService.findPermissionsByRoleNo(userOrgNo);
+    await this.kickOffOnlineUsers(ctx, userNo, appNo);
 
-    await this.kickOffOnlineUsers(ctx, userNo, userAppNo);
+    const userPermissions = await this.rolePermissionService.findPermissionsByRoleNo(userRoleNo);
 
     const accessData = ctx.createAccessData(userNo, process.env.NODE_ENV !== 'production' ? '2h' : undefined);
 
-    accessData.set('userNo', stepData.get('userNo'));
-    stepData.set('accountName', stepData.get('accountName'));
-    accessData.set('userHeaderImg', stepData.get('userHeaderImg'));
+    accessData.set('userNo', userNo);
+    stepData.set('accountName', accountName);
 
-    accessData.set('userOrgNo', stepData.get('userOrgNo'));
-    accessData.set('userOrgLevel', stepData.get('userOrgLevel'));
+    accessData.set('userRoleNo', userRoleNo);
+    accessData.set('userRoleLevel', userRoleLevel);
 
-    accessData.set('userRoleNo', stepData.get('userRoleNo'));
-    accessData.set('userRoleLevel', stepData.get('userRoleLevel'));
-
-    accessData.set('appNo', stepData.get('appNo'));
-    accessData.set('appOrgNo', stepData.get('appOrgNo'));
-    accessData.set('appLevel', stepData.get('appLevel'));
-
+    accessData.set('appNo', appNo);
+    accessData.set('appLevel', appLevel);
     accessData.set('userPermissions', userPermissions.toJson());
 
     await accessData.save();

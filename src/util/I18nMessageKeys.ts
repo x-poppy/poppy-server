@@ -4,7 +4,6 @@ export enum I18nMessageKeys {
 
   Domain_Is_Not_Exist = 'Domain_Is_Not_Exist',
   App_Is_Not_Exist = 'App_Is_Not_Exist',
-  Org_Is_Not_Exist = 'Org_Is_Not_Exist',
   Role_Is_Not_Exist = 'Role_Is_Not_Exist',
   User_Is_Not_Exist = 'User_Is_Not_Exist',
 

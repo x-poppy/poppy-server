@@ -2,7 +2,6 @@ import { AppConfigService } from './service/AppConfigService';
 import { AppDomainService } from './service/AppDomainService';
 import { AppService } from './service/AppService';
 import { OperationLogService } from './service/OperationLogService';
-import { OrgService } from './service/OrgService';
 import { PageService } from './service/PageService';
 import { SessionService } from './service/SessionService';
 import { UserService } from './service/UserService';
@@ -41,7 +40,6 @@ import { UserNoticeService } from './service/UserNoticeService';
     MenuService,
 
     OperationLogService,
-    OrgService,
     PageService,
 
     RolePermissionService,

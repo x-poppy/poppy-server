@@ -39,7 +39,7 @@ export class UserRepository {
     return this.userRepository.findAndCount({
       skip: opts.offset,
       take: opts.size,
-      select: ['userNo', 'orgNo', 'appNo', 'roleNo', 'accountName', 'headerImg', 'mobileNo', 'emailAddr', 'twoFactorAuth', 'status', 'createAt', 'updateAt'],
+      select: ['userNo', 'appNo', 'roleNo', 'accountName', 'headerImg', 'mobileNo', 'emailAddr', 'twoFactorAuth', 'status', 'createAt', 'updateAt'],
       where: {
         appNo: opts.appNo,
       },
@@ -63,7 +63,6 @@ export class UserRepository {
     user.accountName = opts.accountName;
     user.roleNo = opts.roleNo;
     user.nonce = nonce;
-    user.orgNo = opts.orgNo;
     user.appNo = opts.appNo;
     user.mobileNo = opts.mobileNo;
     user.emailAddr = opts.emailAddr;

@@ -1,4 +1,5 @@
 import { RoleService } from '@/domain/service/RoleService';
+import { PoppyAccessData } from '@/types/PoppyAccessData';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
@@ -16,8 +17,7 @@ export class RoleController {
     @RequestParams.Query('offset') @RequestParams((value: string) => parseInt(value)) offset: number,
     @RequestParams.Query('size') @RequestParams((value: string) => parseInt(value)) size: number,
   ): Promise<Record<string, unknown>> {
-    const accessData = ctx.accessData as AccessData;
-    const userOrgNo = accessData.get<string>('userOrgNo');
+    const accessData = ctx.accessData as PoppyAccessData;
     const appNo = accessData.get<string>('appNo');
     const userRoleLevel = accessData.get<number>('userRoleLevel');
 
@@ -25,7 +25,6 @@ export class RoleController {
       offset,
       size,
       appNo,
-      orgNo: userOrgNo,
       roleLevel: userRoleLevel,
     });
     return {

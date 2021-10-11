@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
 @Entity('pp_role_permission')
 export class RolePermissionEntity {

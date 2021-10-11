@@ -5,7 +5,6 @@ import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {
   appNo: string;
-  orgNo: string | null;
   roleNo: string;
   parent: string | null;
   level: number;
@@ -43,7 +42,6 @@ export class AppRepository {
     const appRepository = manager?.getRepository(AppEntity) ?? this.appRepository;
     const app = new AppEntity();
     app.appNo = opts.appNo;
-    app.orgNo = opts.orgNo;
     app.level = opts.level;
     app.parent = opts.parent;
     app.roleNo = opts.roleNo;

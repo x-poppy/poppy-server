@@ -5,10 +5,8 @@ import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-import { OrgRepository } from '@/infrastructure/repository/OrgRepository';
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { AppEntity } from '../model/AppEntity';
-import { OrgEntity } from '../model/OrgEntity';
 import { RoleEntity } from '../model/RoleEntity';
 
 interface ListOpts {
@@ -36,9 +34,6 @@ export class UserService {
   @Inject(UserRepository)
   private userRepository!: UserRepository;
 
-  @Inject(OrgRepository)
-  orgRepository!: OrgRepository;
-
   @Inject(RoleRepository)
   roleRepository!: RoleRepository;
 
@@ -49,20 +44,12 @@ export class UserService {
   async findAndVerifyLoginUser(opts: FindAndVerifyLoginUserOpt): Promise<{
     app: AppEntity;
     user: UserEntity;
-    userOrg: OrgEntity;
     userRole: RoleEntity;
   }> {
     const app = await this.appRepository.findByStatusNormal(opts.appNo);
     if (!app) {
       this.logger.info(`App_Is_Not_Exist. appNo: ${opts.appNo}`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
-    }
-
-    const isTopApp = !app.parent;
-    const appOrg = isTopApp ? null : await this.orgRepository.findByStatusNormal(app.orgNo as string);
-    if (!isTopApp && !appOrg) {
-      this.logger.warn(`Org_Is_Not_Exist. appOrgNo: ${app.orgNo}`);
-      throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);
     }
 
     const user = await this.userRepository.findByAccountNameAndAppNo(opts.userName, opts.appNo);
@@ -72,19 +59,13 @@ export class UserService {
     }
 
     if (user.status === UserStatus.DISABLED) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${opts.appNo}`);
+      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${app.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
     }
 
     if (user.status === UserStatus.LOCKED) {
-      this.logger.warn(`User_Is_Locked. userName: ${opts.userName} appNo: ${opts.appNo}`);
+      this.logger.warn(`User_Is_Locked. userName: ${opts.userName} appNo: ${app.appNo}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
-    }
-
-    const userOrg = await this.orgRepository.findByStatusNormal(user.orgNo);
-    if (!userOrg) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${opts.appNo}`);
-      throw new BusinessError(I18nMessageKeys.Org_Is_Not_Exist);
     }
 
     const userRole = await this.roleRepository.findByStatusNormal(user.roleNo);
@@ -96,7 +77,6 @@ export class UserService {
     return {
       app,
       user,
-      userOrg,
       userRole,
     };
   }
