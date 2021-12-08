@@ -15,19 +15,20 @@ interface ListOpts {
 
 @Provider()
 export class AppDomainRepository {
-  private appDomainRepository: Repository<AppDomainEntity> = getRepository(AppDomainEntity);
+  private repository: Repository<AppDomainEntity> = getRepository(AppDomainEntity);
 
   async create(opts: CreateOpts, manager?: EntityManager): Promise<AppDomainEntity> {
-    const appDomainRepository = manager?.getRepository(AppDomainEntity) ?? this.appDomainRepository;
+    const repository = manager?.getRepository(AppDomainEntity) ?? this.repository;
+
     const appDomain = new AppDomainEntity();
     appDomain.domain = opts.domain;
     appDomain.appNo = opts.appNo;
-    await appDomainRepository.save(appDomain);
+    await repository.save(appDomain);
     return appDomain;
   }
 
   async list(opts: ListOpts): Promise<[AppDomainEntity[], number]> {
-    return this.appDomainRepository.findAndCount({
+    return this.repository.findAndCount({
       where: {
         skip: opts.offset,
         take: opts.size,
@@ -40,7 +41,7 @@ export class AppDomainRepository {
   }
 
   find(domain: string, opts?: FindConditions<AppDomainEntity>): Promise<AppDomainEntity | undefined> {
-    return this.appDomainRepository.findOne(domain, {
+    return this.repository.findOne(domain, {
       where: {
         ...opts,
       },
@@ -48,7 +49,7 @@ export class AppDomainRepository {
   }
 
   async findByStatusNormal(domain: string): Promise<AppDomainEntity | undefined> {
-    return await this.appDomainRepository.findOne(domain, {
+    return await this.repository.findOne(domain, {
       where: {
         status: AppDomainStatus.NORMAL,
       },
@@ -56,7 +57,7 @@ export class AppDomainRepository {
   }
 
   async findAppDomainAddressByAppNo(appNo: string): Promise<string | undefined> {
-    const appDomain = await this.appDomainRepository.findOne({
+    const appDomain = await this.repository.findOne({
       where: {
         appNo,
         status: AppDomainStatus.NORMAL,

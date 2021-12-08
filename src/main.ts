@@ -16,7 +16,7 @@ import { KoaSwagger } from '@augejs/koa-swagger';
 
 import { ApplicationLayerModule } from './application';
 import { DomainLayerModule } from './domain';
-import { FacadeLayerModule } from './facade';
+import { AdminFacadeLayerModule } from './facade/admin';
 import { InfrastructureLayerModule } from './infrastructure';
 import { KoaSecurity } from '@augejs/koa-security';
 import { decryptConfigValues } from './util/decryptConfigValue';
@@ -51,7 +51,7 @@ import { decryptConfigValues } from './util/decryptConfigValue';
 @KoaStepTokenManager()
 @KoaSend()
 @Module({
-  subModules: [FacadeLayerModule, ApplicationLayerModule, DomainLayerModule, InfrastructureLayerModule],
+  subModules: [AdminFacadeLayerModule, ApplicationLayerModule, DomainLayerModule, InfrastructureLayerModule],
 })
 class AppModule {
   @GetLogger()

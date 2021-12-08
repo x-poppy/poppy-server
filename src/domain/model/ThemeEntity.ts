@@ -1,46 +1,38 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
-export enum AppThemeStatus {
-  DISABLED = 'disabled',
-  NORMAL = 'normal',
-}
-
-@Entity('pp_app_theme')
-export class AppThemeEntity {
+@Entity('pp_theme')
+@Index('idx_app_key', ['appNo', 'key'], { unique: true })
+export class ThemeEntity {
   @PrimaryColumn({
+    type: 'bigint',
+    comment: 'pk SnowflakeNo format',
+  })
+  id!: string;
+
+  @Column({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
   })
   appNo!: string;
 
-  @PrimaryColumn({
-    type: 'varchar',
+  @Column({
     length: 80,
-    comment: 'theme variable name camelCase',
+    comment: 'i18n key',
   })
   key!: string;
 
   @Column({
-    type: 'varchar',
-    length: 200,
+    select: false,
+    type: 'simple-json',
     nullable: true,
-    default: null,
   })
   value: string | null = null;
 
   @Column({
-    type: 'text',
+    length: 500,
     nullable: true,
   })
   desc: string | null = null;
-
-  @Column({
-    type: 'enum',
-    enum: AppThemeStatus,
-    default: AppThemeStatus.NORMAL,
-  })
-  @Index()
-  status!: AppThemeStatus;
 
   @CreateDateColumn()
   createAt!: Date;

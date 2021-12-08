@@ -12,6 +12,11 @@ export class AppDomainEntity {
   })
   domain!: string;
 
+  @PrimaryColumn({
+    length: 80,
+  })
+  domain!: string;
+
   @Column({
     type: 'bigint',
     comment: 'appNo',

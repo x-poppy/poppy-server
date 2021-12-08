@@ -9,7 +9,7 @@ import { RolePermissionRepository } from './repository/RolePermissionRepository'
 import { RoleRepository } from './repository/RoleRepository';
 import { UserRepository } from './repository/UserRepository';
 import { UniqueIdService } from './service/UniqueIdService';
-import { AppThemeRepository } from './repository/AppThemeRepository';
+import { ThemeRepository } from './repository/ThemeRepository';
 import { PasswordService } from './service/PasswordService';
 import { OneTimePasswordService } from './service/OneTimePasswordService';
 import { Module } from '@augejs/core';
@@ -25,7 +25,7 @@ import { MailService } from './service/MailService';
     AppDomainRepository,
     AppRepository,
     AppServerProxyRepository,
-    AppThemeRepository,
+    ThemeRepository,
 
     OperationLogRepository,
     PageRepository,

@@ -35,9 +35,9 @@ export class PermissionsBo {
 
     if (rolePermissions) {
       for (const rolePermission of rolePermissions) {
-        const permissionName = rolePermission.resourceCode;
+        const permissionName = rolePermission.menuCode;
         if (parentPermissions.has(permissionName)) {
-          const permission = new PermissionBo(rolePermission.resourceCode);
+          const permission = new PermissionBo(rolePermission.menuCode);
           permissions.set(permission);
         }
       }

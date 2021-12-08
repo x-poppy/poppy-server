@@ -1,4 +1,4 @@
-import { LoginDto } from '@/facade/dto/LoginDto';
+import { LoginDto } from '@/facade/admin/dto/LoginDto';
 import { PasswordService } from '@/infrastructure/service/PasswordService';
 import { ClientValidationError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';

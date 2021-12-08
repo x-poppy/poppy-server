@@ -4,7 +4,7 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { RenderFunction, VIEWS_IDENTIFIER } from '@augejs/views';
-import { PageService } from '../../domain/service/PageService';
+import { PageService } from '../../../domain/service/PageService';
 import { CreatePageDto } from '../dto/CreatePageDto';
 
 @Prefix('/api/v1/page/page')

@@ -1,4 +1,4 @@
-import { ChangePasswordDto } from '@/facade/dto/ChangePasswordDto';
+import { ChangePasswordDto } from '@/facade/admin/dto/ChangePasswordDto';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
 import { PasswordService } from '@/infrastructure/service/PasswordService';
 import { PoppyAccessData } from '@/types/PoppyAccessData';

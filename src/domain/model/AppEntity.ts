@@ -38,11 +38,10 @@ export class AppEntity {
   @Column({
     type: 'varchar',
     length: 6,
-    default: null,
-    comment: 'locale for app if this value is null and the local will decide by client',
-    nullable: true,
+    default: 'en_US',
+    comment: 'locale for app and the client side first',
   })
-  locale: string | null = null;
+  locale = 'en_US';
 
   @Column({
     type: 'varchar',

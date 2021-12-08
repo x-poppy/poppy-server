@@ -2,7 +2,7 @@ import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { AccessData, KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
-import { SessionService } from '../../domain/service/SessionService';
+import { SessionService } from '../../../domain/service/SessionService';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
 import { KoaStepTokenMiddleware } from '@augejs/koa-step-token';
 import { LoginDto } from '../dto/LoginDto';

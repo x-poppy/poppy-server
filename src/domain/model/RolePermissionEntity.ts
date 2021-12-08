@@ -6,7 +6,7 @@ export class RolePermissionEntity {
     length: 80,
     comment: 'resource code PascalCase',
   })
-  resourceCode!: string;
+  menuCode!: string;
 
   @PrimaryColumn({
     type: 'bigint',

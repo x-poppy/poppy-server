@@ -8,14 +8,14 @@ export enum MenuStatus {
 export enum MenuType {
   MENU = 'menu',
   MENU_ITEM = 'menuItem',
-  MENU_ITEM_WIDGET = 'menuItemWidget',
+  MENU_ITEM_PERM = 'menuItemPerm',
 }
 
 @Entity('pp_menu')
 export class MenuEntity {
   @PrimaryColumn({
     length: 80,
-    comment: 'menu code',
+    comment: ' read able menu code',
     unique: true,
   })
   menuCode!: string;
@@ -39,7 +39,7 @@ export class MenuEntity {
     type: 'varchar',
     length: 80,
     nullable: true,
-    comment: 'parent resource code',
+    comment: 'parent menu code',
     default: null,
   })
   @Index()

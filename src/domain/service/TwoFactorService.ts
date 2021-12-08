@@ -1,4 +1,4 @@
-import { TwoFactorAuthDto } from '@/facade/dto/TwoFactorAuthDto';
+import { TwoFactorAuthDto } from '@/facade/admin/dto/TwoFactorAuthDto';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
 import { OneTimePasswordService } from '@/infrastructure/service/OneTimePasswordService';
 import { BusinessError, ClientValidationError } from '@/util/BusinessError';

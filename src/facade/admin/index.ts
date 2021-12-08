@@ -8,7 +8,7 @@ import { RoleController } from './rest/RoleController';
 import { AppController } from './rest/AppController';
 import { AppConfigController } from './rest/AppConfigController';
 import { AppDomainController } from './rest/AppDomainController';
-import { AppThemeController } from './rest/AppThemeController';
+import { ThemeController } from './rest/ThemeController';
 import { ForgetPasswordController } from './rest/ForgetPasswordController';
 import { ServerProxyController } from './rest/ServerProxyController';
 import { RestPasswordInviteController } from './rest/RestPasswordInviteController';
@@ -27,7 +27,7 @@ import { RestPasswordController } from './rest/RestPasswordController';
     AppController,
     AppConfigController,
     AppDomainController,
-    AppThemeController,
+    ThemeController,
     AppUIController,
     ForgetPasswordController,
     MenuController,
@@ -47,7 +47,7 @@ import { RestPasswordController } from './rest/RestPasswordController';
   ],
 })
 @KoaBodyParserMiddleware()
-export class FacadeLayerModule {
+export class AdminFacadeLayerModule {
   @Inject(RestfulAPIHandlerService)
   restfulAPIHandlerService!: RestfulAPIHandlerService;
 

@@ -10,7 +10,7 @@ import { RolePermissionService } from './RolePermissionService';
 import { StepData } from '@augejs/koa-step-token';
 import { TwoFactorListBo } from '../bo/TwoFactorListBo';
 import { ClientValidationError } from '@/util/BusinessError';
-import { LoginDto } from '@/facade/dto/LoginDto';
+import { LoginDto } from '@/facade/admin/dto/LoginDto';
 import { PasswordService } from '@/infrastructure/service/PasswordService';
 import { UserService } from './UserService';
 

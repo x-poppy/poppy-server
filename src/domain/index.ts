@@ -9,7 +9,7 @@ import { AppServerWebHookService } from './service/ServerWebHookService';
 import { AppServerProxyService } from './service/ServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
 import { MenuService } from './service/MenuService';
-import { AppThemeService } from './service/AppThemeService';
+import { ThemeService } from './service/ThemeService';
 import { AppUIService } from './service/AppUIService';
 import { TwoFactorService } from './service/TwoFactorService';
 import { RoleService } from './service/RoleService';
@@ -27,7 +27,7 @@ import { UserNoticeService } from './service/UserNoticeService';
     AppServerProxyService,
     AppServerWebHookService,
     AppService,
-    AppThemeService,
+    ThemeService,
     AppUIService,
 
     ForgetPasswordService,

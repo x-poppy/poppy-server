@@ -1,24 +1,15 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
 
-export enum AppConfigStatus {
-  DISABLED = 'disabled',
-  NORMAL = 'normal',
-}
-
-export enum AppConfigUIType {
-  TEXT = 'text',
-  HTML = 'html',
-}
-
 @Entity('pp_app_config')
+@Index('idx_app_key', ['appNo', 'key'], { unique: true })
 export class AppConfigEntity {
   @PrimaryColumn({
-    length: 80,
-    comment: 'key name',
+    type: 'bigint',
+    comment: 'id',
   })
-  key!: string;
+  id!: string;
 
-  @PrimaryColumn({
+  @Column({
     type: 'bigint',
     comment: 'appNo null means common app',
   })
@@ -26,31 +17,21 @@ export class AppConfigEntity {
   appNo!: string;
 
   @Column({
-    type: 'enum',
-    enum: AppConfigUIType,
-    default: AppConfigUIType.TEXT,
-    comment: 'ui name',
+    length: 80,
+    comment: 'key name',
   })
-  uiType: AppConfigUIType = AppConfigUIType.TEXT;
+  key!: string;
 
   @Column({
-    type: 'text',
+    length: 500,
   })
   value!: string;
 
   @Column({
-    type: 'text',
+    length: 500,
     nullable: true,
   })
   desc: string | null = null;
-
-  @Column({
-    type: 'enum',
-    enum: AppConfigStatus,
-    default: AppConfigStatus.NORMAL,
-  })
-  @Index()
-  status!: AppConfigStatus;
 
   @CreateDateColumn()
   createAt!: Date;

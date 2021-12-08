@@ -1,6 +1,6 @@
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
-import { AppThemeRepository } from '@/infrastructure/repository/AppThemeRepository';
+import { ThemeRepository } from '@/infrastructure/repository/ThemeRepository';
 import { Inject, Provider } from '@augejs/core';
 import { AppDomainUIInfoBo } from '../bo/AppUIDomainInfoBo';
 import { AppUIInfoBo } from '../bo/AppUIInfoBo';
@@ -10,8 +10,8 @@ export class AppUIService {
   @Inject(AppDomainRepository)
   private appDomainRepository!: AppDomainRepository;
 
-  @Inject(AppThemeRepository)
-  appThemeRepository!: AppThemeRepository;
+  @Inject(ThemeRepository)
+  appThemeRepository!: ThemeRepository;
 
   @Inject(AppRepository)
   private appRepository!: AppRepository;

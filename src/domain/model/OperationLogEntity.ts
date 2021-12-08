@@ -11,12 +11,6 @@ export class OperationLogEntity {
   })
   appNo!: string;
 
-  @Column({
-    type: 'bigint',
-    comment: 'orgNo for user',
-  })
-  orgNo!: string;
-
   @CreateDateColumn()
   createAt!: Date;
 

@@ -9,7 +9,7 @@ import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
 import { TwoFactorListBo } from '../bo/TwoFactorListBo';
 import { AppConfigService } from './AppConfigService';
-import { RestPasswordInviteDto } from '@/facade/dto/RestPasswordInviteDto';
+import { RestPasswordInviteDto } from '@/facade/admin/dto/RestPasswordInviteDto';
 import { UserNoticeService } from './UserNoticeService';
 
 @Provider()
