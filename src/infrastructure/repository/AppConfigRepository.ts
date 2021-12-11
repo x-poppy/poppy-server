@@ -1,83 +1,50 @@
 import { AppConfigEntity } from '@/domain/model/AppConfigEntity';
+import { DeepPartialData } from '@/types/DeepPartialData';
+import { FindDeepPartial } from '@/types/FindDeepPartial';
+import { FindManyOpt } from '@/types/FindManyOpt';
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, getRepository, Like, Repository } from '@augejs/typeorm';
+import { EntityManager, Like } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
-
-interface CreateOpt {
-  appNo: string;
-  group: string;
-  key: string;
-  value: string;
-  desc?: string | null;
-}
-
-interface ListOpts {
-  offset: number;
-  size: number;
-  key?: string;
-  appNo: string;
-}
-
-interface UpdateOpts {
-  id: string;
-  key?: string;
-  value?: string;
-  desc?: string;
-}
-
-interface FindConditionOpts {
-  appNo: string;
-  key: string;
-}
+import { PPRepository } from './PPRepository';
 
 @Provider()
-export class AppConfigRepository {
+export class AppConfigRepository extends PPRepository<AppConfigEntity> {
+
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  private repository: Repository<AppConfigEntity> = getRepository(AppConfigEntity);
+  constructor() {
+    super(AppConfigEntity);
+  }
 
-  async create(opts: CreateOpt, manager?: EntityManager): Promise<AppConfigEntity> {
-    const repository = manager?.getRepository(AppConfigEntity) ?? this.repository;
-    const uniqueId = await this.uniqueIdService.getUniqueId();
-    return repository.create({
-      id: uniqueId,
-      appNo: opts.appNo,
-      value: opts.value,
-      desc: opts.desc,
+  async create(data: DeepPartialData<AppConfigEntity>, manager?: EntityManager): Promise<AppConfigEntity> {
+    const id = await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).save({
+      ...data,
+      id,
     });
   }
 
-  async findById(id: string): Promise<AppConfigEntity | undefined> {
-    return this.repository.findOne(id);
-  }
-
-  async list(opts: ListOpts): Promise<[AppConfigEntity[], number]> {
-    return this.repository.findAndCount({
-      skip: opts.offset,
-      take: opts.size,
+  override async findMany(condition: FindDeepPartial<AppConfigEntity>, opts?: FindManyOpt): Promise<[AppConfigEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts?.pagination?.offset,
+        take: opts?.pagination.size,
+      }),
       where: {
-        appNo: opts.appNo,
-        ...(opts.key && {
-          key: Like(`${opts.key}%`),
+        ...(condition.appId && {
+          appId: condition.appId
         }),
+        ...(condition.key && {
+          key: Like(`${condition.key}%`),
+        })
       },
       order: {
+        key: 'ASC',
         createAt: 'DESC',
+        ...opts?.order,
       },
+      select: opts?.select as (keyof AppConfigEntity)[]
     });
-  }
-
-  async findByCondition(opts: FindConditionOpts): Promise<AppConfigEntity | undefined> {
-    return this.repository.findOne(opts);
-  }
-
-  async update(opts: UpdateOpts): Promise<void> {
-    await this.repository.update(opts.id, opts);
-  }
-
-  async delete(id: string, manager?: EntityManager): Promise<void> {
-    const repository = manager?.getRepository(AppConfigEntity) ?? this.repository;
-    await repository.delete(id);
   }
 }

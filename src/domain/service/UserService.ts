@@ -1,93 +1,98 @@
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { UserEntity, UserStatus } from '../model/UserEntity';
 import { UserRepository } from '../../infrastructure/repository/UserRepository';
-import { AppRepository } from '@/infrastructure/repository/AppRepository';
-import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
+import { PPService } from './PPService';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
-import { AppEntity } from '../model/AppEntity';
+import { EntityManager, Transaction, TransactionManager } from '@augejs/typeorm';
+import { UserCreateDto } from '@/facade/dto/UserDto';
+import { UserCredentialRepository } from '@/infrastructure/repository/UserCredentialRepository';
 import { RoleEntity } from '../model/RoleEntity';
-
-interface ListOpts {
-  appNo: string;
-  offset: number;
-  size: number;
-}
-
-interface FindAndVerifyLoginUserOpt {
-  userName: string;
-  appNo: string;
-}
-
+import { AppEntity } from '../model/AppEntity';
+import { AppCreateDto } from '@/facade/dto/AppDto';
 @Provider()
-export class UserService {
+export class UserService extends PPService<UserEntity, UserRepository> {
+
   @GetLogger()
-  logger!: ILogger;
-
-  @Inject(I18N_IDENTIFIER)
-  i18n!: I18n;
-
-  @Inject(AppRepository)
-  private appRepository!: AppRepository;
+  private readonly logger!: ILogger;
 
   @Inject(UserRepository)
-  private userRepository!: UserRepository;
+  protected override readonly repository!: UserRepository;
 
-  @Inject(RoleRepository)
-  roleRepository!: RoleRepository;
+  @Inject(UserCredentialRepository)
+  private userCredentialRepository!: UserCredentialRepository;
 
-  async list(opts: ListOpts): Promise<[UserEntity[], number]> {
-    return this.userRepository.list(opts);
-  }
-
-  async findAndVerifyLoginUser(opts: FindAndVerifyLoginUserOpt): Promise<{
-    app: AppEntity;
-    user: UserEntity;
-    userRole: RoleEntity;
-  }> {
-    const app = await this.appRepository.findByStatusNormal(opts.appNo);
-    if (!app) {
-      this.logger.info(`App_Is_Not_Exist. appNo: ${opts.appNo}`);
-      throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
-    }
-
-    const user = await this.userRepository.findByAccountNameAndAppNo(opts.userName, opts.appNo);
+  async findAndVerify(appId: string, accountName: string): Promise<UserEntity> | never {
+    const user = await this.repository.findOne({ appId, accountName }, { select: ['id', 'roleId', 'status']});
     if (!user) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${opts.appNo}`);
+      this.logger.info(`User_Is_Not_Exist. appId: ${appId} accountName: ${accountName}`);
       throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
     }
 
     if (user.status === UserStatus.DISABLED) {
-      this.logger.warn(`User_Is_Not_Exist. userName: ${opts.userName} appNo: ${app.appNo}`);
+      this.logger.warn(`App_Status_Is_Disabled. appId: ${appId} accountName: ${accountName}`);
       throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
     }
 
     if (user.status === UserStatus.LOCKED) {
-      this.logger.warn(`User_Is_Locked. userName: ${opts.userName} appNo: ${app.appNo}`);
-      throw new BusinessError(I18nMessageKeys.User_Status_Is_Disabled);
+      this.logger.warn(`User_Status_Is_Locked. appId: ${appId} accountName: ${accountName}`);
+      throw new BusinessError(I18nMessageKeys.User_Status_Is_Locked);
     }
 
-    const userRole = await this.roleRepository.findByStatusNormal(user.roleNo);
-    if (!userRole) {
-      this.logger.warn(`Role_Is_Not_Exist. roleNo: ${user.roleNo}`);
-      throw new BusinessError(I18nMessageKeys.Role_Is_Not_Exist);
+    if (user.status !== UserStatus.NORMAL) {
+      this.logger.warn(`User_Status_Is_Not_Normal. appId: ${appId} accountName: ${accountName}`);
+      throw new BusinessError(I18nMessageKeys.User_Status_Is_Not_Normal);
     }
 
-    return {
-      app,
-      user,
-      userRole,
-    };
+    return user;
   }
 
-  async updatePassword(userNo: string, hashPassword: string): Promise<void> {
-    const user = await this.userRepository.find(userNo);
-    if (!user) {
-      this.logger.warn(`User_Is_Not_Exist. userNo: ${userNo}`);
-      throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
-    }
+  async checkAccountNameAvailable(appId: string, accountName: string): Promise<boolean> {
+    const user = await this.repository.findOne({ appId, accountName }, { select: ['id']});
+    return !user;
+  }
 
-    this.userRepository.updateUserPassword(userNo, hashPassword);
+  @Transaction()
+  async createUser (dto: UserCreateDto, @TransactionManager() manager?: EntityManager): Promise<UserEntity> {
+    const user: UserEntity = await this.repository.create({
+      accountName: dto.emailAddr,
+      emailAddr: dto.emailAddr,
+      headerImg: dto.headerImg,
+      appId: dto.appId,
+      roleId: dto.roleId,
+    }, manager);
+
+    await this.userCredentialRepository.create({
+      userId: user.id,
+      appId: dto.appId,
+    }, manager);
+
+    // send email
+
+    return user;
+  }
+
+  async createUserByAppDto(dto: AppCreateDto,
+    createdApp: AppEntity, createdRole: RoleEntity,
+    manager: EntityManager): Promise<UserEntity> {
+      const user = await this.repository.create({
+        accountName: dto.emailAddr,
+        emailAddr: dto.emailAddr,
+        appLevel: createdApp.level,
+        appId: createdApp.id,
+        roleId:createdRole.id,
+      }, manager);
+
+      await this.userCredentialRepository.create({
+        userId: user.id,
+      }, manager);
+
+      return user;
+  }
+
+  @Transaction()
+  async deleteUser(userId: string, appId: string, @TransactionManager() manager: EntityManager): Promise<void> {
+    await this.repository.delete({id: userId, appId,}, manager);
+    await this.userCredentialRepository.delete({ userId, appId }, manager);
   }
 }

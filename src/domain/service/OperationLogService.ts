@@ -1,15 +1,10 @@
 import { Inject, Provider } from '@augejs/core';
 import { OperationLogRepository } from '../../infrastructure/repository/OperationLogRepository';
-
-interface ListOpts {
-  offset: number;
-  size: number;
-  appNo: bigint;
-  orgNo?: bigint | null;
-}
+import { OperationLogEntity } from '../model/OperationLogEntity';
+import { PPService } from './PPService';
 
 @Provider()
-export class OperationLogService {
+export class OperationLogService  extends PPService<OperationLogEntity, OperationLogRepository> {
   @Inject(OperationLogRepository)
-  private operationLogRepository!: OperationLogRepository;
+  protected override repository!: OperationLogRepository;
 }

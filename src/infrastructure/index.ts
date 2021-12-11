@@ -1,7 +1,6 @@
 import { AppConfigRepository } from './repository/AppConfigRepository';
 import { AppDomainRepository } from './repository/AppDomainRepository';
 import { AppRepository } from './repository/AppRepository';
-import { AppServerProxyRepository } from './repository/ServerProxyRepository';
 import { OperationLogRepository } from './repository/OperationLogRepository';
 import { PageRepository } from './repository/PageRepository';
 import { MenuRepository } from './repository/MenuRepository';
@@ -14,26 +13,37 @@ import { PasswordService } from './service/PasswordService';
 import { OneTimePasswordService } from './service/OneTimePasswordService';
 import { Module } from '@augejs/core';
 import { MailService } from './service/MailService';
+import { I18nRepository } from './repository/I18nRepository';
+import { CacheService } from './service/CacheService';
+import { RandomService } from './service/RandomService';
+import { AppLangRepository } from './repository/AppLangRepository';
+import { UserCredentialRepository } from './repository/UserCredentialRepository';
+import { CustomizedServiceRepository } from './repository/CustomizedServiceRepository';
+
 @Module({
   providers: [
     UniqueIdService,
     PasswordService,
     OneTimePasswordService,
     MailService,
+    CacheService,
+    RandomService,
 
     AppConfigRepository,
     AppDomainRepository,
     AppRepository,
-    AppServerProxyRepository,
     ThemeRepository,
 
     OperationLogRepository,
     PageRepository,
-
     RolePermissionRepository,
     MenuRepository,
     RoleRepository,
     UserRepository,
+    UserCredentialRepository,
+    I18nRepository,
+    AppLangRepository,
+    CustomizedServiceRepository,
   ],
 })
 export class InfrastructureLayerModule {}

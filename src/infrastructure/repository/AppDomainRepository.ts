@@ -1,71 +1,52 @@
-import { Provider } from '@augejs/core';
-import { EntityManager, FindConditions, getRepository, Repository } from '@augejs/typeorm';
-import { AppDomainEntity, AppDomainStatus } from '../../domain/model/AppDomainEntity';
-
-interface CreateOpts {
-  appNo: string;
-  domain: string;
-}
-
-interface ListOpts {
-  offset: number;
-  size: number;
-  appNo: string;
-}
-
+import { DeepPartialData } from '@/types/DeepPartialData';
+import { FindDeepPartial } from '@/types/FindDeepPartial';
+import { FindManyOpt } from '@/types/FindManyOpt';
+import { Inject, Provider } from '@augejs/core';
+import { EntityManager, Like } from '@augejs/typeorm';
+import { AppDomainEntity } from '../../domain/model/AppDomainEntity';
+import { UniqueIdService } from '../service/UniqueIdService';
+import { PPRepository } from './PPRepository';
 @Provider()
-export class AppDomainRepository {
-  private repository: Repository<AppDomainEntity> = getRepository(AppDomainEntity);
+export class AppDomainRepository extends PPRepository<AppDomainEntity> {
 
-  async create(opts: CreateOpts, manager?: EntityManager): Promise<AppDomainEntity> {
-    const repository = manager?.getRepository(AppDomainEntity) ?? this.repository;
+  @Inject(UniqueIdService)
+  private uniqueIdService!: UniqueIdService;
 
-    const appDomain = new AppDomainEntity();
-    appDomain.domain = opts.domain;
-    appDomain.appNo = opts.appNo;
-    await repository.save(appDomain);
-    return appDomain;
+  constructor() {
+    super(AppDomainEntity);
   }
 
-  async list(opts: ListOpts): Promise<[AppDomainEntity[], number]> {
-    return this.repository.findAndCount({
+  override async create(opts: DeepPartialData<AppDomainEntity>, manager?: EntityManager): Promise<AppDomainEntity> {
+    const id = await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).save({
+      ...opts,
+      id,
+    });
+  }
+
+  override async findMany(condition: FindDeepPartial<AppDomainEntity>, opts?: FindManyOpt): Promise<[AppDomainEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts.pagination.offset,
+        take: opts.pagination.size,
+      }),
       where: {
-        skip: opts.offset,
-        take: opts.size,
-        appNo: opts.appNo,
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.domain && {
+          domain: Like(`${condition.domain}%`),
+        }),
+        ...(condition.status && {
+          status: condition.status
+        })
       },
       order: {
         createAt: 'DESC',
+        domain: 'ASC',
+        ...opts?.order,
       },
+      select: opts?.select as (keyof AppDomainEntity)[]
     });
-  }
-
-  find(domain: string, opts?: FindConditions<AppDomainEntity>): Promise<AppDomainEntity | undefined> {
-    return this.repository.findOne(domain, {
-      where: {
-        ...opts,
-      },
-    });
-  }
-
-  async findByStatusNormal(domain: string): Promise<AppDomainEntity | undefined> {
-    return await this.repository.findOne(domain, {
-      where: {
-        status: AppDomainStatus.NORMAL,
-      },
-    });
-  }
-
-  async findAppDomainAddressByAppNo(appNo: string): Promise<string | undefined> {
-    const appDomain = await this.repository.findOne({
-      where: {
-        appNo,
-        status: AppDomainStatus.NORMAL,
-      },
-    });
-
-    if (!appDomain) return undefined;
-
-    return appDomain.domain;
   }
 }

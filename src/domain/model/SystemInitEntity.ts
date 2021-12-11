@@ -1,22 +1,15 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
-
+import { Column, Entity, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 @Entity('pp_system_init')
-export class SystemInitEntity {
+export class SystemInitEntity extends PPEntity {
   @PrimaryColumn({
-    type: 'smallint',
-    default: 0,
+    type: 'bigint',
+    comment: 'pk SnowflakeNo format',
   })
-  id = 0;
+  id!: string;
 
   @Column({
     type: 'text',
-    nullable: true,
   })
   initSql: string | null = null;
-
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
 }

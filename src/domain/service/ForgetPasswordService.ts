@@ -1,4 +1,4 @@
-import { LoginDto } from '@/facade/admin/dto/LoginDto';
+import { LoginDto } from '@/facade/dto/LoginDto';
 import { PasswordService } from '@/infrastructure/service/PasswordService';
 import { ClientValidationError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
@@ -6,7 +6,7 @@ import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
 import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
-import { TwoFactorListBo } from '../bo/TwoFactorListBo';
+import { TwoFactorListBo } from '../bo/TwoFactorItemBo';
 import { SessionService } from './SessionService';
 import { UserService } from './UserService';
 

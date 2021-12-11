@@ -1,63 +1,74 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
 export enum RoleStatus {
   DISABLED = 'disabled',
   NORMAL = 'normal',
 }
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string' },
+    appId: { type: 'string' },
+    appLevel: { type: 'number' },
+    parent: { type: 'string' },
+    inherited: { type: 'boolean' },
+    title: { type: 'string' },
+    status: { type: 'string', description: `${Object.values(RoleStatus).join(',')}` }
+  },
+})
 @Entity('pp_role')
-export class RoleEntity {
+export class RoleEntity extends PPEntity {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
   })
-  roleNo!: string;
+  id!: string;
+
+  @Column({
+    type: 'bigint',
+  })
+  @Index()
+  appId!: string;
 
   @Column({
     type: 'bigint',
     comment: 'parent for role null means no parent',
-    nullable: true,
+    default: '0',
   })
-  parent: string | null = null;
+  @Index()
+  parent!: string;
 
   @Column({
-    type: 'boolean',
-    comment: 'is inherited permissions from parent',
-    default: false,
+    type: 'smallint',
+    default: 0,
   })
-  inherited = false;
+  @Index()
+  appLevel = 0;
 
   @Column({
-    type: 'bigint',
-    comment: 'appNo for role',
+    type: 'varchar',
+    length: 120,
+    comment: 'title',
   })
-  appNo!: string;
+  @Index()
+  title!: string;
 
   @Column({
-    type: 'boolean',
-    comment: 'has app level resource permissions',
-    default: false,
-  })
-  hasAppResPerms = false;
-
-  @Column({
+    type: 'varchar',
     length: 80,
-    comment: 'user display nick name',
+    nullable: true
   })
-  displayName!: string;
+  titleI18nKey: string | null = null;
 
   @Column({
     type: 'smallint',
     comment: 'level',
     default: 0,
   })
+  @Index()
   level = 0;
-
-  @Column({
-    type: 'text',
-    nullable: true,
-  })
-  desc: string | null = null;
 
   @Column({
     type: 'enum',
@@ -65,11 +76,5 @@ export class RoleEntity {
     default: RoleStatus.NORMAL,
   })
   @Index()
-  status: RoleStatus = RoleStatus.NORMAL;
-
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
+  status!: RoleStatus;
 }

@@ -1,106 +1,55 @@
-import { I18nEntity } from '@/domain/model/18nEntity';
+import { I18nEntity } from '@/domain/model/I18nEntity';
+import { DeepPartialData } from '@/types/DeepPartialData';
+import { FindDeepPartial } from '@/types/FindDeepPartial';
+import { FindManyOpt } from '@/types/FindManyOpt';
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, getRepository, Like, Repository } from '@augejs/typeorm';
+import { EntityManager, Like } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
+import { PPRepository } from './PPRepository';
 
-interface CreateOpts {
-  appNo: string;
-  locale: string;
-  key: string;
-  value: string;
-  desc?: string;
-}
-
-interface ListOpts {
-  appNo: string;
-  locale?: string;
-  key?: string;
-  offset: number;
-  size: number;
-}
-
-interface AllOpts {
-  appNo: string;
-  locale: string;
-}
-
-interface UpdateOpts {
-  id: string;
-  appNo: string;
-  locale?: string;
-  key?: string;
-  value?: string;
-  desc?: string;
-}
-
-interface DeleteOpts {
-  id: string;
-  appNo: string;
-}
 
 @Provider()
-export class I18nRepository {
+export class I18nRepository extends PPRepository<I18nEntity> {
+
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  private repository: Repository<I18nEntity> = getRepository(I18nEntity);
+  constructor() {
+    super(I18nEntity);
+  }
 
-  async create(opts: CreateOpts, manager?: EntityManager): Promise<I18nEntity> {
-    const repository = manager?.getRepository(I18nEntity) ?? this.repository;
-    const uniqueId = await this.uniqueIdService.getUniqueId();
-
-    return repository.create({
-      id: uniqueId,
-      appNo: opts.appNo,
-      locale: opts.locale,
-      key: opts.key,
-      value: opts.value,
-      desc: opts.desc ?? null,
+  override async create(opts: DeepPartialData<I18nEntity>, manager?: EntityManager): Promise<I18nEntity> {
+    const id = opts.id ?? await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).save({
+      ...opts,
+      id,
     });
   }
 
-  async update(opts: UpdateOpts): Promise<void> {
-    await this.repository.update(
-      {
-        id: opts.id,
-        appNo: opts.appNo,
-      },
-      opts,
-    );
-  }
-
-  async list(opts: ListOpts): Promise<[I18nEntity[], number]> {
-    return this.repository.findAndCount({
-      skip: opts.offset,
-      take: opts.size,
+  override async findMany(condition: FindDeepPartial<I18nEntity>, opts?: FindManyOpt): Promise<[I18nEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts.pagination.offset,
+        take: opts.pagination.size,
+      }),
       where: {
-        appNo: opts.appNo,
-
-        ...(opts.locale && {
-          locale: opts.locale,
+        ...(condition.appId && {
+          appId: condition.appId
         }),
-        ...(opts.key && {
-          package: Like(`${opts.key}%`),
+        ...(condition.locale && {
+          locale: Like(`${condition.locale}%`),
+        }),
+        ...(condition.key && {
+          key: Like(`${condition.key}%`),
         }),
       },
       order: {
+        locale: 'ASC',
         key: 'ASC',
         createAt: 'DESC',
+        ...opts?.order,
       },
+      select: opts?.select as (keyof I18nEntity)[]
     });
-  }
-
-  async all(opts: AllOpts): Promise<I18nEntity[]> {
-    return this.repository.find({
-      where: {
-        appNo: opts.appNo,
-        locale: opts.locale,
-      },
-    });
-  }
-
-  async delete(opts: DeleteOpts, manager?: EntityManager): Promise<void> {
-    const repository = manager?.getRepository(I18nEntity) ?? this.repository;
-    await repository.delete(opts);
   }
 }

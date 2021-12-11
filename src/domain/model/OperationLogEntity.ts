@@ -1,19 +1,50 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
 @Entity('pp_operation_log')
-export class OperationLogEntity {
-  @PrimaryGeneratedColumn()
-  id!: bigint;
+@Index(['createAt'])
+export class OperationLogEntity extends PPEntity {
+  @PrimaryColumn({
+    type: 'bigint',
+    comment: 'id',
+  })
+  id!: string;
 
   @Column({
     type: 'bigint',
-    comment: 'appNo SnowflakeNo format',
   })
-  appNo!: string;
+  @Index()
+  appId!: string;
 
-  @CreateDateColumn()
-  createAt!: Date;
+  @Column({
+    length: 128,
+  })
+  @Index()
+  operator!: string;
 
-  @UpdateDateColumn()
-  updateAt!: Date;
+  @Column({
+    type: 'smallint',
+    default: 0,
+    comment: 'viewLevel is used for view permission'
+  })
+  @Index()
+  viewLevel = 0;
+
+  @Column({
+    length: 256,
+  })
+  @Index()
+  action!: string;
+
+  @Column({
+    length: 128,
+  })
+  @Index()
+  operatorIP!: string;
+
+  @Column({
+    type: 'text',
+    nullable: true
+  })
+  content: string | null = null;
 }

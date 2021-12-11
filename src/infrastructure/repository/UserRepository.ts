@@ -1,100 +1,63 @@
 import { Inject, Provider } from '@augejs/core';
-import crypto from 'crypto';
-import { EntityManager, getRepository, Repository } from '@augejs/typeorm';
+import { EntityManager, LessThan, Like } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
-import { UserEntity, UserStatus } from '../../domain/model/UserEntity';
-import { PasswordService } from '../service/PasswordService';
-
-interface CreateOpts {
-  orgNo: string;
-  appNo: string;
-  roleNo: string;
-  accountName: string;
-  password: string | null;
-  mobileNo: string | null;
-  emailAddr: string | null;
-}
-
-interface ListOpts {
-  appNo: string;
-  offset: number;
-  size: number;
-}
+import { UserEntity } from '../../domain/model/UserEntity';
+import { PPRepository } from './PPRepository';
+import { FindManyOpt } from '@/types/FindManyOpt';
+import { DeepPartialData } from '@/types/DeepPartialData';
+import { FindDeepPartial } from '@/types/FindDeepPartial';
 
 @Provider()
-export class UserRepository {
+export class UserRepository extends PPRepository<UserEntity> {
+
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  @Inject(PasswordService)
-  private passwordService!: PasswordService;
-
-  private userRepository: Repository<UserEntity> = getRepository(UserEntity);
-
-  async findAllUsers(): Promise<UserEntity[]> {
-    return this.userRepository.find();
+  constructor() {
+    super(UserEntity);
   }
 
-  async list(opts: ListOpts): Promise<[UserEntity[], number]> {
-    return this.userRepository.findAndCount({
-      skip: opts.offset,
-      take: opts.size,
-      select: ['userNo', 'appNo', 'roleNo', 'accountName', 'headerImg', 'mobileNo', 'emailAddr', 'twoFactorAuth', 'status', 'createAt', 'updateAt'],
+  override async create(condition: DeepPartialData<UserEntity>, manager?: EntityManager): Promise<UserEntity> {
+    const id = condition.id ?? await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).save({
+      ...condition,
+      id,
+    });
+  }
+
+  override async findMany(condition: FindDeepPartial<UserEntity>, opts?: FindManyOpt): Promise<[UserEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts.pagination.offset,
+        take: opts.pagination.size,
+      }),
       where: {
-        appNo: opts.appNo,
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.appLevel && {
+          appLevel: LessThan(condition.appLevel + 1)
+        }),
+        ...(condition.accountName && {
+          accountName: Like(`${condition.accountName}%`),
+        }),
+        ...(condition.mobileNo && {
+          mobileNo: Like(`${condition.mobileNo}%`)
+        }),
+        ...(condition.registerIP && {
+          registerIP: condition.registerIP,
+        }),
+        ...(condition.status && {
+          status: condition.status
+        })
       },
       order: {
+        appLevel: 'DESC',
         createAt: 'DESC',
+        accountName: 'ASC',
+        ...opts?.order,
       },
-    });
-  }
-
-  async create(opts: CreateOpts, manager?: EntityManager): Promise<UserEntity> {
-    const userRepository = manager?.getRepository(UserEntity) ?? this.userRepository;
-
-    const userNo = await this.uniqueIdService.getUniqueId();
-    const nonce = crypto.randomBytes(16).toString('hex');
-
-    const rawPassword = opts.password ?? crypto.randomBytes(16).toString('hex');
-    const hashPassword = await this.passwordService.hashPwd(userNo, nonce, rawPassword);
-
-    const user = new UserEntity();
-    user.userNo = userNo;
-    user.accountName = opts.accountName;
-    user.roleNo = opts.roleNo;
-    user.nonce = nonce;
-    user.appNo = opts.appNo;
-    user.mobileNo = opts.mobileNo;
-    user.emailAddr = opts.emailAddr;
-    user.passwd = hashPassword;
-
-    return userRepository.save(user);
-  }
-
-  async updateUserPassword(userNo: string, passwd: string): Promise<void> {
-    await this.userRepository.update(userNo, {
-      passwd,
-    });
-  }
-
-  async find(userNo: string): Promise<UserEntity | undefined> {
-    return await this.userRepository.findOne(userNo);
-  }
-
-  async findByStatusNormal(userNo: string): Promise<UserEntity | undefined> {
-    return await this.userRepository.findOne(userNo, {
-      where: {
-        status: UserStatus.NORMAL,
-      },
-    });
-  }
-
-  async findByAccountNameAndAppNo(accountName: string, appNo: string): Promise<UserEntity | undefined> {
-    return this.userRepository.findOne({
-      where: {
-        accountName,
-        appNo,
-      },
+      select: opts?.select  as (keyof UserEntity)[]
     });
   }
 }

@@ -1,145 +1,136 @@
-import { getConnection } from '@augejs/typeorm';
-import { GetLogger, ILogger, Inject, Provider, Value } from '@augejs/core';
+import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
-import { UserRepository } from '@/infrastructure/repository/UserRepository';
-import { BusinessError } from '../../util/BusinessError';
+import { AppEntity, AppStatus } from '../model/AppEntity';
+import { PPService } from './PPService';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
-import { AppEntity } from '../model/AppEntity';
-import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
-
-interface CreateOpts {
-  userNo: string;
-  roleDisplayName: string;
-  roleDesc?: string | null;
-  appDisplayName: string;
-  appDesc?: string | null;
-  icon?: string | null;
-}
-
-interface ListOpts {
-  offset: number;
-  size: number;
-  orgNo: string;
-}
+import { BusinessError } from '@/util/BusinessError';
+import { EntityManager, Transaction, TransactionManager } from '@augejs/typeorm';
+import { AppCreateDto } from '@/facade/dto/AppDto';
+import { PPAccessData } from '@/types/PPAccessData';
+import { UserService } from './UserService';
+import { RoleService } from './RoleService';
+import { CustomizedServiceService } from './CustomizedServiceService';
+import { I18nService } from './I18nService';
+import { MenuService } from './MenuService';
+import { ThemeService } from './ThemeService';
+import { OperationLogService } from './OperationLogService';
+import { AppLangService } from './AppLangService';
+import { RolePermissionService } from './RolePermissionService';
+import { AppDomainService } from './AppDomainService';
+import { UserCredentialService } from './UserCredentialService';
 
 @Provider()
-export class AppService {
-  @Value('/webserver.port')
-  serverPort!: string;
+export class AppService extends PPService <AppEntity, AppRepository>{
 
   @GetLogger()
-  logger!: ILogger;
+  private readonly logger!: ILogger;
 
   @Inject(AppRepository)
-  private appRepository!: AppRepository;
+  protected override readonly repository!: AppRepository;
 
-  @Inject(RoleRepository)
-  private roleRepository!: RoleRepository;
+  @Inject(UserService)
+  private readonly userService!: UserService;
 
-  @Inject(UserRepository)
-  private userRepository!: UserRepository;
+  @Inject(UserCredentialService)
+  private readonly userCredentialService!: UserCredentialService;
 
-  @Inject(UniqueIdService)
-  private uniqueIdService!: UniqueIdService;
+  @Inject(RoleService)
+  private readonly roleService!: RoleService;
 
-  async create(opts: CreateOpts): Promise<AppEntity> {
-    this.logger.info(`create the app validate start. userNo ${opts.userNo}`);
+  @Inject(CustomizedServiceService)
+  private readonly customizedServiceService!: CustomizedServiceService;
 
-    const creatorUser = !opts.userNo ? null : await this.userRepository.findByStatusNormal(opts.userNo);
-    if (!creatorUser) {
-      this.logger.warn(`create the app error. userNo: ${opts.userNo} is not exist!`);
-      throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
-    }
+  @Inject(I18nService)
+  private readonly i18nService!: I18nService;
 
-    const creatorApp = creatorUser ? await this.appRepository.findByStatusNormal(creatorUser.appNo) : null;
-    if (!creatorApp) {
-      this.logger.warn(`create the app error. parent app: ${creatorUser?.appNo} is not exist!`);
+  @Inject(MenuService)
+  private readonly menuService!: MenuService;
+
+  @Inject(ThemeService)
+  private readonly themeService!: ThemeService;
+
+  @Inject(OperationLogService)
+  private readonly operationLogService!: OperationLogService;
+
+  @Inject(AppLangService)
+  private readonly appLangService!: AppLangService;
+
+  @Inject(RolePermissionService)
+  private readonly rolePermissionService!: RolePermissionService;
+
+  @Inject(AppDomainService)
+  private readonly appDomainService!: AppDomainService;
+
+  async findAndVerify(id: string): Promise<AppEntity> | never {
+    const app = await this.repository.findOne({ id }, { select: ['level', 'status', 'expireAt'] });
+    if (!app) {
+      this.logger.info(`App_Is_Not_Exist. appId: ${id}`);
       throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
     }
 
-    let creatorRole = null;
-    if (creatorUser) {
-      creatorRole = await this.roleRepository.findByStatusNormal(creatorUser.roleNo);
-      if (!creatorRole) {
-        this.logger.warn(`create the app error. userNo: ${opts.userNo} target roleNo: ${creatorUser.roleNo} is not exist!`);
-        throw new BusinessError(I18nMessageKeys.Role_Is_Not_Exist);
-      }
+    if (app.status === AppStatus.DISABLED) {
+      this.logger.warn(`App_Status_Is_Disabled. appId: ${id}`);
+      throw new BusinessError(I18nMessageKeys.App_Status_Is_Disabled);
     }
 
-    this.logger.info(`create the app validate end. userNo: ${opts.userNo}`);
-
-    this.logger.info(`create the app start. userNo: ${opts.userNo}`);
-
-    // transaction
-    const queryRunner = getConnection().createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    this.logger.info(`create the app: startTransaction. userNo: ${opts.userNo}`);
-
-    try {
-      const createdAppNo = await this.uniqueIdService.getUniqueId();
-
-      // step 1 app role
-      const creatorRoleNo = creatorRole?.roleNo ?? null;
-      this.logger.info(`create the app start steps: creat role entity start. userNo: ${opts.userNo} creatorRoleNo: ${creatorRoleNo}`);
-      const createdRole = await this.roleRepository.create(
-        {
-          parent: creatorRoleNo,
-          level: creatorRole ? creatorRole.level + 1 : 0,
-          appNo: creatorUser?.appNo ?? createdAppNo,
-          displayName: opts.roleDisplayName,
-          desc: opts.roleDesc ?? null,
-          inherited: true,
-          hasAppResPerms: true,
-        },
-        queryRunner.manager,
-      );
-      this.logger.info(
-        `create the app start steps: creat role entity end. userNo: ${opts.userNo} creatorRoleNo: ${creatorRoleNo} roleNo: ${createdRole.roleNo} roleLevel: ${createdRole.level}`,
-      );
-
-      // step 2 app
-      this.logger.info(`create the app start steps: creat app entity start. userNo: ${opts.userNo}`);
-      const createdApp = await this.appRepository.create(
-        {
-          appNo: createdAppNo,
-          roleNo: createdRole.roleNo,
-          parent: creatorApp?.appNo ?? null,
-          level: creatorApp ? creatorApp.level + 1 : 0,
-          icon: opts.icon ?? null,
-          displayName: opts.appDisplayName,
-          desc: opts.appDesc ?? null,
-        },
-        queryRunner.manager,
-      );
-      this.logger.info(`create the app start steps: creat app entity end. appNo: ${createdApp.appNo}`);
-
-      await queryRunner.commitTransaction();
-      this.logger.info(`create the app: commitTransaction. userNo: ${opts.userNo}`);
-      return createdApp;
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      this.logger.warn(`create the app error: rollbackTransaction. userNo: ${opts.userNo}`);
-      throw err;
-    } finally {
-      await queryRunner.release();
+    if (app.status !== AppStatus.NORMAL) {
+      this.logger.warn(`App_Status_Is_Disabled. appId: ${id}`);
+      throw new BusinessError(I18nMessageKeys.App_Status_Is_Not_Normal);
     }
+
+    if (app.isExpired) {
+      this.logger.warn(`App_isExpired. appId: ${id}`);
+      throw new BusinessError(I18nMessageKeys.App_Is_Expired);
+    }
+
+    return app;
   }
 
-  async list(opts: ListOpts): Promise<[AppEntity[], number]> {
-    return this.appRepository.list({
-      offset: opts.offset,
-      size: opts.size,
-      orgNo: opts.orgNo,
-    });
+  @Transaction()
+  async createApp (
+    dto: AppCreateDto,
+    accessData: PPAccessData,
+    @TransactionManager() manager: EntityManager): Promise<AppEntity> {
+    const appId = accessData.get<string>('appId');
+    const appLevel = accessData.get<number>('appLevel');
+    const userRoleId = accessData.get<string>('userRoleId');
+    const userRoleLevel = accessData.get<number>('userRoleLevel');
+
+    // create appRole, user, adminRole
+    const app = await this.repository.create({
+      title: dto.title,
+      logoImg: dto.logoImg,
+      parent: appId,
+      level: appLevel + 1
+    }, manager);
+
+    const role = await this.roleService.create({
+      appId: app.id,
+      title: 'admin',
+      appLevel: app.level,
+      parent: userRoleId,
+      level: userRoleLevel + 1,
+    }, manager);
+
+    this.userService.createUserByAppDto(dto, app, role, manager);
+
+    return app;
   }
 
-  async delete(appNo: string): Promise<void> {
-    return this.appRepository.delete({
-      appNo,
-    });
+  @Transaction()
+  async deleteApp(appId: string, @TransactionManager() manager: EntityManager): Promise<void> {
+    await this.repository.delete(appId, manager);
+    await this.userService.delete(appId, manager);
+    await this.userCredentialService.delete({ appId }, manager);
+    await this.roleService.delete({ appId }, manager);
+    await this.customizedServiceService.delete({ appId }, manager);
+    await this.i18nService.delete({ appId }, manager);
+    await this.menuService.delete({ appId }, manager);
+    await this.themeService.delete({ appId }, manager);
+    await this.operationLogService.delete({ appId }, manager);
+    await this.appLangService.delete({ appId }, manager);
+    await this.rolePermissionService.delete({ appId }, manager);
+    await this.appDomainService.delete({ appId }, manager);
   }
 }

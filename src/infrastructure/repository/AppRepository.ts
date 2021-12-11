@@ -1,86 +1,52 @@
+import { DeepPartialData } from '@/types/DeepPartialData';
+import { FindDeepPartial } from '@/types/FindDeepPartial';
+import { FindManyOpt } from '@/types/FindManyOpt';
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, FindConditions, getRepository, Repository } from '@augejs/typeorm';
-import { AppEntity, AppStatus } from '../../domain/model/AppEntity';
+import { EntityManager, Like } from '@augejs/typeorm';
+import { AppEntity } from '../../domain/model/AppEntity';
 import { UniqueIdService } from '../service/UniqueIdService';
-
-interface CreateOpt {
-  appNo: string;
-  roleNo: string;
-  parent: string | null;
-  level: number;
-  displayName: string;
-  icon: string | null;
-  desc: string | null;
-}
-
-interface ListOpts {
-  offset: number;
-  size: number;
-  orgNo: string;
-}
-
-interface DeleteOpts {
-  appNo: string;
-}
-
+import { PPRepository } from './PPRepository';
 @Provider()
-export class AppRepository {
+export class AppRepository extends PPRepository<AppEntity> {
+
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  private appRepository: Repository<AppEntity> = getRepository(AppEntity);
+  constructor() {
+    super(AppEntity);
+  }
 
-  async findByStatusNormal(appNo: string): Promise<AppEntity | undefined> {
-    return await this.appRepository.findOne(appNo.toString(), {
-      where: {
-        status: AppStatus.NORMAL,
-      },
+  override async create(data: DeepPartialData<AppEntity>, manager?: EntityManager): Promise<AppEntity> {
+    const id = data.id ?? await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).save({
+      ...data,
+      id,
     });
   }
 
-  async create(opts: CreateOpt, manager?: EntityManager): Promise<AppEntity> {
-    const appRepository = manager?.getRepository(AppEntity) ?? this.appRepository;
-    const app = new AppEntity();
-    app.appNo = opts.appNo;
-    app.level = opts.level;
-    app.parent = opts.parent;
-    app.roleNo = opts.roleNo;
-    app.icon = opts.icon;
-    app.displayName = opts.displayName;
-    app.desc = opts.desc;
-    return appRepository.save(app);
-  }
-
-  find(appNo: string, opts?: FindConditions<AppEntity>): Promise<AppEntity | undefined> {
-    return this.appRepository.findOne(appNo, {
+  override async findMany(condition: FindDeepPartial<AppEntity>, opts?: FindManyOpt): Promise<[AppEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts.pagination.offset,
+        take: opts.pagination.size,
+      }),
       where: {
-        ...opts,
-      },
-    });
-  }
-
-  async findRoot(): Promise<AppEntity | undefined> {
-    return await this.appRepository.findOne({
-      where: {
-        orgNo: null,
-      },
-    });
-  }
-
-  async list(opts: ListOpts): Promise<[AppEntity[], number]> {
-    return this.appRepository.findAndCount({
-      skip: opts.offset,
-      take: opts.size,
-      where: {
-        orgNo: opts.orgNo,
+        ...(condition.parent && {
+          parent: condition.parent
+        }),
+        ...(condition.title && {
+          title: Like(`${condition.title}%`)
+        }),
+        ...(condition.status && {
+          status: condition.status
+        })
       },
       order: {
         createAt: 'DESC',
+        title: 'ASC',
+        ...opts?.order,
       },
+      select: opts?.select as (keyof AppEntity)[]
     });
-  }
-
-  async delete(opts: DeleteOpts): Promise<void> {
-    await this.appRepository.delete(opts.appNo);
   }
 }

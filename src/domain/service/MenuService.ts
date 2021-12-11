@@ -1,75 +1,69 @@
-import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
-import { PageRepository } from '@/infrastructure/repository/PageRepository';
-import { BusinessError } from '@/util/BusinessError';
-import { I18nMessageKeys } from '@/util/I18nMessageKeys';
+import { PPAccessData } from '@/types/PPAccessData';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { MenuTreeBo } from '../bo/MenuTreeBo';
-import { PermissionsBo } from '../bo/PermissionsBo';
-import { MenuEntity } from '../model/MenuEntity';
+import { MenuEntity, MenuPermissionType, MenuStatus, MenuType } from '../model/MenuEntity';
+import { PPService } from './PPService';
+import { RolePermissionService } from './RolePermissionService';
 
 @Provider()
-export class MenuService {
+export class MenuService extends PPService <MenuEntity,MenuRepository> {
+
   @GetLogger()
   logger!: ILogger;
 
-  @Inject(PageRepository)
-  private pageRepository!: PageRepository;
-
   @Inject(MenuRepository)
-  private menuRepository!: MenuRepository;
+  protected override repository!: MenuRepository;
 
-  @Inject(AppRepository)
-  private appRepository!: AppRepository;
+  // @Inject(RoleRepository)
+  // private roleRepository!: RoleRepository;
 
-  async findMenuTreesByAppNo(appNo: string, permissionsBo: PermissionsBo): Promise<MenuTreeBo[]> {
-    const app = (await this.appRepository.findByStatusNormal(appNo)) ?? null;
-    if (!app) {
-      this.logger.warn(`the appNo: ${appNo} is not exist!`);
-      throw new BusinessError(I18nMessageKeys.App_Is_Not_Exist);
-    }
+  @Inject(RolePermissionService)
+  private rolePermissionService!: RolePermissionService;
 
-    let menus = await this.menuRepository.findAllMenusByNormalStatus(app.level);
+  // async listAll(opts: MenuFindLisOpts): Promise<[MenuTreeBo[], number]> {
+  //   const role = await this.roleRepository.findOne({
+  //     roleNo: opts.roleNo,
+  //     status: RoleStatus.NORMAL
+  //   })
 
-    // from top tp bottom
-    if (!menus || menus.length === 0) return [];
-    menus = this.filterResourcesByPermission(menus, permissionsBo);
+  //   if (!role) {
+  //     this.logger.warn(`the RoleNo: ${role} is not exist!`);
+  //     throw new BusinessError(I18nMessageKeys.Role_Is_Not_Exist);
+  //   }
 
-    // find the first root resource
-    const rootMenus = menus.filter((resource) => resource.parent === null);
-    if (!rootMenus) return [];
+  //   const menus = await this.repository.listAll(opts);
+  //   const permissions = await this.rolePermissionService.findPermissionsByRoleNo(opts.roleNo);
+  //   const permissableMenus = permissions.filterMenus(menus);
 
-    const results: MenuTreeBo[] = [];
-    for (const rootMenu of rootMenus) {
-      const menuTreeBo = this.buildMenuTree(new MenuTreeBo(rootMenu), menus);
-      results.push(menuTreeBo);
-    }
+  //   const list = MenuTreeBo.create(null, permissableMenus).children ?? [];
+  //   return [list , list.length];
+  // }
 
-    return results;
+  async menuTreeBySideBar(accessData: PPAccessData): Promise<MenuTreeBo> {
+    const appId = accessData.get<string>('appId');
+    const appLevel = accessData.get<number>('appLevel');
+    const userRoleId = accessData.get<string>('userRoleId');
+    const menus = await this.repository.findAllBySideBar(appId, appLevel);
+    const permissionsBo = await this.rolePermissionService.findPermissionsBoByRoleId(userRoleId);
+    const permissableMenus = permissionsBo.filterMenus(menus);
+
+    return MenuTreeBo.create(null, permissableMenus);
   }
 
-  private filterResourcesByPermission(resources: MenuEntity[], permissionsBo: PermissionsBo): MenuEntity[] {
-    return resources.filter((resource) => {
-      return permissionsBo.has(resource.menuCode);
+  async menuTreeByList(accessData: PPAccessData): Promise<MenuTreeBo> {
+    const appId = accessData.get<string>('appId');
+    const appLevel = accessData.get<number>('appLevel');
+    const userRoleId = accessData.get<string>('userRoleId');
+    const menus = await this.repository.findAll({
+      appId,
+      appLevel: appLevel,
+      status: MenuStatus.NORMAL,
     });
+    const permissionsBo = await this.rolePermissionService.findPermissionsBoByRoleId(userRoleId);
+    const permissableMenus = permissionsBo.filterMenus(menus);
+
+    return MenuTreeBo.create(null, permissableMenus);
   }
 
-  private findChildrenMenus(resources: MenuEntity[], parent: string): MenuEntity[] {
-    const results: MenuEntity[] = [];
-    resources.forEach((resource) => {
-      if (resource.parent === parent) {
-        results.push(resource);
-      }
-    });
-    return results;
-  }
-
-  private buildMenuTree(menu: MenuTreeBo, resources: MenuEntity[]): MenuTreeBo {
-    const childrenResources = this.findChildrenMenus(resources, menu.node.menuCode);
-    for (const childrenResource of childrenResources) {
-      const childMenu = this.buildMenuTree(new MenuTreeBo(childrenResource), resources);
-      menu.addChild(childMenu);
-    }
-    return menu;
-  }
 }

@@ -1,22 +1,21 @@
-import { CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { Entity, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
 @Entity('pp_role_permission')
-export class RolePermissionEntity {
+export class RolePermissionEntity extends PPEntity {
   @PrimaryColumn({
-    length: 80,
-    comment: 'resource code PascalCase',
+    type: 'bigint',
   })
-  menuCode!: string;
+  appId!: string;
 
   @PrimaryColumn({
     type: 'bigint',
-    comment: 'pk SnowflakeNo format',
   })
-  roleNo!: string;
+  roleId!: string;
 
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
+  @PrimaryColumn({
+    length: 80,
+    comment: 'menuCode PascalCase',
+  })
+  menuCode!: string;
 }

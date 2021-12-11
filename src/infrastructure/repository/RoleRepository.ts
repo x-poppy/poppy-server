@@ -1,72 +1,62 @@
-import { MenuStatus } from '@/domain/model/MenuEntity';
 import { RoleEntity } from '@/domain/model/RoleEntity';
+import { FindManyOpt } from '@/types/FindManyOpt';
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, getRepository, LessThanOrEqual, Repository } from '@augejs/typeorm';
+import { DeepPartial, EntityManager, LessThan, Like } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
-
-interface CreateOpt {
-  parent: string | null;
-  appNo: string;
-  level: number;
-  inherited: boolean;
-  displayName: string;
-  desc: string | null;
-  hasAppResPerms?: boolean;
-}
-
-interface ListOpts {
-  offset: number;
-  size: number;
-  appNo: string;
-  level: number;
-}
+import { PPRepository } from './PPRepository';
 
 @Provider()
-export class RoleRepository {
+export class RoleRepository extends PPRepository<RoleEntity> {
+
+
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  private roleRepository: Repository<RoleEntity> = getRepository(RoleEntity);
-
-  async create(opts: CreateOpt, manager?: EntityManager): Promise<RoleEntity> {
-    const roleRepository = manager?.getRepository(RoleEntity) ?? this.roleRepository;
-
-    const roleNo = await this.uniqueIdService.getUniqueId();
-    const role = new RoleEntity();
-    role.roleNo = roleNo;
-    role.parent = opts.parent;
-    role.level = opts.level;
-    role.inherited = opts.inherited;
-    role.appNo = opts.appNo;
-    role.displayName = opts.displayName;
-    role.hasAppResPerms = opts.hasAppResPerms ?? false;
-    role.desc = opts.desc;
-    return roleRepository.save(role);
+  constructor() {
+    super(RoleEntity);
   }
 
-  async findByStatusNormal(roleNo: string): Promise<RoleEntity | undefined> {
-    return await this.roleRepository.findOne(roleNo, {
-      where: {
-        status: MenuStatus.NORMAL,
-      },
+  override async create(opts: DeepPartial<RoleEntity>, manager?: EntityManager): Promise<RoleEntity> {
+    const id = opts.id ?? await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).save({
+      ...opts,
+      id,
     });
   }
 
-  async list(opts: ListOpts): Promise<[RoleEntity[], number]> {
-    return this.roleRepository.findAndCount({
-      skip: opts.offset,
-      take: opts.size,
+  override async findMany(condition: DeepPartial<RoleEntity>, opts?: FindManyOpt): Promise<[RoleEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts.pagination.offset,
+        take: opts.pagination.size,
+      }),
       where: {
-        appNo: opts.appNo,
-        level: LessThanOrEqual(opts.level),
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.appLevel && {
+          appLevel: LessThan(condition.appLevel + 1)
+        }),
+        ...(condition.level && {
+          level: LessThan(condition.level + 1),
+        }),
+        ...(condition.status && {
+          status: condition.status,
+        }),
+        ...(condition.title && {
+          title: Like(`${condition.title}%`),
+        }),
+        ...(condition.appLevel && {
+          appLevel: LessThan(condition.appLevel + 1)
+        })
       },
       order: {
+        appLevel: 'DESC',
         createAt: 'DESC',
+        title: 'ASC',
+        ...opts?.order,
       },
+      select: opts?.select as (keyof RoleEntity)[]
     });
-  }
-
-  async delete(roleNo: string): Promise<void> {
-    await this.roleRepository.delete(roleNo);
   }
 }

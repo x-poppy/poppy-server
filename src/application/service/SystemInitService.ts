@@ -7,6 +7,7 @@ import { getConnection, getRepository } from 'typeorm';
 import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
 import { Commands, REDIS_IDENTIFIER } from '@augejs/redis';
 import { SystemInitEntity } from '@/domain/model/SystemInitEntity';
+import { RandomService } from '@/infrastructure/service/RandomService';
 
 @Provider()
 export class SystemInitService {
@@ -16,28 +17,30 @@ export class SystemInitService {
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
+  @Inject(RandomService)
+  private randomService!: RandomService;
+
   @Inject(REDIS_IDENTIFIER)
   redis!: Commands;
 
   async loadInitSql(): Promise<string> {
-    const roleNo = await this.uniqueIdService.getUniqueId();
-    const appNo = await this.uniqueIdService.getUniqueId();
-    const appDomain = 'http://localhost:7001';
-    const userNo = await this.uniqueIdService.getUniqueId();
-    const userAccountName = 'root';
-    const userPassword = 'dev';
-    const userNonce = crypto.randomBytes(16).toString('hex');
 
-    const initSqlContent = fs
-      .readFileSync(path.join(__appRootDir, 'config/init.sql'), 'utf8')
-      .replace(/\${roleNo}/g, roleNo)
-      .replace(/\${appNo}/g, appNo)
-      .replace(/\${appDomain}/, appDomain)
-      .replace(/\${userNo}/, userNo)
-      .replace(/\${userAccountName}/, userAccountName)
-      .replace(/\${userPassword}/, userPassword)
-      .replace(/\${userNonce}/, userNonce);
+    const idGenerator = async () => this.uniqueIdService.getUniqueId();
 
+    const initSqlContent = fs.readFileSync(path.join(__appRootDir, 'config/init.sql'), 'utf8')
+
+      .replace(/\${appId}/g, await idGenerator())
+      .replace(/\${appTitle}/g, 'Poppy System')
+      .replace(/\${appDomainId}/g, await idGenerator())
+      .replace(/\${appDomain}/g, '127.0.0.1%3A7001')
+      .replace(/\${roleId}/g, await idGenerator())
+      .replace(/\${roleTitle}/g, 'admin')
+      .replace(/\${userId}/g, await idGenerator())
+      .replace(/\${userName}/g, 'admin')
+      .replace(/\${userNonce}/g, await this.randomService.nonce())
+      .replace(/\${userPassword}/g, 'dev')
+      .replace(/\${systemMenuId}/g, await idGenerator())
+      ;
     return initSqlContent;
   }
 
@@ -58,9 +61,6 @@ export class SystemInitService {
     this.logger.info('System Prepare Data for init start.');
 
     const sql = await this.loadInitSql();
-
-    console.log(sql);
-
     const sqlStatements = sql
       .split(';')
       .map((sqlStatement) => sqlStatement.trim())

@@ -1,8 +1,18 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string' },
+    appId: { type: 'string' },
+    key: { type: 'string' },
+    value: { type: 'string' },
+  },
+})
 @Entity('pp_theme')
-@Index('idx_app_key', ['appNo', 'key'], { unique: true })
-export class ThemeEntity {
+@Index(['appId', 'key'], { unique: true })
+export class ThemeEntity extends PPEntity {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
@@ -11,32 +21,17 @@ export class ThemeEntity {
 
   @Column({
     type: 'bigint',
-    comment: 'pk SnowflakeNo format',
   })
-  appNo!: string;
+  appId!: string;
 
   @Column({
     length: 80,
-    comment: 'i18n key',
+    comment: 'key',
   })
   key!: string;
 
   @Column({
-    select: false,
-    type: 'simple-json',
-    nullable: true,
+    length: 120,
   })
-  value: string | null = null;
-
-  @Column({
-    length: 500,
-    nullable: true,
-  })
-  desc: string | null = null;
-
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
+  value!: string;
 }

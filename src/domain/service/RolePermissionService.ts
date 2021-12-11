@@ -1,83 +1,64 @@
 import { Inject, Provider } from '@augejs/core';
-
-import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
-import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { RolePermissionRepository } from '@/infrastructure/repository/RolePermissionRepository';
-import { RoleEntity } from '../model/RoleEntity';
 import { PermissionsBo } from '../bo/PermissionsBo';
-import { AppRepository } from '@/infrastructure/repository/AppRepository';
+import { RolePermissionEntity } from '../model/RolePermissionEntity';
+import { PPService } from './PPService';
+import { RoleService } from './RoleService';
+import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
 
 @Provider()
-export class RolePermissionService {
-  @Inject(RoleRepository)
-  private roleRepository!: RoleRepository;
+export class RolePermissionService extends PPService<RolePermissionEntity, RolePermissionRepository> {
+
+  @Inject(RoleService)
+  private roleService!: RoleService;
 
   @Inject(MenuRepository)
-  private resourceRepository!: MenuRepository;
+  private menuRepository!: MenuRepository;
 
   @Inject(RolePermissionRepository)
-  private rolePermissionRepository!: RolePermissionRepository;
+  protected override repository!: RolePermissionRepository;
 
-  @Inject(AppRepository)
-  private appRepository!: AppRepository;
+  private async findRoleSelfPermissions(roleId: string): Promise<PermissionsBo> {
+    const rolePermissions = await this.repository.findAll(
+      {
+        roleId
+      }, {
+      select: ['appId', 'menuCode']
+    });
 
-  private cachedMergedRolePermissions: Map<string, PermissionsBo> = new Map();
-
-  private async findSelfPermissions(role: RoleEntity, parentPermissions: PermissionsBo): Promise<PermissionsBo> {
-    const rolePermissions = await this.rolePermissionRepository.findAllByRoleNo(role.roleNo);
-    return PermissionsBo.fromRolePermissions(rolePermissions, parentPermissions);
+    return PermissionsBo.fromRolePermissions(rolePermissions);
   }
 
-  private async findParentPermissions(role: RoleEntity): Promise<PermissionsBo> {
-    if (!role.parent || !role.inherited) {
-      return new PermissionsBo();
-    }
 
-    return await this.findMergedPermissionsByRoleNo(role.parent);
+  private async findAppPermissions(appId: string, appLevel: number): Promise<PermissionsBo> {
+    const menus = await this.menuRepository.findAllNoPermissionMenus(appId, appLevel);
+    return PermissionsBo.fromMenu(menus);
   }
 
-  private async findAppPermissions(role: RoleEntity): Promise<PermissionsBo> {
-    if (!role.hasAppResPerms) {
-      return new PermissionsBo();
-    }
-
-    const resources = await this.resourceRepository.findAllPermissionsByAppNo(role.appNo);
-    return PermissionsBo.fromResources(resources);
+  private async findParentPermissions(parentRoleId: string): Promise<PermissionsBo> {
+    if (parentRoleId === '0') return new PermissionsBo();
+    return this.findMergedPermissionsByRoleId(parentRoleId)
   }
 
-  private async findGlobalPermissions(role: RoleEntity): Promise<PermissionsBo> {
-    const app = await this.appRepository.findByStatusNormal(role.appNo);
-    if (!app) {
-      return new PermissionsBo();
-    }
-
-    const resources = await this.resourceRepository.findAllPermissionsByAppLevel(app.level);
-    return PermissionsBo.fromResources(resources);
-  }
-
-  private async findMergedPermissionsByRoleNo(roleNo: string): Promise<PermissionsBo> {
-    if (this.cachedMergedRolePermissions.has(roleNo)) {
-      return this.cachedMergedRolePermissions.get(roleNo) as PermissionsBo;
-    }
-
-    const role = await this.roleRepository.findByStatusNormal(roleNo);
+  private async findMergedPermissionsByRoleId(roleId: string): Promise<PermissionsBo> {
+    const role = await this.roleService.findOne({ id: roleId }, { select: [ 'id', 'parent', 'appId', 'appLevel' ] });
     if (!role) {
       return new PermissionsBo();
     }
 
-    const roleGoalPermissions = await this.findGlobalPermissions(role);
-    const roleAppPermissions = await this.findAppPermissions(role);
-    const roleParentPermissions = await this.findParentPermissions(role);
-    const roleSelfPermissions = await this.findSelfPermissions(role, roleParentPermissions);
+    const appPermissions = await this.findAppPermissions(role.appId, role.appLevel);
+    const parentRolePermissions = await this.findParentPermissions(role.parent);
+    const roleSelfPermissions = await this.findRoleSelfPermissions(role.id);
 
-    const mergedPermissions = new PermissionsBo().merge(roleGoalPermissions).merge(roleAppPermissions).merge(roleParentPermissions).merge(roleSelfPermissions);
-
-    this.cachedMergedRolePermissions.set(roleNo, mergedPermissions);
+    const mergedPermissions = new PermissionsBo()
+      .merge(roleSelfPermissions)
+      .filter(parentRolePermissions)
+      .merge(appPermissions);
 
     return mergedPermissions;
   }
 
-  async findPermissionsByRoleNo(roleNo: string): Promise<PermissionsBo> {
-    return this.findMergedPermissionsByRoleNo(roleNo);
+  async findPermissionsBoByRoleId(roleId: string): Promise<PermissionsBo> {
+    return this.findMergedPermissionsByRoleId(roleId);
   }
 }

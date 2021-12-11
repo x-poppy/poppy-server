@@ -1,75 +1,66 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { AfterLoad, Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
 export enum AppStatus {
   DISABLED = 'disabled',
   NORMAL = 'normal',
 }
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string' },
+    parent: { type: 'string' },
+    status: {  type: 'string', enum: ['normal', 'disabled'] },
+    expireAt: {type: 'string' }
+  },
+})
 @Entity('pp_app')
-export class AppEntity {
+export class AppEntity extends PPEntity {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
   })
-  appNo!: string;
+  id!: string;
 
   @Column({
     type: 'bigint',
-    comment: 'parent for app null means no parent',
-    nullable: true,
+    comment: 'parent for app 0 means no parent',
+    default: '0',
   })
   @Index()
-  parent: string | null = null;
+  parent!: string;
+
+  @Column({
+    type: 'varchar',
+    length: 512,
+    nullable: true,
+    default: null,
+    comment: 'app icon image (abs) path 300 * 300',
+  })
+  logoImg: string | null = null;
+
+  @Column({
+    type: 'varchar',
+    length: 120,
+    comment: 'title',
+  })
+  @Index()
+  title!: string;
+
+  @Column({
+    type: 'varchar',
+    length: 80,
+    nullable: true
+  })
+  titleI18nKey: string | null = null;
 
   @Column({
     type: 'smallint',
     comment: 'app level',
     default: 0,
   })
-  @Index()
   level = 0;
-
-  @Column({
-    type: 'bigint',
-    comment: 'role no for app',
-  })
-  roleNo!: string;
-
-  @Column({
-    type: 'varchar',
-    length: 6,
-    default: 'en_US',
-    comment: 'locale for app and the client side first',
-  })
-  locale = 'en_US';
-
-  @Column({
-    type: 'varchar',
-    length: 200,
-    comment: 'app icon image (abs)path 300 * 300',
-    nullable: true,
-  })
-  icon: string | null = null;
-
-  @Column({
-    length: 80,
-    comment: 'user display nick name',
-  })
-  displayName!: string;
-
-  @Column({
-    type: 'text',
-    nullable: true,
-  })
-  desc: string | null = null;
-
-  @Column({
-    type: 'varchar',
-    length: 128,
-    comment: 'The ICP for app',
-    nullable: true,
-  })
-  icp: string | null = null;
 
   @Column({
     type: 'enum',
@@ -81,18 +72,14 @@ export class AppEntity {
 
   @Column({
     type: 'datetime',
-    width: 6,
-    default: () => 'CURRENT_TIMESTAMP(6)',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   expireAt!: Date;
 
-  @CreateDateColumn()
-  createAt!: Date;
+  isExpired = false;
 
-  @UpdateDateColumn()
-  updateAt!: Date;
-
-  get isExpired(): boolean {
-    return Date.now() > this.expireAt.getTime();
+  @AfterLoad()
+  updateIsExpired(): void {
+    this.isExpired = Date.now() > this.expireAt.getTime();
   }
 }

@@ -5,48 +5,42 @@ import { OperationLogService } from './service/OperationLogService';
 import { PageService } from './service/PageService';
 import { SessionService } from './service/SessionService';
 import { UserService } from './service/UserService';
-import { AppServerWebHookService } from './service/ServerWebHookService';
-import { AppServerProxyService } from './service/ServerProxyService';
 import { RolePermissionService } from './service/RolePermissionService';
 import { MenuService } from './service/MenuService';
 import { ThemeService } from './service/ThemeService';
-import { AppUIService } from './service/AppUIService';
-import { TwoFactorService } from './service/TwoFactorService';
+import { TwoFactorAuthService } from './service/TwoFactorAuthService';
 import { RoleService } from './service/RoleService';
 import { ForgetPasswordService } from './service/ForgetPasswordService';
 import { Module } from '@augejs/core';
 import { ResetPasswordInviteService } from './service/ResetPasswordInviteService';
 import { ChangePasswordService } from './service/ChangePasswordService';
 import { ResetPasswordService } from './service/ResetPasswordService';
-import { UserNoticeService } from './service/UserNoticeService';
+import { I18nService } from './service/I18nService';
+import { AppLangService } from './service/AppLangService';
+import { UserCredentialService } from './service/UserCredentialService';
+import { CustomizedServiceService } from './service/CustomizedServiceService';
+import { UserAvatarService } from './service/UserAvatarService';
 
 @Module({
   providers: [
     AppConfigService,
     AppDomainService,
-    AppServerProxyService,
-    AppServerWebHookService,
-    AppService,
+    I18nService,
     ThemeService,
-    AppUIService,
-
-    ForgetPasswordService,
-    ResetPasswordInviteService,
-    ChangePasswordService,
-    ResetPasswordService,
-
-    UserNoticeService,
-
+    UserService,
+    UserCredentialService,
+    AppService,
     MenuService,
 
-    OperationLogService,
-    PageService,
+    CustomizedServiceService,
 
     RolePermissionService,
     RoleService,
     SessionService,
-    TwoFactorService,
-    UserService,
+    AppLangService,
+    TwoFactorAuthService,
+    OperationLogService,
+    UserAvatarService,
   ],
 })
 export class DomainLayerModule {}

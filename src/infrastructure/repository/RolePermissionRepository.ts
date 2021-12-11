@@ -1,16 +1,51 @@
 import { RolePermissionEntity } from '@/domain/model/RolePermissionEntity';
+import { FindAllOpt } from '@/types/FindAllOpt';
+import { FindOneOpt } from '@/types/FindOneOpts';
 import { Provider } from '@augejs/core';
-import { getRepository, Repository } from '@augejs/typeorm';
+import { DeepPartial } from '@augejs/typeorm';
+import { PPRepository } from './PPRepository';
 
 @Provider()
-export class RolePermissionRepository {
-  private roleResourcePermRepository: Repository<RolePermissionEntity> = getRepository(RolePermissionEntity);
+export class RolePermissionRepository extends PPRepository<RolePermissionEntity> {
 
-  async findAllByRoleNo(roleNo: string): Promise<RolePermissionEntity[] | undefined> {
-    return await this.roleResourcePermRepository.find({
+  constructor() {
+    super(RolePermissionEntity);
+  }
+
+  override async findOne(condition: DeepPartial<RolePermissionEntity>, opts?: FindOneOpt): Promise<RolePermissionEntity | undefined> {
+    return this.getRepository().findOne({
       where: {
-        roleNo,
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.roleId && {
+          roleId: condition.roleId
+        }),
+        ...(condition.menuCode && {
+          menuCode: condition.menuCode
+        }),
       },
+      select: opts?.select as (keyof RolePermissionEntity)[]
     });
+  }
+
+  override async findAll(condition: DeepPartial<RolePermissionEntity>, opts?: FindAllOpt): Promise<RolePermissionEntity[]> {
+    return this.getRepository().find({
+      where: {
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.roleId && {
+          roleId: condition.roleId
+        }),
+        ...(condition.menuCode && {
+          menuCode: condition.menuCode
+        }),
+      },
+      order: {
+        ...opts?.order
+      },
+      select: opts?.select as (keyof RolePermissionEntity)[]
+    })
   }
 }

@@ -1,27 +1,39 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
 export enum AppDomainStatus {
   DISABLED = 'disabled',
   NORMAL = 'normal',
 }
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string' },
+    appId: { type: 'string' },
+    domain: { type: 'string', description: 'domain' },
+    status: { type: 'string', enum: ['normal', 'disabled'] },
+  },
+})
 @Entity('pp_app_domain')
-export class AppDomainEntity {
+export class AppDomainEntity extends PPEntity {
   @PrimaryColumn({
-    length: 80,
+    type: 'bigint',
+    comment: 'id',
   })
-  domain!: string;
+  id!: string;
 
-  @PrimaryColumn({
+  @Column({
     length: 80,
   })
+  @Index({ unique: true })
   domain!: string;
 
   @Column({
     type: 'bigint',
-    comment: 'appNo',
+    comment: 'appId',
   })
-  appNo!: string;
+  appId!: string;
 
   @Column({
     type: 'enum',
@@ -30,10 +42,4 @@ export class AppDomainEntity {
   })
   @Index()
   status!: AppDomainStatus;
-
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
 }

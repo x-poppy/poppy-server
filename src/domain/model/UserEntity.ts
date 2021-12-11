@@ -1,4 +1,6 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from '@augejs/typeorm';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { Entity, PrimaryColumn, Column, Index } from '@augejs/typeorm';
+import { PPEntity } from './PPEntity';
 
 export enum UserStatus {
   DISABLED = 'disabled',
@@ -6,37 +8,43 @@ export enum UserStatus {
   LOCKED = 'locked',
 }
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string' },
+    appId: { type: 'string' },
+    roleId: { type: 'string' },
+    accountName: { type: 'string' },
+    headerImg: { type: 'string' },
+    registerIP: { type: 'string' },
+    appLevel: { type: 'number' },
+    mobileNo: { type: 'string' },
+    status: {  type: 'string', enum: ['normal', 'disabled'] },
+    expireAt: {type: 'string' }
+  },
+})
 @Entity('pp_user')
-@Index('idx_app_account', ['appNo', 'accountName'], { unique: true })
-export class UserEntity {
+@Index(['appId', 'accountName'], { unique: true })
+export class UserEntity extends PPEntity {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
   })
-  userNo!: string;
+  id!: string;
 
   @Column({
     type: 'bigint',
-    comment: 'appNo for user for search',
   })
   @Index()
-  appNo!: string;
+  appId!: string;
 
   @Column({
     type: 'bigint',
-    comment: 'role no for user',
   })
   @Index()
-  roleNo!: string;
+  roleId!: string;
 
   @Column({
-    length: 32,
-    comment: 'chars randomStr for security reason',
-  })
-  nonce!: string;
-
-  @Column({
-    length: 80,
+    length: 256,
     comment: 'use accountName',
   })
   @Index()
@@ -44,16 +52,7 @@ export class UserEntity {
 
   @Column({
     type: 'varchar',
-    length: 20,
-    comment: 'use mobile no',
-    nullable: true,
-  })
-  @Index()
-  mobileNo: string | null = null;
-
-  @Column({
-    type: 'varchar',
-    length: 80,
+    length: 256,
     comment: 'use email',
     nullable: true,
   })
@@ -61,47 +60,36 @@ export class UserEntity {
   emailAddr: string | null = null;
 
   @Column({
-    length: 128,
-    comment: 'user passwd sha2(raw pwd + use_no + random_no) hex',
-  })
-  passwd!: string;
-
-  @Column({
     type: 'varchar',
-    length: '50',
-    nullable: true,
-    comment: 'user opt key aes + random_no + row pwd dev for spec',
-  })
-  optKey: string | null = null;
-
-  @Column({
-    type: 'bool',
-    comment: 'twoFactorAuth',
-    default: false,
-  })
-  twoFactorAuth = false;
-
-  @Column({
-    type: 'varchar',
-    length: 200,
-    comment: 'user header image (abs)path',
+    length: 64,
+    comment: 'the format +213 551234567',
     nullable: true,
   })
-  headerImg: string | null = null;
+  @Index()
+  mobileNo: string | null = null;
 
   @Column({
     type: 'smallint',
-    comment: 'the user login error times',
     default: 0,
   })
-  loginErrTimes = 0;
+  @Index()
+  appLevel = 0;
+
+  @Column({
+    type: 'varchar',
+    length: 512,
+    comment: 'user header image abs path',
+    nullable: true,
+  })
+  headerImg: string | null = null;
 
   @Column({
     type: 'varchar',
     length: 20,
     default: '127.0.0.1',
   })
-  registerIP = '127.0.0.1';
+  @Index()
+  registerIP!: string;
 
   @Column({
     type: 'enum',
@@ -109,11 +97,6 @@ export class UserEntity {
     default: UserStatus.NORMAL,
   })
   @Index()
-  status: UserStatus = UserStatus.NORMAL;
-
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
+  status!: UserStatus;
 }
+

@@ -1,95 +1,81 @@
 import { ThemeEntity } from '@/domain/model/ThemeEntity';
+import { DeepPartialData } from '@/types/DeepPartialData';
+import { FindAllOpt } from '@/types/FindAllOpt';
+import { FindDeepPartial } from '@/types/FindDeepPartial';
+import { FindManyOpt } from '@/types/FindManyOpt';
 import { Inject, Provider } from '@augejs/core';
-import { EntityManager, getRepository, Like, Repository } from '@augejs/typeorm';
+import { EntityManager, Like } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
-
-interface CreateOpts {
-  appNo: string;
-  key: string;
-  value: string;
-  desc?: string;
-}
-
-interface ListOpts {
-  appNo: string;
-  key?: string;
-  offset: number;
-  size: number;
-}
-
-interface AllOpts {
-  appNo: string;
-}
-
-interface UpdateOpts {
-  id: string;
-  appNo: string;
-  key?: string;
-  value?: string;
-  desc?: string;
-}
-
-interface DeleteOpts {
-  id: string;
-  appNo: string;
-}
+import { PPRepository } from './PPRepository';
 
 @Provider()
-export class ThemeRepository {
+export class ThemeRepository extends PPRepository <ThemeEntity>{
+
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
-  private repository: Repository<ThemeEntity> = getRepository(ThemeEntity);
+  constructor() {
+    super(ThemeEntity);
+  }
 
-  async create(opts: CreateOpts, manager?: EntityManager): Promise<ThemeEntity> {
-    const repository = manager?.getRepository(ThemeEntity) ?? this.repository;
-    const uniqueId = await this.uniqueIdService.getUniqueId();
-
-    return repository.create({
-      id: uniqueId,
-      appNo: opts.appNo,
-      value: opts.value,
-      desc: opts.desc ?? null,
+  override async create(data: DeepPartialData<ThemeEntity>, manager?: EntityManager): Promise<ThemeEntity> {
+    const id = data.id ?? await this.uniqueIdService.getUniqueId();
+    return this.getRepository(manager).create({
+      ...data,
+      id,
     });
   }
 
-  async update(opts: UpdateOpts): Promise<void> {
-    await this.repository.update(
-      {
-        id: opts.id,
-        appNo: opts.appNo,
+  override async findOne(condition: FindDeepPartial<ThemeEntity>): Promise<ThemeEntity | undefined> {
+    return this.getRepository().findOne({
+      where: {
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.key && {
+          key: condition.key
+        }),
       },
-      opts,
-    );
+    });
   }
 
-  async list(opts: ListOpts): Promise<[ThemeEntity[], number]> {
-    return this.repository.findAndCount({
-      skip: opts.offset,
-      take: opts.size,
+  override async findMany(condition: FindDeepPartial<ThemeEntity>, opts?: FindManyOpt): Promise<[ThemeEntity[], number]> {
+    return this.getRepository().findAndCount({
+      ...(opts?.pagination && {
+        skip: opts.pagination.offset,
+        take: opts.pagination.size,
+      }),
       where: {
-        appNo: opts.appNo,
-        ...(opts.key && {
-          package: Like(`${opts.key}%`),
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.key && {
+          key: Like(`${condition.key}%`),
         }),
       },
       order: {
-        key: 'ASC',
         createAt: 'DESC',
+        key: 'ASC',
+        ...opts?.order,
       },
     });
   }
 
-  async all(opts: AllOpts): Promise<ThemeEntity[]> {
-    return this.repository.find({
+  override async findAll(condition: FindDeepPartial<ThemeEntity>, opts?: FindAllOpt): Promise<ThemeEntity[]> {
+    return this.getRepository().find({
       where: {
-        appNo: opts.appNo,
+        ...(condition.appId && {
+          appId: condition.appId
+        }),
+        ...(condition.key && {
+          key: Like(`${condition.key}%`),
+        }),
+      },
+      order: {
+        createAt: 'DESC',
+        key: 'ASC',
+        ...opts?.order
       },
     });
-  }
-
-  async delete(opts: DeleteOpts, manager?: EntityManager): Promise<void> {
-    const repository = manager?.getRepository(ThemeEntity) ?? this.repository;
-    await repository.delete(opts);
   }
 }

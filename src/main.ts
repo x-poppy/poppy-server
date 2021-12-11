@@ -16,7 +16,7 @@ import { KoaSwagger } from '@augejs/koa-swagger';
 
 import { ApplicationLayerModule } from './application';
 import { DomainLayerModule } from './domain';
-import { AdminFacadeLayerModule } from './facade/admin';
+import { AdminFacadeLayerModule } from './facade';
 import { InfrastructureLayerModule } from './infrastructure';
 import { KoaSecurity } from '@augejs/koa-security';
 import { decryptConfigValues } from './util/decryptConfigValue';
@@ -25,7 +25,9 @@ import { decryptConfigValues } from './util/decryptConfigValue';
   workers: 0,
   enable: process.env.NODE_ENV === 'production',
 })
-@I18nConfig()
+@I18nConfig({
+  defaultLocale: 'en-US',
+})
 @Typeorm({
   synchronize: process.env.NODE_ENV !== 'production',
 })
@@ -39,13 +41,10 @@ import { decryptConfigValues } from './util/decryptConfigValue';
 @KoaFavicon()
 @AxiosConfig()
 @KoaSecurity()
-@KoaStatic({
-  prefix: '',
-  dir: path.join(__appRootDir, './node_modules/@x-poppy/poppy-web/build'),
-})
+@KoaStatic()
 @WebServer()
 @Views()
-@KoaSwagger()
+@KoaSwagger({decorator: true})
 @RedisConnection()
 @KoaAccessTokenManager({})
 @KoaStepTokenManager()

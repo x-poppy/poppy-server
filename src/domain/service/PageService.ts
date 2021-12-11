@@ -3,7 +3,7 @@ import { PageContentType, PageEntity } from '../model/PageEntity';
 import { PageRepository } from '../../infrastructure/repository/PageRepository';
 import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
 import { HttpStatus, KoaContext } from '@augejs/koa';
-import { PoppyAccessData } from '@/types/PoppyAccessData';
+import { PoppyAccessData } from '@/types/PPAccessData';
 
 interface CreateOpt {
   appNo: string;

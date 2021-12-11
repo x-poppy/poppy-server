@@ -1,8 +1,20 @@
-import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from '@augejs/typeorm';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
+import { MaxLength } from '@augejs/validator';
+import { PPEntity } from './PPEntity';
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string' },
+    appId: { type: 'string' },
+    key: { type: 'string' },
+    value: { type: 'string' },
+    desc: { type: 'string' },
+  },
+})
 @Entity('pp_app_config')
-@Index('idx_app_key', ['appNo', 'key'], { unique: true })
-export class AppConfigEntity {
+@Index(['appId', 'key'], { unique: true })
+export class AppConfigEntity extends PPEntity {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'id',
@@ -11,31 +23,28 @@ export class AppConfigEntity {
 
   @Column({
     type: 'bigint',
-    comment: 'appNo null means common app',
+    comment: 'appId',
   })
-  @Index()
-  appNo!: string;
+  appId!: string;
 
   @Column({
     length: 80,
     comment: 'key name',
   })
+  @MaxLength(80)
   key!: string;
 
   @Column({
-    length: 500,
+    length: 200,
   })
+  @MaxLength(80)
   value!: string;
 
   @Column({
-    length: 500,
+    type: 'varchar',
+    length: 128,
     nullable: true,
   })
+  @MaxLength(120)
   desc: string | null = null;
-
-  @CreateDateColumn()
-  createAt!: Date;
-
-  @UpdateDateColumn()
-  updateAt!: Date;
 }

@@ -5,8 +5,9 @@ info:
 
 tags:
 - name: "Health"
-- name: "AppUI"
-  description: "App UI service group serve for the client UI. This group of api should not cover by `Authorization`"
+
+- name: "Theme"
+  description: "Client theme"
 
 - name: "Authorization"
   description: "Authorization service group."
@@ -16,6 +17,8 @@ tags:
 
 - name: "Menu"
   description: "Menu service group. Include `HomeMenu` and `HeadMenu`"
+
+
 
 - name: "Role"
   description: "Role service group."
@@ -43,6 +46,33 @@ securityDefinitions:
     in: header
 
 definitions:
+  CreateThemeDto:
+    type: object
+    properties:
+      theme:
+        type: string
+        example: "theme name"
+      value:
+        type: object
+      desc:
+        type: string
+        example: ""
+    required:
+      - theme
+      - value
+
+  UpdateThemeDto:
+    type: object
+    properties:
+      theme:
+        type: string
+        example: "theme name"
+      value:
+        type: object
+      desc:
+        type: string
+        example: ""
+
   LoginDto:
     type: object
     properties:
@@ -123,56 +153,41 @@ paths:
         "200":
           description: ""
 
-  /api/v1/app-ui/domain-info/{domain}:
-    get:
-      tags:
-        - "AppUI"
-      summary: "Get app-domain entity by domain"
-      description: "This API should be the first one API for client to get the AppNo by domain."
+  /api/v1/theme/theme:
+    post:
+      tags: [ Theme ]
+      summary: "Create A theme for an app"
       parameters:
-        - in: path
-          name: domain
-          default: "http%3A%2F%2Flocalhost%3A7001"
-          description: "If this value is empty it will get the domain from the request"
-          type: string
+        - in: body
+          name: loginDto
           required: true
-      responses:
-        "200":
-          description: ""
           schema:
-            $ref: "#/definitions/AppDomainUIInfoBo"
-
-  /api/v1/app-ui/app-info/{appNo}:
-    get:
-      tags:
-        - "AppUI"
-      summary: "Get app-theme properties"
-      description: "Get the app info before login"
-      parameters:
-        - in: path
-          name: appNo
-          type: string
-          required: true
+            $ref: "#/definitions/CreateThemeDto"
       responses:
         "200":
+          description: ""
+      security:
+        - accessToken: []
+    put:
+      tags: [ Theme ]
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+        - in: body
+          name:  updateThemeDto
+          required: true
           schema:
-            $ref: "#/definitions/AppUIInfoBo"
-          description: ""
+            $ref: "#/definitions/UpdateThemeDto"
 
-  /api/v1/app-ui/theme-info/{appNo}:
-    get:
-      tags:
-        - "AppUI"
-      summary: "Get app ui info"
-      description: "Get the app ui info before login"
-      parameters:
-        - in: path
-          name: appNo
-          type: string
-          required: true
       responses:
         "200":
           description: ""
+      security:
+        - accessToken: []
+
+      deprecated: false
 
   /api/v1/authorization/session/auth:
     post:
