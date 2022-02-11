@@ -1,17 +1,17 @@
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { UserEntity, UserStatus } from '../model/UserEntity';
+import { UserDO, UserStatus } from '../model/UserDO';
 import { UserRepository } from '../../infrastructure/repository/UserRepository';
 import { PPService } from './PPService';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { EntityManager, Transaction, TransactionManager } from '@augejs/typeorm';
-import { UserCreateDto } from '@/facade/dto/UserDto';
+import { UserCreateDTO } from '@/facade/dto/UserDTO';
 import { UserCredentialRepository } from '@/infrastructure/repository/UserCredentialRepository';
-import { RoleEntity } from '../model/RoleEntity';
-import { AppEntity } from '../model/AppEntity';
-import { AppCreateDto } from '@/facade/dto/AppDto';
+import { RoleDO } from '../model/RoleDO';
+import { AppDO } from '../model/AppDO';
+import { AppCreateDTO } from '@/facade/dto/AppDTO';
 @Provider()
-export class UserService extends PPService<UserEntity, UserRepository> {
+export class UserService extends PPService<UserDO, UserRepository> {
 
   @GetLogger()
   private readonly logger!: ILogger;
@@ -22,7 +22,7 @@ export class UserService extends PPService<UserEntity, UserRepository> {
   @Inject(UserCredentialRepository)
   private userCredentialRepository!: UserCredentialRepository;
 
-  async findAndVerify(appId: string, accountName: string): Promise<UserEntity> | never {
+  async findAndVerify(appId: string, accountName: string): Promise<UserDO> | never {
     const user = await this.repository.findOne({ appId, accountName }, { select: ['id', 'roleId', 'status']});
     if (!user) {
       this.logger.info(`User_Is_Not_Exist. appId: ${appId} accountName: ${accountName}`);
@@ -53,8 +53,8 @@ export class UserService extends PPService<UserEntity, UserRepository> {
   }
 
   @Transaction()
-  async createUser (dto: UserCreateDto, @TransactionManager() manager?: EntityManager): Promise<UserEntity> {
-    const user: UserEntity = await this.repository.create({
+  async createUser (dto: UserCreateDTO, @TransactionManager() manager?: EntityManager): Promise<UserDO> {
+    const user: UserDO = await this.repository.create({
       accountName: dto.emailAddr,
       emailAddr: dto.emailAddr,
       headerImg: dto.headerImg,
@@ -72,9 +72,9 @@ export class UserService extends PPService<UserEntity, UserRepository> {
     return user;
   }
 
-  async createUserByAppDto(dto: AppCreateDto,
-    createdApp: AppEntity, createdRole: RoleEntity,
-    manager: EntityManager): Promise<UserEntity> {
+  async createUserByAppDto(dto: AppCreateDTO,
+    createdApp: AppDO, createdRole: RoleDO,
+    manager: EntityManager): Promise<UserDO> {
       const user = await this.repository.create({
         accountName: dto.emailAddr,
         emailAddr: dto.emailAddr,

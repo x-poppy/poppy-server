@@ -1,10 +1,10 @@
-import { SystemInitEntity } from '@/domain/model/SystemInitEntity';
+import { SystemInitDO } from '@/domain/model/SystemInitDO';
 import { Provider } from '@augejs/core';
 import { getRepository, Repository } from 'typeorm';
 
 @Provider()
 export class SystemInitRepository {
-  private systemInitRepository: Repository<SystemInitEntity> = getRepository(SystemInitEntity);
+  private systemInitRepository: Repository<SystemInitDO> = getRepository(SystemInitDO);
 
   async has(): Promise<boolean> {
     const systemInit = await this.systemInitRepository.findOne(0);

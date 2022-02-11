@@ -7,7 +7,7 @@ import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
-import { TwoFactorListBo } from '../bo/TwoFactorItemBo';
+import { TwoFactorListBo } from '../bo/TwoFactorAuthInfoBO';
 import { AppConfigService } from './AppConfigService';
 import { RestPasswordInviteDto } from '@/facade/dto/RestPasswordInviteDto';
 import { UserNoticeService } from './UserNoticeService';

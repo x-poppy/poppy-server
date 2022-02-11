@@ -1,4 +1,4 @@
-import { MenuEntity, MenuPermissionType, MenuStatus, MenuType } from '@/domain/model/MenuEntity';
+import { MenuDO, MenuPermissionType, MenuStatus, MenuType } from '@/domain/model/MenuDO';
 import { DeepPartialData } from '@/types/DeepPartialData';
 import { FindAllOpt } from '@/types/FindAllOpt';
 import { FindDeepPartial } from '@/types/FindDeepPartial';
@@ -9,16 +9,16 @@ import { UniqueIdService } from '../service/UniqueIdService';
 import { PPRepository } from './PPRepository';
 
 @Provider()
-export class MenuRepository extends PPRepository<MenuEntity>{
+export class MenuRepository extends PPRepository<MenuDO>{
 
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
   constructor() {
-    super(MenuEntity);
+    super(MenuDO);
   }
 
-  override async create(data: DeepPartialData<MenuEntity>, manager?: EntityManager): Promise<MenuEntity> {
+  override async create(data: DeepPartialData<MenuDO>, manager?: EntityManager): Promise<MenuDO> {
     const id = data.id ?? await this.uniqueIdService.getUniqueId();
     return this.getRepository(manager).save({
       ...data,
@@ -26,7 +26,7 @@ export class MenuRepository extends PPRepository<MenuEntity>{
     });
   }
 
-  override async findOne(condition: FindDeepPartial<MenuEntity>, opts?: FindOneOpt): Promise<MenuEntity | undefined> {
+  override async findOne(condition: FindDeepPartial<MenuDO>, opts?: FindOneOpt): Promise<MenuDO | undefined> {
     return this.getRepository().findOne({
       where: {
         ...(condition.appId && {
@@ -36,16 +36,19 @@ export class MenuRepository extends PPRepository<MenuEntity>{
           menuCode: condition.menuCode
         }),
       },
-      select: opts?.select as (keyof MenuEntity)[]
+      select: opts?.select as (keyof MenuDO)[]
     });
   }
 
-  override async findAll(condition: FindDeepPartial<MenuEntity>, opts?: FindAllOpt): Promise<MenuEntity[]> {
+  override async findAll(condition: FindDeepPartial<MenuDO>, opts?: FindAllOpt): Promise<MenuDO[]> {
     return this.getRepository().find({
       where: [{
-        appId: condition.appId as string,
+        appId: condition.appId,
         ...(condition.menuCode && {
           menuCode: Like(`${condition.menuCode}%`),
+        }),
+        ...(condition.title && {
+          title: Like(`${condition.title}%`),
         }),
         ...(condition.status && {
           status: condition.status
@@ -54,6 +57,9 @@ export class MenuRepository extends PPRepository<MenuEntity>{
         appLevel: LessThan(condition.appLevel),
         ...(condition.menuCode && {
           menuCode: Like(`${condition.menuCode}%`),
+        }),
+        ...(condition.title && {
+          title: Like(`${condition.title}%`),
         }),
         ...(condition.status && {
           status: condition.status
@@ -66,11 +72,11 @@ export class MenuRepository extends PPRepository<MenuEntity>{
         title: 'ASC',
         ...opts?.order
       },
-      select: opts?.select as (keyof MenuEntity)[]
+      select: opts?.select as (keyof MenuDO)[]
     });
   }
 
-  findAllBySideBar(appId: string, appLevel: number): Promise<MenuEntity[]> {
+  findAllBySideBar(appId: string, appLevel: number): Promise<MenuDO[]> {
     return this.getRepository().find({
       where: [{
         appId,
@@ -92,7 +98,7 @@ export class MenuRepository extends PPRepository<MenuEntity>{
     });
   }
 
-  findAllNoPermissionMenus(appId: string, appLevel: number): Promise<MenuEntity[]> {
+  findAllNoPermissionMenus(appId: string, appLevel: number): Promise<MenuDO[]> {
     return this.getRepository().find({
       where: [{
           appId,

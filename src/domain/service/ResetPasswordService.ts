@@ -1,15 +1,13 @@
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
-import { PoppyAccessData } from '@/types/PPAccessData';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
-import { TwoFactorListBo } from '../bo/TwoFactorItemBo';
+import { TwoFactorAuthInfoBO } from '../bo/TwoFactorAuthInfoBO';
 import { AppConfigService } from './AppConfigService';
-import { RestPasswordInviteDto } from '@/facade/dto/RestPasswordInviteDto';
 import { ResetPasswordDto } from '@/facade/dto/ResetPasswordDto';
 import { SessionService } from './SessionService';
 import { UserService } from './UserService';

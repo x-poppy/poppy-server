@@ -1,23 +1,23 @@
 import { Inject, Provider } from '@augejs/core';
 import { EntityManager, LessThan, Like } from '@augejs/typeorm';
 import { UniqueIdService } from '../service/UniqueIdService';
-import { UserEntity } from '../../domain/model/UserEntity';
+import { UserDO } from '../../domain/model/UserDO';
 import { PPRepository } from './PPRepository';
 import { FindManyOpt } from '@/types/FindManyOpt';
 import { DeepPartialData } from '@/types/DeepPartialData';
 import { FindDeepPartial } from '@/types/FindDeepPartial';
 
 @Provider()
-export class UserRepository extends PPRepository<UserEntity> {
+export class UserRepository extends PPRepository<UserDO> {
 
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
   constructor() {
-    super(UserEntity);
+    super(UserDO);
   }
 
-  override async create(condition: DeepPartialData<UserEntity>, manager?: EntityManager): Promise<UserEntity> {
+  override async create(condition: DeepPartialData<UserDO>, manager?: EntityManager): Promise<UserDO> {
     const id = condition.id ?? await this.uniqueIdService.getUniqueId();
     return this.getRepository(manager).save({
       ...condition,
@@ -25,7 +25,7 @@ export class UserRepository extends PPRepository<UserEntity> {
     });
   }
 
-  override async findMany(condition: FindDeepPartial<UserEntity>, opts?: FindManyOpt): Promise<[UserEntity[], number]> {
+  override async findMany(condition: FindDeepPartial<UserDO>, opts?: FindManyOpt): Promise<[UserDO[], number]> {
     return this.getRepository().findAndCount({
       ...(opts?.pagination && {
         skip: opts.pagination.offset,
@@ -57,7 +57,7 @@ export class UserRepository extends PPRepository<UserEntity> {
         accountName: 'ASC',
         ...opts?.order,
       },
-      select: opts?.select  as (keyof UserEntity)[]
+      select: opts?.select  as (keyof UserDO)[]
     });
   }
 }

@@ -2,9 +2,10 @@ import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
 import { AccessData } from '@augejs/koa-access-token/dist/AccessData';
 import { I18N_IDENTIFIER, I18n } from '@augejs/i18n';
+import UAParser from 'ua-parser-js';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { StepData } from '@augejs/koa-step-token';
-import { SessionLoginDto } from '@/facade/dto/SessionDto';
+import { SessionLoginDTO } from '@/facade/dto/SessionDTO';
 import { AppService } from './AppService';
 import { UserService } from './UserService';
 import { RoleService } from './RoleService';
@@ -12,8 +13,9 @@ import { UserCredentialService } from './UserCredentialService';
 import { TwoFactorAuthService } from './TwoFactorAuthService';
 import { RolePermissionService } from './RolePermissionService';
 import { CustomizedServiceService } from './CustomizedServiceService';
-import { CustomizedServiceCode } from '../model/CustomizedServiceEntity';
-import { UserStatus } from '../model/UserEntity';
+import { CustomizedServiceCode } from '../model/CustomizedServiceDO';
+import { UserStatus } from '../model/UserDO';
+import { TwoFactorAuthType } from '../model/UserCredentialDO';
 
 @Provider()
 export class SessionService {
@@ -45,40 +47,39 @@ export class SessionService {
   @Inject(RolePermissionService)
   private rolePermissionService!: RolePermissionService;
 
-  async auth(ctx: KoaContext, appId: string, loginDto: SessionLoginDto): Promise<StepData> | never {
-    this.logger.info(`auth start. appId: ${appId}} userName ${loginDto.userName}`);
+  async auth(ctx: KoaContext, appId: string, loginDTO: SessionLoginDTO): Promise<StepData> | never {
+    this.logger.info(`auth start. appId: ${appId}} userName ${loginDTO.userName}`);
 
     const app = await this.appService.findAndVerify(appId);
-    const user = await this.userService.findAndVerify(appId, loginDto.userName);
+    const user = await this.userService.findAndVerify(appId, loginDTO.userName);
     const userRole = await this.roleService.findAndVerify(appId, user.roleId);
-    await this.userCredentialService.verifyPassword(user.id, loginDto.password);
+    await this.userCredentialService.verifyPassword(user.id, loginDTO.password);
 
-    const twoFactorList = await this.twoFactorService.findTwoFactorList(user.id);
-    const needTwoFactorAuth = twoFactorList.length > 0;
+    const twoFactorAuthInfoBO = await this.twoFactorService.findTwoFactorAuthInfo(user.id);
 
-    const loginService = await this.customizedServiceService.findAndVerify(appId, CustomizedServiceCode.LOGIN, true);
+    const loginServiceDO = await this.customizedServiceService.findAndVerify(appId, CustomizedServiceCode.Login, true);
 
     const stepData = ctx.createStepData('login');
     stepData.set('userId', user.id);
-    stepData.set('accountName', loginDto.userName);
+    stepData.set('accountName', loginDTO.userName);
     stepData.set('userRoleId', userRole.id);
     stepData.set('userRoleLevel', userRole.level);
     stepData.set('appId', appId);
     stepData.set('appLevel', app.level);
-    stepData.set('needTwoFactorAuth', needTwoFactorAuth);
-    stepData.set('twoFactorAuthList', twoFactorList);
-    stepData.set('sessionExpireTime', loginService?.extParams?.sessionExpireTime ?? '2h');
-    stepData.set('maxOnlineUserCount', loginService?.extParams?.maxOnlineUserCount ?? 3);
+    stepData.set('twoFactorAuthInfo', twoFactorAuthInfoBO);
+    stepData.set('sessionExpireTime', loginServiceDO?.parameters?.sessionExpireTime ?? '2h');
+    stepData.set('maxOnlineUserCount', loginServiceDO?.parameters?.maxOnlineUserCount ?? 3);
 
     const twoFactorAuthSteps = [];
-    if (needTwoFactorAuth) {
-      twoFactorAuthSteps.push('twoFactorList', 'twoFactorAuth');
+    if (twoFactorAuthInfoBO.type !== TwoFactorAuthType.NONE) {
+      twoFactorAuthSteps.push('twoFactorAuth');
     }
+
     stepData.steps = [...twoFactorAuthSteps, 'end'].filter(Boolean) as string[];
     stepData.commit();
     await stepData.save();
 
-    this.logger.info(`auth end. appId: ${appId}} userName ${loginDto.userName}`);
+    this.logger.info(`auth end. appId: ${appId}} userName ${loginDTO.userName}`);
     return stepData;
   }
 
@@ -155,8 +156,8 @@ export class SessionService {
     accessData.set('appId', appId);
     accessData.set('appLevel', appLevel);
 
-    const userPermissions = await this.rolePermissionService.findPermissionsBoByRoleId(userRoleId);
-    accessData.set('userPermissions', userPermissions.toJSON());
+    const parseResult = UAParser(ctx.get('user-agent'));
+    accessData.set('device', `${parseResult.os.name}(${parseResult.os.version}) ${parseResult.browser.name}(${parseResult.browser.version})`);
 
     await accessData.save();
 

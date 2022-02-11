@@ -1,4 +1,4 @@
-import { RoleEntity } from '@/domain/model/RoleEntity';
+import { RoleDO } from '@/domain/model/RoleDO';
 import { RoleService } from '@/domain/service/RoleService';
 import { RequestAccessDataValue } from '@/util/decorator/RequestAccessData';
 import { RequestValidator } from '@/util/decorator/RequestValidator';
@@ -6,8 +6,9 @@ import { Inject, Provider } from '@augejs/core';
 import { Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
-import { OrderDto } from '../dto/OrderDto';
-import { PaginationDto } from '../dto/PaginationDto';
+import { OrderDTO } from '../dto/OrderDTO';
+import { PaginationDTO } from '../dto/PaginationDTO';
+import { RoleListDTO } from '../dto/RoleDTO';
 
 @SwaggerTag({ name: 'Role', description: '`Role` Entity'})
 @Prefix('/api/v1/role')
@@ -25,12 +26,12 @@ export class RoleController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/RoleEntity' }
+        schema: { $ref: `#/definitions/${RoleDO.name}` }
       }
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/RoleEntity' },
+        schema: { $ref: `#/definitions/${RoleDO.name}` },
         description: ''
       }
     },
@@ -42,8 +43,8 @@ export class RoleController {
     @RequestAccessDataValue('appId') appId: string,
     @RequestAccessDataValue('userRoleId') userRoleId: string,
     @RequestAccessDataValue('userRoleLevel') userRoleLevel: number,
-    @RequestParams.Body() @RequestValidator(RoleEntity) dto: RoleEntity
-  ): Promise<RoleEntity> {
+    @RequestParams.Body() @RequestValidator(RoleDO) dto: RoleDO
+  ): Promise<RoleDO> {
     return await this.service.create({
       ...dto,
       parent: userRoleId,
@@ -52,7 +53,7 @@ export class RoleController {
     });
   }
 
-  @SwaggerAPI('/api/v1/Role/{id}', 'get', {
+  @SwaggerAPI('/api/v1/role/{id}', 'get', {
     tags: [ 'Role' ],
     summary: 'detail',
     parameters: [
@@ -65,7 +66,7 @@ export class RoleController {
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/RoleEntity' },
+        schema: { $ref: `#/definitions/${RoleDO.name}` },
         description: ''
       }
     },
@@ -76,7 +77,7 @@ export class RoleController {
   async detail(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string
-  ): Promise<RoleEntity | undefined> {
+  ): Promise<RoleDO | undefined> {
     return await this.service.findOne({ id, appId });
   }
 
@@ -91,9 +92,9 @@ export class RoleController {
         schema: {
           type: 'object',
           properties: {
-            query: { $ref: '#/definitions/RoleEntity' },
-            pagination: { $ref: '#/definitions/PaginationDto' },
-            order: { $ref: '#/definitions/OrderDto' }
+            query: { $ref: `#/definitions/${RoleListDTO.name}` },
+            pagination: { $ref: `#/definitions/${PaginationDTO.name}` },
+            order: { $ref: `#/definitions/${OrderDTO.name}` }
           }
         }
       }
@@ -106,7 +107,7 @@ export class RoleController {
             count: { type: 'number' },
             list: {
               type: 'array',
-              items: { $ref: '#/definitions/RoleEntity' }
+              items: { $ref: `#/definitions/${RoleDO.name}` }
             }
           }
         },
@@ -120,10 +121,10 @@ export class RoleController {
   async list(
     @RequestAccessDataValue('appId') appId: string,
     @RequestAccessDataValue('userRoleLevel') userRoleLevel: number,
-    @RequestParams.Body('query') @RequestValidator(RoleEntity) queryDto: RoleEntity,
-    @RequestParams.Body('pagination') @RequestValidator(PaginationDto) paginationDto: PaginationDto,
-    @RequestParams.Body('order') @RequestValidator(OrderDto) orderDto: OrderDto,
-  ): Promise<{ list: RoleEntity[], count: number }> {
+    @RequestParams.Body('query') @RequestValidator(RoleListDTO) queryDto: RoleListDTO,
+    @RequestParams.Body('pagination') @RequestValidator(PaginationDTO) paginationDto: PaginationDTO,
+    @RequestParams.Body('order') @RequestValidator(OrderDTO) orderDto: OrderDTO,
+  ): Promise<{ list: RoleDO[], count: number }> {
     const [list, count] = await this.service.findMany({
       ...queryDto,
       level: userRoleLevel,
@@ -150,10 +151,10 @@ export class RoleController {
       },
       {
         in: 'body',
-        name: 'RoleEntity',
+        name: 'RoleDO',
         required: true,
         schema: {
-          $ref: '#/definitions/RoleEntity'
+          $ref: `#/definitions/${RoleDO.name}`
         }
       }
     ],
@@ -170,7 +171,7 @@ export class RoleController {
   async update(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string,
-    @RequestParams.Body() @RequestValidator(RoleEntity) dto: RoleEntity
+    @RequestParams.Body() @RequestValidator(RoleDO) dto: RoleDO
   ): Promise<{}> {
     await this.service.update({ id, appId }, { ...dto });
     return {};

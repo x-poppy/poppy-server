@@ -1,9 +1,9 @@
-import { OrderDto } from "@/facade/dto/OrderDto"
-import { PaginationDto } from "@/facade/dto/PaginationDto"
+import { OrderDTO } from "@/facade/dto/OrderDTO"
+import { PaginationDTO } from "@/facade/dto/PaginationDTO"
 
 export interface FindManyOpt {
-  order?: OrderDto
-  pagination?: PaginationDto
+  order?: OrderDTO
+  pagination?: PaginationDTO
   select?: string[]
   params?: Record<string, unknown>
 }

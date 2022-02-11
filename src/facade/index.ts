@@ -2,17 +2,15 @@ import { MenuController } from './rest/MenuController';
 import { PageController } from './rest/PageController';
 import { SessionController } from './rest/SessionController';
 import { UserController } from './rest/UserController';
-import { TwoFactorController } from './rest/TwoFactorController';
+import { TwoFactorAuthController } from './rest/TwoFactorAuthController';
 import { RoleController } from './rest/RoleController';
 import { AppController } from './rest/AppController';
 import { AppConfigController } from './rest/AppConfigController';
 import { AppDomainController } from './rest/AppDomainController';
 import { ThemeController } from './rest/ThemeController';
 import { ForgetPasswordController } from './rest/ForgetPasswordController';
-import { ServerProxyController } from './rest/ServerProxyController';
 import { RestPasswordInviteController } from './rest/RestPasswordInviteController';
 import { OperationLogController } from './rest/OperationLogController';
-import { WebHookController } from './rest/WebHookController';
 import { Inject, Module } from '@augejs/core';
 import { KoaContext, MiddlewareHandler } from '@augejs/koa';
 import { RestfulAPIHandlerService } from '@/application/service/RestfulAPIHandlerService';
@@ -21,6 +19,8 @@ import { HomeController } from './web/HomeController';
 import { I18nController } from './rest/I18nController';
 import { AppLangController } from './rest/AppLangController';
 import { SwaggerSecurityDefinition } from '@augejs/koa-swagger';
+import { AvatarController } from './rest/AvatarController';
+import { CustomizedServiceController } from './rest/CustomizedServiceController';
 
 @SwaggerSecurityDefinition('accessToken', {
   name: 'Authorization',
@@ -31,14 +31,17 @@ import { SwaggerSecurityDefinition } from '@augejs/koa-swagger';
   providers: [
     HomeController,
     SessionController,
-    AppConfigController,
+    // AppConfigController,
     AppDomainController,
     AppLangController,
     RoleController,
     UserController,
     I18nController,
     AppController,
-    MenuController
+    MenuController,
+    TwoFactorAuthController,
+    AvatarController,
+    CustomizedServiceController
   ],
 })
 @KoaBodyParserMiddleware()

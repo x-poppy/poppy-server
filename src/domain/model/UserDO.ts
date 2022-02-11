@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Entity, PrimaryColumn, Column, Index } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 export enum UserStatus {
   DISABLED = 'disabled',
@@ -24,7 +24,7 @@ export enum UserStatus {
 })
 @Entity('pp_user')
 @Index(['appId', 'accountName'], { unique: true })
-export class UserEntity extends PPEntity {
+export class UserDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',

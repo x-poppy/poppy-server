@@ -1,9 +1,9 @@
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 @Entity('pp_operation_log')
 @Index(['createAt'])
-export class OperationLogEntity extends PPEntity {
+export class OperationLogDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'id',

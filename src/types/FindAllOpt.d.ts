@@ -1,7 +1,7 @@
-import { OrderDto } from "@/facade/dto/OrderDto";
+import { OrderDTO } from "@/facade/dto/OrderDTO";
 
 export interface FindAllOpt {
-  order?: OrderDto,
+  order?: OrderDTO,
   select?: string[],
   params?: Record<string, unknown>
 }

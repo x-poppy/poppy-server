@@ -1,13 +1,15 @@
 import { CustomizedServiceRepository } from '@/infrastructure/repository/CustomizedServiceRepository';
 import { BusinessError } from '@/util/BusinessError';
+import { isServiceModuleTag } from '@/util/decorator/ServiceModuleTag';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { Container, GetContainer, GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
-import { CustomizedServiceEntity, CustomizedServiceStatus } from '../model/CustomizedServiceEntity';
+import { CustomizedServiceDO, CustomizedServiceStatus } from '../model/CustomizedServiceDO';
+import { CustomizedServiceAdapter } from './customizedServiceAdapter/CustomizedServiceAdapter';
 import { PPService } from './PPService';
 
 @Provider()
-export class CustomizedServiceService extends PPService<CustomizedServiceEntity, CustomizedServiceRepository> {
+export class CustomizedServiceService extends PPService<CustomizedServiceDO, CustomizedServiceRepository> {
 
   @GetLogger()
   private readonly logger!: ILogger;
@@ -19,76 +21,77 @@ export class CustomizedServiceService extends PPService<CustomizedServiceEntity,
   container!: Container;
 
   async checkServiceAvailable(appId: string, serviceCode: string): Promise<boolean> {
-    const channel = await this.repository.findOne({ appId, serviceCode, status: CustomizedServiceStatus.NORMAL }, { select: ['id'] });
-    if (!channel) return false;
+    const customizedServiceDO = await this.repository.findOne({ appId, serviceCode, status: CustomizedServiceStatus.NORMAL }, { select: ['status'] });
+    if (!customizedServiceDO) {
+      return false;
+    }
+
+    if (customizedServiceDO.status !== CustomizedServiceStatus.NORMAL) {
+      return false;
+    }
+
     return true;
   }
 
-  async findAndVerify(appId: string, serviceCode: string, allowNotExist = true): Promise<CustomizedServiceEntity | undefined> | never {
-    const customizedService = await this.repository.findOne ({ appId, serviceCode }, { select: ['extParams', 'status'] });
-    if (!customizedService) {
+  async findAndVerify(appId: string, serviceCode: string, allowNotExist = true): Promise<CustomizedServiceDO | undefined> | never {
+    const customizedService = await this.repository.findOne ({ appId, serviceCode });
+    this.verify(appId, serviceCode, allowNotExist, customizedService);
+    return customizedService;
+  }
+
+  private verify(appId: string, serviceCode: string, allowNotExist = true, customizedServiceDO?: CustomizedServiceDO): void | never {
+    if (!customizedServiceDO) {
       if (allowNotExist) {
-        return undefined;
+        return;
       }
       this.logger.info(`Customized_Service_Is_Not_Exist. appId: ${appId} serviceCode: ${serviceCode}`);
       throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Not_Exist);
     }
 
-    if (customizedService.status === CustomizedServiceStatus.DISABLED) {
+    if (customizedServiceDO.status === CustomizedServiceStatus.DISABLED) {
       this.logger.warn(`Customized_Service_Is_Disabled. appId: ${appId} serviceCode: ${serviceCode}`);
       throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Disabled);
     }
 
-    if (customizedService.status !== CustomizedServiceStatus.NORMAL) {
+    if (customizedServiceDO.status !== CustomizedServiceStatus.NORMAL) {
       this.logger.warn(`Customized_Service_Is_Not_Normal. appId: ${appId} serviceCode: ${serviceCode}`);
       throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Not_Normal);
     }
-
-    return customizedService;
   }
 
-  private findServiceModuleInstance(moduleCode: string):any | null {
-    let targetServiceModule: any | null = null;
-
+  private findServiceAdapter(moduleCode: string | null):CustomizedServiceAdapter | null {
+    if (!moduleCode) return null;
     if (!this.container.isBound(moduleCode)) return null;
 
-    const serviceModules = this.container.getAll(moduleCode);
-        // .filter((service: IChannelPayTypeService) => {
-        //   return isPayType(service, payType);
-        // });
+    const serviceAdapters = this.container.getAll<object>(moduleCode)
+        .filter((service) => {
+          return isServiceModuleTag(service, moduleCode);
+        });
 
-    if (serviceModules.length > 0) {
-      targetServiceModule = serviceModules[0];
-    }
+    if (serviceAdapters.length <= 0) return null;
 
-    return targetServiceModule;
+    return serviceAdapters[0];
   }
 
-  async request(ctx: KoaContext, appId: string, serviceCode: string): Promise<any> {
-    const customizedService = await this.findOne({appId, serviceCode});
-    if (!customizedService) {
-      throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Not_Exist);
+  async findAndVerifyServiceAdapter<T>(customizedServiceDO: CustomizedServiceDO):Promise<T | null> | never {
+    this.verify(customizedServiceDO.appId, customizedServiceDO.serviceCode, false, customizedServiceDO);
+    const adapterService =  this.findServiceAdapter(customizedServiceDO.moduleCode);
+    if (!adapterService) {
+      return null;
     }
 
-    const serviceModule =  this.findServiceModuleInstance(customizedService.moduleCode);
+    return adapterService as T;
+  }
+
+  async request(ctx: KoaContext, appId: string, serviceCode: string): Promise<void> {
+    const customizedServiceDO = (await this.findOne({ appId, serviceCode })) as CustomizedServiceDO;
+    this.verify(appId, serviceCode, false, customizedServiceDO);
+
+    const serviceModule =  this.findServiceAdapter(customizedServiceDO.moduleCode);
     if (!serviceModule) {
       throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Not_Exist);
     }
 
-    return serviceModule.request(ctx, customizedService);
-  }
-
-  async callback(ctx: KoaContext, appId: string, serviceCode: string): Promise<any> {
-    const customizedService = await this.findOne({appId, serviceCode});
-    if (!customizedService) {
-      throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Not_Exist);
-    }
-
-    const serviceModule =  this.findServiceModuleInstance(customizedService.moduleCode);
-    if (!serviceModule) {
-      throw new BusinessError(I18nMessageKeys.Customized_Service_Is_Not_Exist);
-    }
-
-    return serviceModule.callback(ctx, customizedService);
+    await serviceModule.request?.(ctx, customizedServiceDO);
   }
 }

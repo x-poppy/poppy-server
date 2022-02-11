@@ -1,6 +1,6 @@
 import { Inject, Provider } from '@augejs/core';
 import { getRepository, Repository } from '@augejs/typeorm';
-import { PageEntity, PageStatus, PageContentType } from '../../domain/model/PageEntity';
+import { PageEntity, PageStatus, PageContentType } from '../../domain/model/PageDO';
 import { UniqueIdService } from '../service/UniqueIdService';
 
 interface CreateOpt {

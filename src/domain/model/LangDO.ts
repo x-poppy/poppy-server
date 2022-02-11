@@ -1,8 +1,8 @@
 import { Column, Entity, PrimaryColumn } from "@augejs/typeorm";
-import { PPEntity } from "./PPEntity";
+import { PPDO } from "./PPDO";
 
 @Entity('pp_lang')
-export class LangEntity  extends PPEntity {
+export class LangDO  extends PPDO {
   @PrimaryColumn({
     type: 'varchar',
     length: 10,
@@ -13,9 +13,9 @@ export class LangEntity  extends PPEntity {
   @Column({
     type: 'varchar',
     length: 20,
-    comment: 'Locale Title',
+    comment: 'name',
   })
-  title!: string;
+  name!: string;
 
   @Column({
     type: 'varchar',

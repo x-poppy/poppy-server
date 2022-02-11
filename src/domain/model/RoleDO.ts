@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 export enum RoleStatus {
   DISABLED = 'disabled',
@@ -13,13 +13,12 @@ export enum RoleStatus {
     appId: { type: 'string' },
     appLevel: { type: 'number' },
     parent: { type: 'string' },
-    inherited: { type: 'boolean' },
     title: { type: 'string' },
     status: { type: 'string', description: `${Object.values(RoleStatus).join(',')}` }
   },
 })
 @Entity('pp_role')
-export class RoleEntity extends PPEntity {
+export class RoleDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
@@ -54,13 +53,6 @@ export class RoleEntity extends PPEntity {
   })
   @Index()
   title!: string;
-
-  @Column({
-    type: 'varchar',
-    length: 80,
-    nullable: true
-  })
-  titleI18nKey: string | null = null;
 
   @Column({
     type: 'smallint',

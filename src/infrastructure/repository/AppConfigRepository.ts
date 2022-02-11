@@ -1,4 +1,4 @@
-import { AppConfigEntity } from '@/domain/model/AppConfigEntity';
+import { AppConfigDO } from '@/domain/model/AppConfigDO';
 import { DeepPartialData } from '@/types/DeepPartialData';
 import { FindDeepPartial } from '@/types/FindDeepPartial';
 import { FindManyOpt } from '@/types/FindManyOpt';
@@ -8,16 +8,16 @@ import { UniqueIdService } from '../service/UniqueIdService';
 import { PPRepository } from './PPRepository';
 
 @Provider()
-export class AppConfigRepository extends PPRepository<AppConfigEntity> {
+export class AppConfigRepository extends PPRepository<AppConfigDO> {
 
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
   constructor() {
-    super(AppConfigEntity);
+    super(AppConfigDO);
   }
 
-  async create(data: DeepPartialData<AppConfigEntity>, manager?: EntityManager): Promise<AppConfigEntity> {
+  async create(data: DeepPartialData<AppConfigDO>, manager?: EntityManager): Promise<AppConfigDO> {
     const id = await this.uniqueIdService.getUniqueId();
     return this.getRepository(manager).save({
       ...data,
@@ -25,7 +25,7 @@ export class AppConfigRepository extends PPRepository<AppConfigEntity> {
     });
   }
 
-  override async findMany(condition: FindDeepPartial<AppConfigEntity>, opts?: FindManyOpt): Promise<[AppConfigEntity[], number]> {
+  override async findMany(condition: FindDeepPartial<AppConfigDO>, opts?: FindManyOpt): Promise<[AppConfigDO[], number]> {
     return this.getRepository().findAndCount({
       ...(opts?.pagination && {
         skip: opts?.pagination?.offset,
@@ -44,7 +44,7 @@ export class AppConfigRepository extends PPRepository<AppConfigEntity> {
         createAt: 'DESC',
         ...opts?.order,
       },
-      select: opts?.select as (keyof AppConfigEntity)[]
+      select: opts?.select as (keyof AppConfigDO)[]
     });
   }
 }

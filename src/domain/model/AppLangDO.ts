@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from "@augejs/koa-swagger";
 import { Entity, PrimaryColumn } from "@augejs/typeorm";
-import { PPEntity } from "./PPEntity";
+import { PPDO } from "./PPDO";
 
 @SwaggerDefinition({
   properties: {
@@ -11,7 +11,7 @@ import { PPEntity } from "./PPEntity";
   },
 })
 @Entity('pp_app_lang')
-export class AppLangEntity extends PPEntity {
+export class AppLangDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
   })

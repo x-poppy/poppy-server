@@ -1,7 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { MaxLength } from '@augejs/validator';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 @SwaggerDefinition({
   properties: {
@@ -9,42 +8,30 @@ import { PPEntity } from './PPEntity';
     appId: { type: 'string' },
     key: { type: 'string' },
     value: { type: 'string' },
-    desc: { type: 'string' },
   },
 })
-@Entity('pp_app_config')
+@Entity('pp_theme')
 @Index(['appId', 'key'], { unique: true })
-export class AppConfigEntity extends PPEntity {
+export class ThemeDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
-    comment: 'id',
+    comment: 'pk SnowflakeNo format',
   })
   id!: string;
 
   @Column({
     type: 'bigint',
-    comment: 'appId',
   })
   appId!: string;
 
   @Column({
     length: 80,
-    comment: 'key name',
+    comment: 'key',
   })
-  @MaxLength(80)
   key!: string;
 
   @Column({
-    length: 200,
+    length: 120,
   })
-  @MaxLength(80)
   value!: string;
-
-  @Column({
-    type: 'varchar',
-    length: 128,
-    nullable: true,
-  })
-  @MaxLength(120)
-  desc: string | null = null;
 }

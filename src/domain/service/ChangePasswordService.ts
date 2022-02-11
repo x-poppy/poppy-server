@@ -8,7 +8,7 @@ import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { I18n, I18N_IDENTIFIER } from '@augejs/i18n';
 import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
-import { TwoFactorListBo } from '../bo/TwoFactorItemBo';
+import { TwoFactorListBo } from '../bo/TwoFactorAuthInfoBO';
 import { SessionService } from './SessionService';
 import { UserService } from './UserService';
 

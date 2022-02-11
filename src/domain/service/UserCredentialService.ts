@@ -3,11 +3,11 @@ import { PasswordService } from '@/infrastructure/service/PasswordService';
 import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { UserCredentialEntity } from '../model/UserCredentialEntity';
+import { UserCredentialDO } from '../model/UserCredentialDO';
 import { PPService } from './PPService';
 
 @Provider()
-export class UserCredentialService extends PPService <UserCredentialEntity, UserCredentialRepository>{
+export class UserCredentialService extends PPService <UserCredentialDO, UserCredentialRepository>{
 
   @GetLogger()
   private logger!: ILogger;

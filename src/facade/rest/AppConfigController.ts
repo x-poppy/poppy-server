@@ -1,4 +1,4 @@
-import { AppConfigEntity } from '@/domain/model/AppConfigEntity';
+import { AppConfigDO } from '@/domain/model/AppConfigDO';
 import { AppConfigService } from '@/domain/service/AppConfigService';
 import { RequestAccessDataValue } from '@/util/decorator/RequestAccessData';
 import { RequestValidator } from '@/util/decorator/RequestValidator';
@@ -6,8 +6,8 @@ import { Inject, Provider } from '@augejs/core';
 import { Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
-import { OrderDto } from '../dto/OrderDto';
-import { PaginationDto } from '../dto/PaginationDto';
+import { OrderDTO } from '../dto/OrderDTO';
+import { PaginationDTO } from '../dto/PaginationDTO';
 
 @SwaggerTag({ name: 'AppConfig', description: '`AppConfig` Entity'})
 @Prefix('/api/v1/app-config')
@@ -40,8 +40,8 @@ export class AppConfigController {
   @RequestMapping.Post('')
   async create(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body() @RequestValidator(AppConfigEntity) createDto: AppConfigEntity
-    ): Promise<AppConfigEntity> {
+    @RequestParams.Body() @RequestValidator(AppConfigDO) createDto: AppConfigDO
+    ): Promise<AppConfigDO> {
     return await this.service.create({
       ...createDto,
       appId,
@@ -78,7 +78,7 @@ export class AppConfigController {
   async update(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string,
-    @RequestParams.Body() @RequestValidator(AppConfigEntity) updateDto: AppConfigEntity
+    @RequestParams.Body() @RequestValidator(AppConfigDO) updateDto: AppConfigDO
     ): Promise<{}> {
     await this.service.update({ id, appId }, { ...updateDto });
     return {};
@@ -96,8 +96,8 @@ export class AppConfigController {
           type: 'object',
           properties: {
             query: { $ref: '#/definitions/AppConfigEntity' },
-            pagination: { $ref: '#/definitions/PaginationDto' },
-            order: { $ref: '#/definitions/OrderDto' }
+            pagination: { $ref: '#/definitions/PaginationDTO' },
+            order: { $ref: '#/definitions/OrderDTO' }
           }
         }
       }
@@ -123,10 +123,10 @@ export class AppConfigController {
   @RequestMapping.Post('list')
   async list(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('query') @RequestValidator(AppConfigEntity) queryDto: AppConfigEntity,
-    @RequestParams.Body('pagination') @RequestValidator(PaginationDto) paginationDto: PaginationDto,
-    @RequestParams.Body('order') @RequestValidator(OrderDto) orderDto: OrderDto,
-  ): Promise<{ list: AppConfigEntity[], count: number }> {
+    @RequestParams.Body('query') @RequestValidator(AppConfigDO) queryDto: AppConfigDO,
+    @RequestParams.Body('pagination') @RequestValidator(PaginationDTO) paginationDto: PaginationDTO,
+    @RequestParams.Body('order') @RequestValidator(OrderDTO) orderDto: OrderDTO,
+  ): Promise<{ list: AppConfigDO[], count: number }> {
     const [list, count] = await this.service.findMany({
       ...queryDto,
       appId
@@ -165,7 +165,7 @@ export class AppConfigController {
   async detail(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string
-  ): Promise<AppConfigEntity | undefined> {
+  ): Promise<AppConfigDO | undefined> {
     return await this.service.findOne({ id, appId, });
   }
 

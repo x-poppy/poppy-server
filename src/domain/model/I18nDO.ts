@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 @SwaggerDefinition({
   properties: {
@@ -12,7 +12,7 @@ import { PPEntity } from './PPEntity';
 })
 @Entity('pp_i18n')
 @Index(['appId', 'locale', 'key'], { unique: true })
-export class I18nEntity  extends PPEntity {
+export class I18nDO  extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'id',
@@ -25,6 +25,13 @@ export class I18nEntity  extends PPEntity {
   appId!: string;
 
   @Column({
+    type: 'smallint',
+    comment: 'app level',
+    default: 0,
+  })
+  appLevel = 0;
+
+  @Column({
     length: 80,
   })
   locale!: string;
@@ -35,7 +42,7 @@ export class I18nEntity  extends PPEntity {
   key!: string
 
   @Column({
-    length: 128
+    length: 2048
   })
   value!: string
 }

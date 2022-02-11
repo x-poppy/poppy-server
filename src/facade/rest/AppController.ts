@@ -1,4 +1,4 @@
-import { AppEntity } from '@/domain/model/AppEntity';
+import { AppDO } from '@/domain/model/AppDO';
 import { AppService } from '@/domain/service/AppService';
 import { RequestAccessDataValue } from '@/util/decorator/RequestAccessData';
 import { RequestValidator } from '@/util/decorator/RequestValidator';
@@ -6,8 +6,9 @@ import { Inject, Provider } from '@augejs/core';
 import { Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
-import { OrderDto } from '../dto/OrderDto';
-import { PaginationDto } from '../dto/PaginationDto';
+import { AppCreateDTO, AppListDTO } from '@/facade/dto/AppDTO';
+import { OrderDTO } from '@/facade/dto/OrderDTO';
+import { PaginationDTO } from '@/facade/dto/PaginationDTO';
 
 @SwaggerTag({ name: 'App', description: '`App` Entity'})
 @Prefix('/api/v1/app')
@@ -26,13 +27,13 @@ export class AppController {
         name: 'data',
         required: true,
         schema: {
-          $ref: '#/definitions/AppCreateDto'
+          $ref: `#/definitions/${AppCreateDTO.name}`
         }
       }
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/AppEntity' },
+        schema: { $ref: `#/definitions/${AppDO.name}` },
         description: ''
       }
     },
@@ -43,9 +44,9 @@ export class AppController {
   async create(
     @RequestAccessDataValue('appId') appId: string,
     @RequestAccessDataValue('appLevel') appLevel: number,
-    @RequestParams.Body() @RequestValidator(AppEntity) createDto: AppEntity): Promise<AppEntity> {
+    @RequestParams.Body() @RequestValidator(AppCreateDTO) createDTO: AppCreateDTO): Promise<AppDO> {
       return this.service.create({
-        ...createDto,
+        ...createDTO,
         parent: appId,
         level: appLevel + 1,
       });
@@ -65,7 +66,7 @@ export class AppController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/AppEntity' }
+        schema: { $ref: `#/definitions/${AppDO.name}` },
       }
     ],
     responses: {
@@ -81,7 +82,7 @@ export class AppController {
   async update(
     @RequestAccessDataValue('appLevel') appLevel: number,
     @RequestParams.Params('id') id: string,
-    @RequestParams.Body() @RequestValidator(AppEntity) updateDto: AppEntity
+    @RequestParams.Body() @RequestValidator(AppDO) updateDto: AppDO
     ): Promise<{}> {
     await this.service.update({
       id,
@@ -101,9 +102,9 @@ export class AppController {
         schema: {
           type: 'object',
           properties: {
-            query: { $ref: '#/definitions/AppEntity' },
-            pagination: { $ref: '#/definitions/PaginationDto' },
-            order: { $ref: '#/definitions/OrderDto' }
+            query: { $ref: `#/definitions/${AppListDTO.name}` },
+            pagination: { $ref: `#/definitions/${PaginationDTO.name}` },
+            order: { $ref: `#/definitions/${OrderDTO.name}` }
           }
         }
       }
@@ -116,7 +117,7 @@ export class AppController {
             count: { type: 'number' },
             list: {
               type: 'array',
-              items: { $ref: '#/definitions/AppEntity' }
+              items: { $ref: `#/definitions/${AppDO.name}` }
             }
           }
         },
@@ -129,10 +130,10 @@ export class AppController {
   @RequestMapping.Post('list')
   async list(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('query') @RequestValidator(AppEntity) queryDto: AppEntity,
-    @RequestParams.Body('pagination') @RequestValidator(PaginationDto) paginationDto: PaginationDto,
-    @RequestParams.Body('order') @RequestValidator(OrderDto) orderDto: OrderDto,
-  ): Promise<{ list: AppEntity[], count: number }> {
+    @RequestParams.Body('query') @RequestValidator(AppListDTO) queryDto: AppListDTO,
+    @RequestParams.Body('pagination') @RequestValidator(PaginationDTO) paginationDto: PaginationDTO,
+    @RequestParams.Body('order') @RequestValidator(OrderDTO) orderDto: OrderDTO,
+  ): Promise<{ list: AppDO[], count: number }> {
     const [list, count] = await this.service.findMany({
       ...queryDto,
       parent: appId,
@@ -160,7 +161,7 @@ export class AppController {
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/AppEntity' },
+        schema: { $ref: `#/definitions/${AppDO.name}` },
         description: ''
       }
     },
@@ -171,7 +172,7 @@ export class AppController {
   async detail(
     @RequestAccessDataValue('appLevel') appLevel: number,
     @RequestParams.Params('id') id: string
-  ): Promise<AppEntity | undefined> {
+  ): Promise<AppDO | undefined> {
     return await this.service.findOne({
       id,
       level: appLevel,

@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 export enum AppDomainStatus {
   DISABLED = 'disabled',
@@ -16,7 +16,7 @@ export enum AppDomainStatus {
   },
 })
 @Entity('pp_app_domain')
-export class AppDomainEntity extends PPEntity {
+export class AppDomainDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'id',

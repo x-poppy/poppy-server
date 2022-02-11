@@ -1,13 +1,13 @@
-import { MenuEntity } from '../model/MenuEntity';
-import { RolePermissionEntity } from '../model/RolePermissionEntity';
+import { MenuDO } from '../model/MenuDO';
+import { RolePermissionDO } from '../model/RolePermissionDO';
 
 export class PermissionBo {
   constructor(public appId: string, public name: string) {}
 }
 
-export class PermissionsBo {
-  static fromJSON(json: Record<string, Record<string, boolean>> | null): PermissionsBo {
-    const permissions = new PermissionsBo();
+export class PermissionsBO {
+  static fromJSON(json: Record<string, Record<string, boolean>> | null): PermissionsBO {
+    const permissions = new PermissionsBO();
     if (json) {
       for (const [appId, perms] of Object.entries(json)) {
         for (const [name] of Object.entries(perms)) {
@@ -20,8 +20,8 @@ export class PermissionsBo {
     return permissions;
   }
 
-  static fromMenu(menus?: MenuEntity[] | null): PermissionsBo {
-    const permissions = new PermissionsBo();
+  static fromMenu(menus?: MenuDO[] | null): PermissionsBO {
+    const permissions = new PermissionsBO();
     if (menus) {
       for (const menu of menus) {
         const permission = new PermissionBo(menu.appId, menu.menuCode);
@@ -31,8 +31,8 @@ export class PermissionsBo {
     return permissions;
   }
 
-  static fromRolePermissions(rolePermissions: RolePermissionEntity[]): PermissionsBo {
-    const permissions = new PermissionsBo();
+  static fromRolePermissions(rolePermissions: RolePermissionDO[]): PermissionsBO {
+    const permissions = new PermissionsBO();
     for (const rolePermission of rolePermissions) {
       const permission = new PermissionBo(rolePermission.appId, rolePermission.menuCode);
       permissions.set(permission);
@@ -85,7 +85,7 @@ export class PermissionsBo {
     return result;
   }
 
-  merge(permissions: PermissionsBo | null): this {
+  merge(permissions: PermissionsBO | null): this {
     if (!permissions) return this;
     if (!permissions.appsPermsMap) return this;
     if (permissions.appsPermsMap.size === 0) return this;
@@ -105,7 +105,7 @@ export class PermissionsBo {
     return this;
   }
 
-  filter(permissions: PermissionsBo | null): this {
+  filter(permissions: PermissionsBO | null): this {
     if (!permissions) return this;
     if (!permissions.appsPermsMap) return this;
     if (permissions.appsPermsMap.size === 0) return this;
@@ -130,7 +130,7 @@ export class PermissionsBo {
     return this;
   }
 
-  filterMenus(menus: MenuEntity[] | null | undefined): MenuEntity[] {
+  filterMenus(menus: MenuDO[] | null | undefined): MenuDO[] {
     if (!menus) return [];
 
     return menus.filter((menu) => {

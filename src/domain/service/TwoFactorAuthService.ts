@@ -1,14 +1,15 @@
-import { TwoFactorAuthDto } from '@/facade/dto/TwoFactorAuthDto';
+import { TwoFactorAuthDTO } from '@/facade/dto/TwoFactorAuthDTO';
 import { OneTimePasswordService } from '@/infrastructure/service/OneTimePasswordService';
-import { BusinessError, ClientValidationError } from '@/util/BusinessError';
+import { ClientValidationError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
+import RandomUtil from '@/util/RandomUtil';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { KoaContext } from '@augejs/koa';
 import { StepData } from '@augejs/koa-step-token';
-import { TwoFactorListItemBo } from '../bo/TwoFactorItemBo';
-import { CustomizedServiceCode } from '../model/CustomizedServiceEntity';
-import { UserCredentialEntity } from '../model/UserCredentialEntity';
-import { UserStatus } from '../model/UserEntity';
+import { Commands, REDIS_IDENTIFIER } from '@augejs/redis';
+import { TwoFactorAuthInfoBO } from '../bo/TwoFactorAuthInfoBO';
+import { CustomizedServiceCode } from '../model/CustomizedServiceDO';
+import { TwoFactorAuthType, UserCredentialDO } from '../model/UserCredentialDO';
 import { CustomizedServiceService } from './CustomizedServiceService';
 import { UserCredentialService } from './UserCredentialService';
 import { UserService } from './UserService';
@@ -16,51 +17,71 @@ import { UserService } from './UserService';
 @Provider()
 export class TwoFactorAuthService {
   @GetLogger()
-  logger!: ILogger;
+  private readonly logger!: ILogger;
+
+  @Inject(REDIS_IDENTIFIER)
+  private readonly redis!: Commands;
 
   @Inject(OneTimePasswordService)
-  oneTimePasswordService!: OneTimePasswordService;
+  private readonly oneTimePasswordService!: OneTimePasswordService;
 
   @Inject(UserService)
-  private userService!: UserService;
+  private readonly userService!: UserService;
 
   @Inject(UserCredentialService)
-  private userCredentialService!: UserCredentialService;
+  private readonly userCredentialService!: UserCredentialService;
 
   @Inject(CustomizedServiceService)
-  private customizedServiceService!: CustomizedServiceService;
+  private readonly customizedServiceService!: CustomizedServiceService;
 
-  async list(ctx: KoaContext): Promise<StepData> {
-    const stepData = ctx.stepData as StepData;
-
-    const newStepData = ctx.createStepData(stepData.sessionName, stepData.maxAge, stepData.toJSON());
-    newStepData.popStep();
-    await newStepData.save();
-    ctx.stepData = newStepData;
-
-    return newStepData;
+  async info(stepData: StepData): Promise<TwoFactorAuthInfoBO> {
+    const twoFactorAuthInfoBO = TwoFactorAuthInfoBO.fromJSON(stepData.get<Record<string, string>>('twoFactorAuthInfo'));
+    twoFactorAuthInfoBO.mask();
+    return twoFactorAuthInfoBO;
   }
 
-  async auth(ctx: KoaContext, twoFactorAuthDto: TwoFactorAuthDto): Promise<StepData> {
-    const stepData = ctx.stepData as StepData;
-
+  async sendCaptcha(stepData: StepData): Promise<string> {
     const userId = stepData.get<string>('userId');
-    const user = await this.userService.findOne({ id: userId, status: UserStatus.NORMAL });
-    if (!user) {
-      this.logger.warn(`User_Is_Not_Exist. userId: ${userId}`);
-      throw new BusinessError(I18nMessageKeys.User_Is_Not_Exist);
+    const appId = stepData.get<string>('appId');
+    const sessionName = stepData.sessionName;
+    const captcha = RandomUtil.randomNumberString(6);
+
+    const twoFactorAuthServiceDO = await this.customizedServiceService.findAndVerify(appId, CustomizedServiceCode.TwoFactorAuth, true);
+    const captchaMaxAge = Number(twoFactorAuthServiceDO?.parameters?.captchaExpireTime ?? 10 * 60 * 60);
+    const twoFactorAuthInfoBO = TwoFactorAuthInfoBO.fromJSON(stepData.get<Record<string, string>>('twoFactorAuthInfo'))
+    if (twoFactorAuthInfoBO.type == TwoFactorAuthType.EMAIL || twoFactorAuthInfoBO.type === TwoFactorAuthType.SMS) {
+      const redisKey = `captcha-${sessionName}-${twoFactorAuthInfoBO.type}:${userId}:${twoFactorAuthInfoBO.data}`;
+      await this.redis.set(redisKey, captcha, 'PX', captchaMaxAge);
     }
 
-    // if (!user.optKey) {
-    //   this.logger.warn(`User_Is_Not_Exist. userNo: ${userNo}`);
-    //   throw new BusinessError(I18nMessageKeys.User_Opt_Key_Empty_Error);
-    // }
+    this.logger.info(`send captcha. appId: ${appId}} userId: ${userId} sessionName: ${sessionName} captcha: ${captcha} captchaMaxAge: ${captchaMaxAge}`);
+
+    return captcha;
+  }
+
+  async auth(ctx: KoaContext, twoFactorAuthDTO: TwoFactorAuthDTO): Promise<StepData> {
+    const captcha = twoFactorAuthDTO.code;
+    const stepData = ctx.stepData as StepData;
+    const twoFactorAuthInfoBO = TwoFactorAuthInfoBO.fromJSON(stepData.get<Record<string, string>>('twoFactorAuthInfo'));
+    let verifyResult = true;
+    if (twoFactorAuthInfoBO.type === TwoFactorAuthType.OTP) {
+      verifyResult = await this.oneTimePasswordService.verify(captcha, twoFactorAuthInfoBO.data);
+    } else if (twoFactorAuthInfoBO.type == TwoFactorAuthType.EMAIL || twoFactorAuthInfoBO.type === TwoFactorAuthType.SMS) {
+      const userId = stepData.get<string>('userId');
+      const sessionName = stepData.sessionName;
+      const redisKey = `captcha-${sessionName}-${twoFactorAuthInfoBO.type}:${userId}:${twoFactorAuthInfoBO.data}`;
+      const targetCaptcha = await this.redis.get(redisKey);
+      verifyResult = targetCaptcha === captcha;
+
+      if (verifyResult) {
+        await this.redis.del(redisKey);
+      }
+    }
 
     // do the validate
-    const verifyResult = await this.oneTimePasswordService.verify(twoFactorAuthDto.code, "");
     if (!verifyResult) {
-      this.logger.warn(`User_Name_Or_Password_Is_InCorrect. userNo: ${userId}`);
-      throw new ClientValidationError(I18nMessageKeys.Login_User_Name_Or_Password_Is_InCorrect);
+      this.logger.warn(`Two_Factor_Auth_Code_Error. type: ${twoFactorAuthInfoBO.type} code: ${captcha}`);
+      throw new ClientValidationError(I18nMessageKeys.Two_Factor_Auth_Code_Error);
     }
 
     const newStepData = ctx.createStepData(stepData.sessionName, stepData.maxAge, stepData.toJSON());
@@ -71,51 +92,52 @@ export class TwoFactorAuthService {
     return newStepData;
   }
 
-  async verify(): Promise<boolean> {
-    return true;
-  }
+  async findTwoFactorAuthInfo(userId: string): Promise<TwoFactorAuthInfoBO> {
+    const twoFactorAuthBO = new TwoFactorAuthInfoBO();
+    twoFactorAuthBO.type = TwoFactorAuthType.NONE;
 
-  async findTwoFactorList(userId: string): Promise<TwoFactorListItemBo[]> {
-    const user = await this.userService.findOne({ id: userId }, { select: ['mobileNo', 'emailAddr'] });
-    if (!user) return [];
+    const user = await this.userService.findOne({ id: userId }, { select: ['appId', 'mobileNo', 'emailAddr'] });
+    if (!user) {
+      return twoFactorAuthBO;
+    }
 
-    const userCredential = await this.userCredentialService.findOne({ userId }, { select: ['otpKey']}) as UserCredentialEntity;
-    if (!userCredential) return [];
+    const isTwoFactorAuthServiceAvailable = await this.customizedServiceService.checkServiceAvailable(user.appId, CustomizedServiceCode.TwoFactorAuth);
+    if (!isTwoFactorAuthServiceAvailable) {
+      return twoFactorAuthBO;
+    }
 
-    const twoFactorList = [];
-    const userTwoFactorAuth = userCredential.twoFactorAuth;
-    if (userTwoFactorAuth) {
+    const userCredential = await this.userCredentialService.findOne({ userId }, { select: ['otpKey', 'twoFactorAuthType']}) as UserCredentialDO;
+    if (!userCredential) {
+      return twoFactorAuthBO;
+    }
+
+    const userTwoFactorAuthType = userCredential.twoFactorAuthType;
+    if (userTwoFactorAuthType === TwoFactorAuthType.EMAIL) {
+      if (user.emailAddr) {
+        const isEmailChannelAvailable = await this.customizedServiceService.checkServiceAvailable(user.appId, CustomizedServiceCode.Email);
+        if (isEmailChannelAvailable) {
+          twoFactorAuthBO.type = userTwoFactorAuthType;
+          twoFactorAuthBO.data = user.emailAddr;
+        }
+      }
+    } else if (userTwoFactorAuthType === TwoFactorAuthType.SMS) {
       if (user.mobileNo) {
         const isSmsChannelAvailable = await this.customizedServiceService.checkServiceAvailable(user.appId, CustomizedServiceCode.SMS);
         if (isSmsChannelAvailable) {
-          twoFactorList.push({
-            type: CustomizedServiceCode.SMS,
-            data: user.mobileNo,
-          });
+          twoFactorAuthBO.type = userTwoFactorAuthType;
+          twoFactorAuthBO.data = user.mobileNo;
         }
       }
-
-      if (user.emailAddr) {
-        const isEmailChannelAvailable = await this.customizedServiceService.checkServiceAvailable(user.appId, CustomizedServiceCode.EMAIL);
-        if (isEmailChannelAvailable) {
-          twoFactorList.push({
-            type: CustomizedServiceCode.EMAIL,
-            data: user.emailAddr
-          });
-        }
-      }
-
+    } else if (userTwoFactorAuthType === TwoFactorAuthType.OTP) {
       if (userCredential.otpKey) {
-        const isOptChannelAvailable = await this.customizedServiceService.checkServiceAvailable(user.appId, CustomizedServiceCode.EMAIL);
+        const isOptChannelAvailable = await this.customizedServiceService.checkServiceAvailable(user.appId, CustomizedServiceCode.Email);
         if (isOptChannelAvailable) {
-          twoFactorList.push({
-            type: CustomizedServiceCode.OTP,
-            data: '',
-          });
+          twoFactorAuthBO.type = userTwoFactorAuthType;
+          twoFactorAuthBO.data = userCredential.otpKey;
         }
       }
     }
 
-    return twoFactorList;
+    return twoFactorAuthBO;
   }
 }

@@ -1,4 +1,4 @@
-import { I18nEntity } from '@/domain/model/I18nEntity';
+import { I18nDO } from '@/domain/model/I18nDO';
 import { I18nService } from '@/domain/service/I18nService';
 import { RequestAccessDataValue } from '@/util/decorator/RequestAccessData';
 import { RequestAppId } from '@/util/decorator/RequestAppId';
@@ -8,8 +8,9 @@ import { Inject, Provider } from '@augejs/core';
 import { Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
-import { OrderDto } from '../dto/OrderDto';
-import { PaginationDto } from '../dto/PaginationDto';
+import { I18nCreateOrUpdateDTO, I18nListDTO } from '../dto/I18nDTO';
+import { OrderDTO } from '../dto/OrderDTO';
+import { PaginationDTO } from '../dto/PaginationDTO';
 
 @SwaggerTag({ name: 'I18n'})
 @Provider()
@@ -27,12 +28,12 @@ export class I18nController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/I18nEntity' }
+        schema: { $ref: `#/definitions/${I18nCreateOrUpdateDTO.name}` }
       }
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/I18nEntity' },
+        schema: { $ref: '#/definitions/I18nDO' },
         description: ''
       }
     },
@@ -42,10 +43,10 @@ export class I18nController {
   @RequestMapping.Post('')
   async create(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body() @RequestValidator(I18nEntity) createDto: I18nEntity
-    ): Promise<I18nEntity> {
+    @RequestParams.Body() @RequestValidator(I18nCreateOrUpdateDTO) createDTO: I18nCreateOrUpdateDTO
+    ): Promise<I18nDO> {
     return await this.service.create({
-      ...createDto,
+      ...createDTO,
       appId,
     });
   }
@@ -63,7 +64,7 @@ export class I18nController {
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/I18nEntity' },
+        schema: { $ref: '#/definitions/I18nDO' },
         description: ''
       }
     },
@@ -76,7 +77,7 @@ export class I18nController {
   async detail(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string
-  ): Promise<I18nEntity | undefined> {
+  ): Promise<I18nDO | undefined> {
     return await this.service.findOne({ id, appId, });
   }
 
@@ -94,7 +95,7 @@ export class I18nController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/I18nEntity' },
+        schema: { $ref: `#/definitions/${I18nCreateOrUpdateDTO.name}` },
       }
     ],
     responses: {
@@ -110,9 +111,9 @@ export class I18nController {
   async update(
     @RequestParams.Params('id') id: string,
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body() @RequestValidator(I18nEntity) dto: I18nEntity
+    @RequestParams.Body() @RequestValidator(I18nCreateOrUpdateDTO) updateDTO: I18nCreateOrUpdateDTO
     ): Promise<{}> {
-    await this.service.update({ id, appId }, dto);
+    await this.service.update({ id, appId }, updateDTO);
     return {};
   }
 
@@ -127,9 +128,9 @@ export class I18nController {
         schema: {
           type: 'object',
           properties: {
-            query: { $ref: '#/definitions/I18nEntity' },
-            pagination: { $ref: '#/definitions/PaginationDto' },
-            order: { $ref: '#/definitions/OrderDto' }
+            query: { $ref: `#/definitions/${I18nListDTO.name}` },
+            pagination: { $ref: `#/definitions/${PaginationDTO.name}` },
+            order: { $ref: `#/definitions/${OrderDTO.name}` }
           }
         }
       }
@@ -145,7 +146,7 @@ export class I18nController {
             list: {
               type: 'array',
               items: {
-                $ref: '#/definitions/I18nEntity',
+                $ref: `#/definitions/${I18nDO.name}`,
               }
             }
           }
@@ -156,15 +157,15 @@ export class I18nController {
     security: [{ accessToken: []}]
   })
   @KoaAccessTokenMiddleware()
-  @RequestMapping.Get('')
+  @RequestMapping.Post('list')
   async list(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('query') @RequestValidator(I18nEntity) queryDto: I18nEntity,
-    @RequestParams.Body('pagination') @RequestValidator(PaginationDto) paginationDto: PaginationDto,
-    @RequestParams.Body('order') @RequestValidator(OrderDto) orderDto: OrderDto,
-    ): Promise<{ list: I18nEntity[]; count: number }> {
+    @RequestParams.Body('query') @RequestValidator(I18nListDTO) queryDTO: I18nListDTO,
+    @RequestParams.Body('pagination') @RequestValidator(PaginationDTO) paginationDto: PaginationDTO,
+    @RequestParams.Body('order') @RequestValidator(OrderDTO) orderDto: OrderDTO,
+    ): Promise<{ list: I18nDO[]; count: number }> {
     const [list, count] = await this.service.findMany({
-      ...queryDto,
+      ...queryDTO,
       appId,
     }, {
       pagination: paginationDto,
@@ -206,7 +207,7 @@ export class I18nController {
     return {};
   }
 
-  @SwaggerAPI('/api/v1/message-bundle', 'post', {
+  @SwaggerAPI('/api/v1/i18n/message-bundle', 'post', {
     tags: [ 'I18n' ],
     summary: 'get the message bundle from the app',
     parameters: [
@@ -236,13 +237,12 @@ export class I18nController {
       }
     },
   })
-  @RequestMapping.Get('/i18n/message-bundle')
+  @RequestMapping.Post('/message-bundle')
   async messageBundle(
     @RequestAppLocale() locale: string,
     @RequestAppId() appId: string,
     @RequestParams.Body() queryDto: Record<string, string>
     ): Promise<Record<string, string>> {
-    // return this.service.findOne(dto);
-    return {};
+    return this.service.findMessageBundle(appId, locale, queryDto);
   }
 }

@@ -6,7 +6,7 @@ import { GetLogger, ILogger, Inject, Provider, __appRootDir } from '@augejs/core
 import { getConnection, getRepository } from 'typeorm';
 import { UniqueIdService } from '@/infrastructure/service/UniqueIdService';
 import { Commands, REDIS_IDENTIFIER } from '@augejs/redis';
-import { SystemInitEntity } from '@/domain/model/SystemInitEntity';
+import { SystemInitDO } from '@/domain/model/SystemInitDO';
 import { RandomService } from '@/infrastructure/service/RandomService';
 
 @Provider()
@@ -45,7 +45,7 @@ export class SystemInitService {
   }
 
   async onAppWillReady(): Promise<void> {
-    const systemHasInitialized = await getRepository(SystemInitEntity).findOne(0);
+    const systemHasInitialized = await getRepository(SystemInitDO).findOne(0);
     if (systemHasInitialized) {
       this.logger.info('System has Initialized. Skip');
       return;

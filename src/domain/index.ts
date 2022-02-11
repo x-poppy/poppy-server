@@ -19,7 +19,7 @@ import { I18nService } from './service/I18nService';
 import { AppLangService } from './service/AppLangService';
 import { UserCredentialService } from './service/UserCredentialService';
 import { CustomizedServiceService } from './service/CustomizedServiceService';
-import { UserAvatarService } from './service/UserAvatarService';
+import { CustomizedServiceAdapterModule } from './service/customizedServiceAdapter';
 
 @Module({
   providers: [
@@ -40,7 +40,9 @@ import { UserAvatarService } from './service/UserAvatarService';
     AppLangService,
     TwoFactorAuthService,
     OperationLogService,
-    UserAvatarService,
   ],
+  subModules: [
+    CustomizedServiceAdapterModule,
+  ]
 })
 export class DomainLayerModule {}

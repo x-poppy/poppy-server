@@ -1,4 +1,4 @@
-import { ThemeEntity } from '@/domain/model/ThemeEntity';
+import { ThemeDO } from '@/domain/model/ThemeDO';
 import { DeepPartialData } from '@/types/DeepPartialData';
 import { FindAllOpt } from '@/types/FindAllOpt';
 import { FindDeepPartial } from '@/types/FindDeepPartial';
@@ -9,16 +9,16 @@ import { UniqueIdService } from '../service/UniqueIdService';
 import { PPRepository } from './PPRepository';
 
 @Provider()
-export class ThemeRepository extends PPRepository <ThemeEntity>{
+export class ThemeRepository extends PPRepository <ThemeDO>{
 
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
   constructor() {
-    super(ThemeEntity);
+    super(ThemeDO);
   }
 
-  override async create(data: DeepPartialData<ThemeEntity>, manager?: EntityManager): Promise<ThemeEntity> {
+  override async create(data: DeepPartialData<ThemeDO>, manager?: EntityManager): Promise<ThemeDO> {
     const id = data.id ?? await this.uniqueIdService.getUniqueId();
     return this.getRepository(manager).create({
       ...data,
@@ -26,7 +26,7 @@ export class ThemeRepository extends PPRepository <ThemeEntity>{
     });
   }
 
-  override async findOne(condition: FindDeepPartial<ThemeEntity>): Promise<ThemeEntity | undefined> {
+  override async findOne(condition: FindDeepPartial<ThemeDO>): Promise<ThemeDO | undefined> {
     return this.getRepository().findOne({
       where: {
         ...(condition.appId && {
@@ -39,7 +39,7 @@ export class ThemeRepository extends PPRepository <ThemeEntity>{
     });
   }
 
-  override async findMany(condition: FindDeepPartial<ThemeEntity>, opts?: FindManyOpt): Promise<[ThemeEntity[], number]> {
+  override async findMany(condition: FindDeepPartial<ThemeDO>, opts?: FindManyOpt): Promise<[ThemeDO[], number]> {
     return this.getRepository().findAndCount({
       ...(opts?.pagination && {
         skip: opts.pagination.offset,
@@ -61,7 +61,7 @@ export class ThemeRepository extends PPRepository <ThemeEntity>{
     });
   }
 
-  override async findAll(condition: FindDeepPartial<ThemeEntity>, opts?: FindAllOpt): Promise<ThemeEntity[]> {
+  override async findAll(condition: FindDeepPartial<ThemeDO>, opts?: FindAllOpt): Promise<ThemeDO[]> {
     return this.getRepository().find({
       where: {
         ...(condition.appId && {

@@ -5,9 +5,9 @@ import { FindDeepPartial } from "@/types/FindDeepPartial";
 import { FindManyOpt } from "@/types/FindManyOpt";
 import { FindOneOpt } from "@/types/FindOneOpts";
 import { EntityManager } from "@augejs/typeorm";
-import { PPEntity } from "../model/PPEntity";
+import { PPDO } from "../model/PPDO";
 
-export class PPService<TPPEntity extends PPEntity,TPPRepository extends PPRepository<TPPEntity>> {
+export class PPService<TPPEntity extends PPDO,TPPRepository extends PPRepository<TPPEntity>> {
 
   protected repository!: TPPRepository;
 

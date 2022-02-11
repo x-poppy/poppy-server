@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { AfterLoad, Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 export enum AppStatus {
   DISABLED = 'disabled',
@@ -16,7 +16,7 @@ export enum AppStatus {
   },
 })
 @Entity('pp_app')
-export class AppEntity extends PPEntity {
+export class AppDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
@@ -49,13 +49,6 @@ export class AppEntity extends PPEntity {
   title!: string;
 
   @Column({
-    type: 'varchar',
-    length: 80,
-    nullable: true
-  })
-  titleI18nKey: string | null = null;
-
-  @Column({
     type: 'smallint',
     comment: 'app level',
     default: 0,
@@ -80,6 +73,6 @@ export class AppEntity extends PPEntity {
 
   @AfterLoad()
   updateIsExpired(): void {
-    this.isExpired = Date.now() > this.expireAt.getTime();
+    this.isExpired = Date.now() > this.expireAt?.getTime();
   }
 }

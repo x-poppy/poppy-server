@@ -1,4 +1,4 @@
-import { AppDomainEntity } from '@/domain/model/AppDomainEntity';
+import { AppDomainDO } from '@/domain/model/AppDomainDO';
 import { AppDomainService } from '@/domain/service/AppDomainService';
 import { DecodeURIComponent } from '@/util/decorator/DecodeURIComponent';
 import { RequestAccessDataValue } from '@/util/decorator/RequestAccessData';
@@ -7,8 +7,9 @@ import { Inject, Provider } from '@augejs/core';
 import { Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
-import { OrderDto } from '../dto/OrderDto';
-import { PaginationDto } from '../dto/PaginationDto';
+import { AppDomainCreateDTO, AppDomainListDTO } from '../dto/AppDomainDTO';
+import { OrderDTO } from '../dto/OrderDTO';
+import { PaginationDTO } from '../dto/PaginationDTO';
 
 @SwaggerTag({ name: 'AppDomain', description: '`AppDomain` entity '})
 @Prefix('/api/v1/app-domain')
@@ -26,12 +27,12 @@ export class AppDomainController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/AppDomainEntity' }
+        schema: { $ref: `#/definitions/${AppDomainCreateDTO.name}` }
       }
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/AppDomainEntity' },
+        schema: { $ref: `#/definitions/${AppDomainDO.name}` },
         description: ''
       }
     },
@@ -41,10 +42,10 @@ export class AppDomainController {
   @RequestMapping.Post('')
   async create(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('data') @RequestValidator(AppDomainEntity) createDto: AppDomainEntity
-    ): Promise<AppDomainEntity> {
+    @RequestParams.Body('data') @RequestValidator(AppDomainCreateDTO) createDTO: AppDomainCreateDTO
+    ): Promise<AppDomainDO> {
     return await this.service.create({
-      ...createDto,
+      ...createDTO,
       appId,
     });
   }
@@ -63,7 +64,7 @@ export class AppDomainController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/AppDomainEntity' }
+        schema: { $ref: `#/definitions/${AppDomainDO.name}` }
       }
     ],
     responses: {
@@ -79,7 +80,7 @@ export class AppDomainController {
   async update(
     @RequestParams.Params('id') id: string,
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('data') @RequestValidator(AppDomainEntity) updateDto: AppDomainEntity
+    @RequestParams.Body('data') @RequestValidator(AppDomainDO) updateDto: AppDomainDO
     ): Promise<{}> {
     await this.service.update({ id, appId }, updateDto);
     return {};
@@ -96,9 +97,9 @@ export class AppDomainController {
         schema: {
           type: 'object',
           properties: {
-            query: { $ref: '#/definitions/AppDomainEntity' },
-            pagination: { $ref: '#/definitions/PaginationDto' },
-            order: { $ref: '#/definitions/OrderDto' }
+            query: { $ref: `#/definitions/${AppDomainListDTO.name}` },
+            pagination: { $ref: `#/definitions/${PaginationDTO.name}` },
+            order: { $ref: `#/definitions/${OrderDTO.name}` }
           }
         }
       },
@@ -112,7 +113,7 @@ export class AppDomainController {
             count: { type: 'number', },
             list: {
               type: 'array',
-              items: { $ref: '#/definitions/AppDomainEntity' }
+              items: { $ref: `#/definitions/${AppDomainDO.name}` }
             }
           }
         },
@@ -125,12 +126,12 @@ export class AppDomainController {
   @RequestMapping.Post('list')
   async list(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('query') @RequestValidator(AppDomainEntity) queryDto: AppDomainEntity,
-    @RequestParams.Body('pagination') @RequestValidator(PaginationDto) paginationDto: PaginationDto,
-    @RequestParams.Body('order') @RequestValidator(OrderDto) orderDto: OrderDto,
-  ): Promise< { list: AppDomainEntity[], count: number } > {
+    @RequestParams.Body('query') @RequestValidator(AppDomainListDTO) queryDTO: AppDomainListDTO,
+    @RequestParams.Body('pagination') @RequestValidator(PaginationDTO) paginationDto: PaginationDTO,
+    @RequestParams.Body('order') @RequestValidator(OrderDTO) orderDto: OrderDTO,
+  ): Promise< { list: AppDomainDO[], count: number } > {
     const [list, count] = await this.service.findMany({
-      ...queryDto,
+      ...queryDTO,
       appId,
     }, {
       pagination: paginationDto,
@@ -156,7 +157,7 @@ export class AppDomainController {
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/AppDomainEntity' },
+        schema: { $ref: `#/definitions/${AppDomainDO.name}` },
         description: ''
       }
     },
@@ -167,7 +168,7 @@ export class AppDomainController {
   async detail(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string
-  ): Promise<AppDomainEntity | undefined> {
+  ): Promise<AppDomainDO | undefined> {
     return await this.service.findOne({ id, appId });
   }
 
@@ -261,7 +262,7 @@ export class AppDomainController {
     security: [{ accessToken: [] }]
   })
   @KoaAccessTokenMiddleware()
-  @RequestMapping.Get('/app-domain/available-domain/:domain')
+  @RequestMapping.Get('available-domain/:domain')
   async checkDomainAvailable(
     @RequestParams.Params('domain') @DecodeURIComponent() domain: string,
   ): Promise<{}> {

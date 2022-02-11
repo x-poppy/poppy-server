@@ -1,13 +1,14 @@
+import { MenuListDTO } from '@/facade/dto/MenuDTO';
 import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
 import { PPAccessData } from '@/types/PPAccessData';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
-import { MenuTreeBo } from '../bo/MenuTreeBo';
-import { MenuEntity, MenuPermissionType, MenuStatus, MenuType } from '../model/MenuEntity';
+import { MenuTreeBO } from '../bo/MenuTreeBO';
+import { MenuDO, MenuPermissionType, MenuStatus, MenuType } from '../model/MenuDO';
 import { PPService } from './PPService';
 import { RolePermissionService } from './RolePermissionService';
 
 @Provider()
-export class MenuService extends PPService <MenuEntity,MenuRepository> {
+export class MenuService extends PPService <MenuDO,MenuRepository> {
 
   @GetLogger()
   logger!: ILogger;
@@ -21,26 +22,7 @@ export class MenuService extends PPService <MenuEntity,MenuRepository> {
   @Inject(RolePermissionService)
   private rolePermissionService!: RolePermissionService;
 
-  // async listAll(opts: MenuFindLisOpts): Promise<[MenuTreeBo[], number]> {
-  //   const role = await this.roleRepository.findOne({
-  //     roleNo: opts.roleNo,
-  //     status: RoleStatus.NORMAL
-  //   })
-
-  //   if (!role) {
-  //     this.logger.warn(`the RoleNo: ${role} is not exist!`);
-  //     throw new BusinessError(I18nMessageKeys.Role_Is_Not_Exist);
-  //   }
-
-  //   const menus = await this.repository.listAll(opts);
-  //   const permissions = await this.rolePermissionService.findPermissionsByRoleNo(opts.roleNo);
-  //   const permissableMenus = permissions.filterMenus(menus);
-
-  //   const list = MenuTreeBo.create(null, permissableMenus).children ?? [];
-  //   return [list , list.length];
-  // }
-
-  async menuTreeBySideBar(accessData: PPAccessData): Promise<MenuTreeBo> {
+  async menuTreeBySideBar(accessData: PPAccessData): Promise<MenuTreeBO> {
     const appId = accessData.get<string>('appId');
     const appLevel = accessData.get<number>('appLevel');
     const userRoleId = accessData.get<string>('userRoleId');
@@ -48,22 +30,28 @@ export class MenuService extends PPService <MenuEntity,MenuRepository> {
     const permissionsBo = await this.rolePermissionService.findPermissionsBoByRoleId(userRoleId);
     const permissableMenus = permissionsBo.filterMenus(menus);
 
-    return MenuTreeBo.create(null, permissableMenus);
+    return MenuTreeBO.create(null, permissableMenus);
   }
 
-  async menuTreeByList(accessData: PPAccessData): Promise<MenuTreeBo> {
+  async menuTreeByList(accessData: PPAccessData, queryDTO: MenuListDTO): Promise<MenuTreeBO> {
     const appId = accessData.get<string>('appId');
     const appLevel = accessData.get<number>('appLevel');
     const userRoleId = accessData.get<string>('userRoleId');
     const menus = await this.repository.findAll({
       appId,
       appLevel: appLevel,
-      status: MenuStatus.NORMAL,
+      ...(queryDTO.status && {
+        status: queryDTO.status,
+      }),
+      ...(queryDTO.menuCode && {
+        menuCode: queryDTO.menuCode
+      })
+
     });
     const permissionsBo = await this.rolePermissionService.findPermissionsBoByRoleId(userRoleId);
     const permissableMenus = permissionsBo.filterMenus(menus);
 
-    return MenuTreeBo.create(null, permissableMenus);
+    return MenuTreeBO.create(null, permissableMenus);
   }
 
 }

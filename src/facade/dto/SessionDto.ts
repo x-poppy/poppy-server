@@ -7,17 +7,16 @@ import { Length, ValidationArguments } from "@augejs/validator";
   properties: {
     userName: {
       type: 'string',
-      example: ""
+      example: "admin"
     },
     password: {
       type: 'string',
-      example: ''
+      example: '123123'
     }
   },
 })
-
 @I18nValidatorDecorator()
-export class SessionLoginDto {
+export class SessionLoginDTO {
   @Length(4, 64, {
     message: (args: ValidationArguments) => {
       const validatorOwner = args.object as I18nValidatorOwner;

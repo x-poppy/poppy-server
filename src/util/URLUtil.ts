@@ -11,3 +11,7 @@ export function covertQueryStringToMap(queryString: string): Record<string, stri
       return results;
     }, {})
 }
+
+export default {
+  covertQueryStringToMap
+};

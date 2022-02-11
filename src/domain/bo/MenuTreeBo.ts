@@ -1,9 +1,16 @@
-import { MenuEntity } from '../model/MenuEntity';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { MenuDO } from '../model/MenuDO';
 
-export class MenuTreeBo {
+@SwaggerDefinition({
+  properties: {
+    node: { $ref: '#/definitions/MenuDO' },
+    children: { type: 'array', items: { type: 'object', default: {} }},
+  },
+})
+export class MenuTreeBO {
 
-  static create(menu: MenuEntity | null, allMenus: MenuEntity[]): MenuTreeBo {
-    const menuTree = new MenuTreeBo(menu);
+  static create(menu: MenuDO | null, allMenus: MenuDO[]): MenuTreeBO {
+    const menuTree = new MenuTreeBO(menu);
     allMenus
       .filter((childrenMenu) => {
         if (!menu) {
@@ -19,15 +26,15 @@ export class MenuTreeBo {
     return menuTree;
   }
 
-  node: MenuEntity | null;
-  children: MenuTreeBo[];
+  node: MenuDO | null;
+  children: MenuTreeBO[];
 
-  constructor(node: MenuEntity | null) {
+  constructor(node: MenuDO | null) {
     this.node = node;
     this.children = [];
   }
 
-  addChild(child: MenuTreeBo): void {
+  addChild(child: MenuTreeBO): void {
     this.children.push(child);
   }
 }

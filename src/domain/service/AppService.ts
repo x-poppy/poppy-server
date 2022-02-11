@@ -1,12 +1,12 @@
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 
 import { AppRepository } from '@/infrastructure/repository/AppRepository';
-import { AppEntity, AppStatus } from '../model/AppEntity';
+import { AppDO, AppStatus } from '../model/AppDO';
 import { PPService } from './PPService';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { BusinessError } from '@/util/BusinessError';
 import { EntityManager, Transaction, TransactionManager } from '@augejs/typeorm';
-import { AppCreateDto } from '@/facade/dto/AppDto';
+import { AppCreateDTO } from '@/facade/dto/AppDTO';
 import { PPAccessData } from '@/types/PPAccessData';
 import { UserService } from './UserService';
 import { RoleService } from './RoleService';
@@ -21,7 +21,7 @@ import { AppDomainService } from './AppDomainService';
 import { UserCredentialService } from './UserCredentialService';
 
 @Provider()
-export class AppService extends PPService <AppEntity, AppRepository>{
+export class AppService extends PPService <AppDO, AppRepository>{
 
   @GetLogger()
   private readonly logger!: ILogger;
@@ -62,7 +62,7 @@ export class AppService extends PPService <AppEntity, AppRepository>{
   @Inject(AppDomainService)
   private readonly appDomainService!: AppDomainService;
 
-  async findAndVerify(id: string): Promise<AppEntity> | never {
+  async findAndVerify(id: string): Promise<AppDO> | never {
     const app = await this.repository.findOne({ id }, { select: ['level', 'status', 'expireAt'] });
     if (!app) {
       this.logger.info(`App_Is_Not_Exist. appId: ${id}`);
@@ -89,9 +89,9 @@ export class AppService extends PPService <AppEntity, AppRepository>{
 
   @Transaction()
   async createApp (
-    dto: AppCreateDto,
+    dto: AppCreateDTO,
     accessData: PPAccessData,
-    @TransactionManager() manager: EntityManager): Promise<AppEntity> {
+    @TransactionManager() manager: EntityManager): Promise<AppDO> {
     const appId = accessData.get<string>('appId');
     const appLevel = accessData.get<number>('appLevel');
     const userRoleId = accessData.get<string>('userRoleId');

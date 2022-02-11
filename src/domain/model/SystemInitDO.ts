@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 @Entity('pp_system_init')
-export class SystemInitEntity extends PPEntity {
+export class SystemInitDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',

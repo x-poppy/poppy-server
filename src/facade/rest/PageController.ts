@@ -1,4 +1,4 @@
-import { PageEntity } from '@/domain/model/PageEntity';
+import { PageEntity } from '@/domain/model/PageDO';
 import { RequestValidator } from '@/util/decorator/RequestValidator';
 import { Inject, Provider } from '@augejs/core';
 import { KoaContext, Prefix, RequestMapping, RequestParams } from '@augejs/koa';

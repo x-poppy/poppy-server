@@ -1,4 +1,3 @@
-import path from 'path';
 import { Module, boot, GetLogger, ILogger, Cluster, __appRootDir } from '@augejs/core';
 import { WebServer } from '@augejs/koa';
 import { KoaStatic, KoaFavicon, KoaSend } from '@augejs/koa-static';
@@ -7,7 +6,6 @@ import { AxiosConfig } from '@augejs/axios';
 import { YAMLConfig } from '@augejs/file-config';
 import { RedisConnection } from '@augejs/redis';
 import { Log4js } from '@augejs/log4js';
-import { MailTransport } from '@augejs/mail';
 import { Typeorm } from '@augejs/typeorm';
 import { KoaAccessTokenManager } from '@augejs/koa-access-token';
 import { KoaStepTokenManager } from '@augejs/koa-step-token';
@@ -31,12 +29,9 @@ import { decryptConfigValues } from './util/decryptConfigValue';
 @Typeorm({
   synchronize: process.env.NODE_ENV !== 'production',
 })
-@MailTransport()
 @Log4js()
 @YAMLConfig({
-  processor(result: Record<string, any>) {
-    return decryptConfigValues(result);
-  },
+  processor: decryptConfigValues,
 })
 @KoaFavicon()
 @AxiosConfig()

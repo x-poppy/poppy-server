@@ -13,7 +13,7 @@ import { IsInt, Length, Max, MaxLength, Min } from "@augejs/validator"
     },
   },
 })
-export class PaginationDto {
+export class PaginationDTO {
   @IsInt()
   @Min(0)
   @Max(10000)

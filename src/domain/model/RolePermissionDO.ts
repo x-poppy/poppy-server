@@ -1,8 +1,8 @@
 import { Entity, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 @Entity('pp_role_permission')
-export class RolePermissionEntity extends PPEntity {
+export class RolePermissionDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
   })

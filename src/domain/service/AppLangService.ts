@@ -1,10 +1,10 @@
 import { Inject, Provider } from '@augejs/core';
 import { PPService } from './PPService';
 import { AppLangRepository } from '@/infrastructure/repository/AppLangRepository';
-import { AppLangEntity } from '../model/AppLangEntity';
+import { AppLangDO } from '../model/AppLangDO';
 
 @Provider()
-export class AppLangService extends PPService<AppLangEntity, AppLangRepository> {
+export class AppLangService extends PPService<AppLangDO, AppLangRepository> {
 
   @Inject(AppLangRepository)
   protected repository!: AppLangRepository;

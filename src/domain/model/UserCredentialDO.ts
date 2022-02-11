@@ -1,8 +1,15 @@
 import { Entity, PrimaryColumn, Column, Index } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
+
+export enum TwoFactorAuthType {
+  NONE = 'none',
+  EMAIL = 'email',
+  SMS = 'sms',
+  OTP = 'opt',
+}
 
 @Entity('pp_user_credential')
-export class UserCredentialEntity extends PPEntity {
+export class UserCredentialDO extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'pk SnowflakeNo format',
@@ -16,11 +23,12 @@ export class UserCredentialEntity extends PPEntity {
   appId!: string;
 
   @Column({
-    type: 'bool',
     comment: 'twoFactorAuth',
-    default: false,
+    type: 'enum',
+    enum: TwoFactorAuthType,
+    default: TwoFactorAuthType.NONE,
   })
-  twoFactorAuth = false;
+  twoFactorAuthType = TwoFactorAuthType.NONE;
 
   @Column({
     length: 32,

@@ -1,11 +1,11 @@
 import { AppDomainRepository } from '@/infrastructure/repository/AppDomainRepository';
 import { CacheService } from '@/infrastructure/service/CacheService';
 import { Inject, Provider } from '@augejs/core';
-import { AppDomainEntity, AppDomainStatus } from '../model/AppDomainEntity';
+import { AppDomainDO, AppDomainStatus } from '../model/AppDomainDO';
 import { PPService } from './PPService';
 
 @Provider()
-export class AppDomainService extends PPService<AppDomainEntity, AppDomainRepository> {
+export class AppDomainService extends PPService<AppDomainDO, AppDomainRepository> {
 
   @Inject(AppDomainRepository)
   protected repository!: AppDomainRepository;

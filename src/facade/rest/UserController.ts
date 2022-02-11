@@ -1,16 +1,16 @@
-import { UserEntity } from '@/domain/model/UserEntity';
+import { UserDO } from '@/domain/model/UserDO';
 import { UserService } from '@/domain/service/UserService';
 import { DecodeURIComponent } from '@/util/decorator/DecodeURIComponent';
 import { RequestAccessDataValue } from '@/util/decorator/RequestAccessData';
-import { RequestAppId } from '@/util/decorator/RequestAppId';
 import { RequestValidator } from '@/util/decorator/RequestValidator';
+import { maskEmail, maskPhone } from '@/util/MaskUtil';
 import { Inject, Provider } from '@augejs/core';
 import { Prefix, RequestMapping, RequestParams } from '@augejs/koa';
 import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
-import { OrderDto } from '../dto/OrderDto';
-import { PaginationDto } from '../dto/PaginationDto';
-import { UserCreateDto } from '../dto/UserDto';
+import { OrderDTO } from '../dto/OrderDTO';
+import { PaginationDTO } from '../dto/PaginationDTO';
+import { UserCreateDTO, UserListDTO } from '../dto/UserDTO';
 
 @SwaggerTag({ name: 'User', description: '`User` Entity'})
 @Prefix('/api/v1/user')
@@ -28,12 +28,12 @@ export class UserController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/UserCreateDto' }
+        schema: { $ref: '#/definitions/UserCreateDTO' }
       }
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/UserEntity' },
+        schema: { $ref: '#/definitions/UserDO' },
         description: ''
       }
     },
@@ -43,7 +43,7 @@ export class UserController {
   @RequestMapping.Post('')
   async create(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body() @RequestValidator(UserCreateDto) dto: UserCreateDto): Promise<UserEntity> {
+    @RequestParams.Body() @RequestValidator(UserCreateDTO) dto: UserCreateDTO): Promise<UserDO> {
       dto.appId = appId;
     return await this.service.createUser(dto);
   }
@@ -59,9 +59,9 @@ export class UserController {
         schema: {
           type: 'object',
           properties: {
-            query: { $ref: '#/definitions/UserEntity' },
-            pagination: { $ref: '#/definitions/PaginationDto' },
-            order: { $ref: '#/definitions/OrderDto' }
+            query: { $ref: '#/definitions/UserListDTO' },
+            pagination: { $ref: '#/definitions/PaginationDTO' },
+            order: { $ref: '#/definitions/OrderDTO' }
           }
         }
       }
@@ -74,7 +74,7 @@ export class UserController {
             count: { type: 'number' },
             list: {
               type: 'array',
-              items: { $ref: '#/definitions/UserEntity' }
+              items: { $ref: '#/definitions/UserDO' }
             }
           }
         },
@@ -87,20 +87,26 @@ export class UserController {
   @RequestMapping.Post('list')
   async list(
     @RequestAccessDataValue('appId') appId: string,
-    @RequestParams.Body('query') @RequestValidator(UserEntity) queryDto: UserEntity,
-    @RequestParams.Body('pagination') @RequestValidator(PaginationDto) paginationDto: PaginationDto,
-    @RequestParams.Body('order') @RequestValidator(OrderDto) orderDto: OrderDto,
-  ): Promise<Record<string, unknown>> {
+    @RequestParams.Body('query') @RequestValidator(UserListDTO) queryDTO: UserListDTO,
+    @RequestParams.Body('pagination') @RequestValidator(PaginationDTO) paginationDTO: PaginationDTO,
+    @RequestParams.Body('order') @RequestValidator(OrderDTO) orderDTO: OrderDTO,
+  ): Promise<{ list:UserDO[],count: number }> {
     const [list, count] = await this.service.findMany({
-      ...queryDto,
+      ...queryDTO,
       appId,
     }, {
-      pagination: paginationDto,
-      order: orderDto
+      pagination: paginationDTO,
+      order: orderDTO
+    });
+
+    const maskedList = list.map<UserDO>(item => {
+      item.emailAddr = maskEmail(item.emailAddr);
+      item.mobileNo = maskPhone(item.mobileNo);
+      return item;
     });
 
     return {
-      list,
+      list: maskedList,
       count,
     };
   }
@@ -119,7 +125,7 @@ export class UserController {
         in: 'body',
         name: 'data',
         required: true,
-        schema: { $ref: '#/definitions/UserEntity' }
+        schema: { $ref: '#/definitions/UserDO' }
       }
     ],
     responses: {
@@ -135,7 +141,7 @@ export class UserController {
   async update(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string,
-    @RequestParams.Body() @RequestValidator(UserEntity) dto: UserEntity
+    @RequestParams.Body() @RequestValidator(UserDO) dto: UserDO
     ): Promise<{}> {
     await this.service.update({ id, appId }, { ...dto });
     return {};
@@ -154,7 +160,7 @@ export class UserController {
     ],
     responses: {
       '200': {
-        schema: { $ref: '#/definitions/UserEntity' },
+        schema: { $ref: `#/definitions/${UserDO.name}` },
         description: ''
       }
     },
@@ -165,8 +171,14 @@ export class UserController {
   async detail(
     @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('id') id: string
-  ): Promise<UserEntity | undefined> {
-    return await this.service.findOne({ id, appId, });
+  ): Promise<UserDO | undefined> {
+    const userDO = await this.service.findOne({ id, appId, });
+    if (userDO) {
+      userDO.emailAddr = maskEmail(userDO.emailAddr);
+      userDO.mobileNo = maskPhone(userDO.mobileNo);
+    }
+
+    return userDO;
   }
 
   @SwaggerAPI('/api/v1/user/{id}', 'delete', {
@@ -225,7 +237,7 @@ export class UserController {
   @KoaAccessTokenMiddleware()
   @RequestMapping.Get('/available-account/:accountName')
   async checkAccountNameAvailable(
-    @RequestAppId() appId: string,
+    @RequestAccessDataValue('appId') appId: string,
     @RequestParams.Params('accountName') @DecodeURIComponent() accountName: string,
   ): Promise<{}> {
     const result = await this.service.checkAccountNameAvailable(appId, accountName);

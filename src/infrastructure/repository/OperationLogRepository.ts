@@ -1,4 +1,4 @@
-import { OperationLogEntity } from '@/domain/model/OperationLogEntity';
+import { OperationLogDO } from '@/domain/model/OperationLogDO';
 import { FindManyOpt } from '@/types/FindManyOpt';
 import { Inject, Provider } from '@augejs/core';
 import { DeepPartial, EntityManager, LessThan } from '@augejs/typeorm';
@@ -6,16 +6,16 @@ import { UniqueIdService } from '../service/UniqueIdService';
 import { PPRepository } from './PPRepository';
 
 @Provider()
-export class OperationLogRepository  extends PPRepository<OperationLogEntity> {
+export class OperationLogRepository  extends PPRepository<OperationLogDO> {
 
   @Inject(UniqueIdService)
   private uniqueIdService!: UniqueIdService;
 
   constructor() {
-    super(OperationLogEntity);
+    super(OperationLogDO);
   }
 
-  override async create(data: DeepPartial<OperationLogEntity>, manager?: EntityManager): Promise<OperationLogEntity> {
+  override async create(data: DeepPartial<OperationLogDO>, manager?: EntityManager): Promise<OperationLogDO> {
     const id = data.id ?? await this.uniqueIdService.getUniqueId();
     return this.getRepository(manager).save({
       ...data,
@@ -23,7 +23,7 @@ export class OperationLogRepository  extends PPRepository<OperationLogEntity> {
     });
   }
 
-  override async findMany(condition: DeepPartial<OperationLogEntity>, opts?: FindManyOpt): Promise<[OperationLogEntity[], number]> {
+  override async findMany(condition: DeepPartial<OperationLogDO>, opts?: FindManyOpt): Promise<[OperationLogDO[], number]> {
     return this.getRepository().findAndCount({
       ...(opts?.pagination && {
         skip: opts.pagination.offset,

@@ -1,5 +1,6 @@
+import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 export enum MenuStatus {
   DISABLED = 'disabled',
@@ -21,9 +22,25 @@ export enum MenuPermissionType {
   WITH_PERMISSION = 'withPerm'
 }
 
+@SwaggerDefinition({
+  properties: {
+    id: { type: 'string'},
+    menuCode: { type: 'string'},
+    appId: { type: 'string'},
+    appLevel: { type: 'number'},
+    parent: { type: 'string'},
+    type: { type: 'string'},
+    linkUrl: { type: 'string' },
+    icon: { type: 'string' },
+    permissionType: { type: 'string' },
+    priority: { type: 'number'},
+    title: { type: 'string'},
+    status: { type: 'string'},
+  },
+})
 @Entity('pp_menu')
 @Index(['appId', 'menuCode'], { unique: true })
-export class MenuEntity extends PPEntity {
+export class MenuDO extends PPDO {
 
   @PrimaryColumn({
     type: 'bigint',
@@ -103,13 +120,6 @@ export class MenuEntity extends PPEntity {
   })
   @Index()
   title!: string;
-
-  @Column({
-    type: 'varchar',
-    length: 80,
-    nullable: true
-  })
-  titleI18nKey: string | null = null;
 
   @Column({
     type: 'enum',

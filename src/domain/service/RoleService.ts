@@ -1,4 +1,4 @@
-import { RoleCreateDto } from '@/facade/dto/RoleDto';
+import { RoleCreateDTO } from '@/facade/dto/RoleDTO';
 import { RoleRepository } from '@/infrastructure/repository/RoleRepository';
 import { UserRepository } from '@/infrastructure/repository/UserRepository';
 import { PPAccessData } from '@/types/PPAccessData';
@@ -6,11 +6,11 @@ import { BusinessError } from '@/util/BusinessError';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
 import { GetLogger, ILogger, Inject, Provider } from '@augejs/core';
 import { EntityManager, Transaction, TransactionManager } from '@augejs/typeorm';
-import { RoleEntity, RoleStatus } from '../model/RoleEntity';
+import { RoleDO, RoleStatus } from '../model/RoleDO';
 import { PPService } from './PPService';
 
 @Provider()
-export class RoleService extends PPService<RoleEntity,RoleRepository> {
+export class RoleService extends PPService<RoleDO,RoleRepository> {
 
   @GetLogger()
   private readonly logger!: ILogger;
@@ -22,7 +22,7 @@ export class RoleService extends PPService<RoleEntity,RoleRepository> {
   private readonly userRepository!: UserRepository;
 
 
-  async findAndVerify(appId: string, roleId: string): Promise<RoleEntity> | never {
+  async findAndVerify(appId: string, roleId: string): Promise<RoleDO> | never {
     const role = await this.repository.findOne({ id: roleId, appId }, { select: ['id', 'status', 'level'] });
     if (!role) {
       this.logger.info(`Role_Is_Not_Exist. roleId: ${roleId} appId: ${appId}`);
@@ -47,13 +47,13 @@ export class RoleService extends PPService<RoleEntity,RoleRepository> {
     return usedCount > 0;
   }
 
-  async createRole(dto: RoleCreateDto, accessData: PPAccessData,  @TransactionManager() manager: EntityManager): Promise<RoleEntity> {
+  async createRole(dto: RoleCreateDTO, accessData: PPAccessData,  @TransactionManager() manager: EntityManager): Promise<RoleDO> {
     const appId = accessData.get<string>('appId');
     const appLevel = accessData.get<number>('appLevel');
     const userRoleId = accessData.get<string>('userRoleId');
     const userRoleLevel = accessData.get<number>('userRoleLevel');
 
-    const role: RoleEntity = await this.create({
+    const role: RoleDO = await this.create({
       level: userRoleLevel + 1,
       parent: userRoleId,
       appId,

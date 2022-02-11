@@ -19,6 +19,7 @@ import { RandomService } from './service/RandomService';
 import { AppLangRepository } from './repository/AppLangRepository';
 import { UserCredentialRepository } from './repository/UserCredentialRepository';
 import { CustomizedServiceRepository } from './repository/CustomizedServiceRepository';
+import { AdapterHttpService } from './service/AdapterHttpService';
 
 @Module({
   providers: [
@@ -28,6 +29,7 @@ import { CustomizedServiceRepository } from './repository/CustomizedServiceRepos
     MailService,
     CacheService,
     RandomService,
+    AdapterHttpService,
 
     AppConfigRepository,
     AppDomainRepository,

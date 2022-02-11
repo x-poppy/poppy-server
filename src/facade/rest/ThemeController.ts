@@ -4,8 +4,8 @@ import { KoaAccessTokenMiddleware } from '@augejs/koa-access-token';
 
 import { ThemeService } from '@/domain/service/ThemeService';
 import { RequestValidator } from '@/util/decorator/RequestValidator';
-import { PoppyAccessData } from '@/types/PPAccessData';
-import { ThemeEntity } from '@/domain/model/ThemeEntity';
+import { PPAccessData } from '@/types/PPAccessData';
+import { ThemeDO } from '@/domain/model/ThemeDO';
 import { SwaggerAPI, SwaggerTag } from '@augejs/koa-swagger';
 
 @SwaggerTag({ name: 'Theme'})
@@ -22,7 +22,7 @@ export class ThemeController {
     parameters: [
       {
         in: 'body',
-        name: 'ThemeCreateDto',
+        name: 'data',
         required: true,
         schema: {
           $ref: '#/definitions/ThemeCreateDto'
@@ -42,9 +42,9 @@ export class ThemeController {
   @RequestMapping.Post('')
   async create(
     @RequestParams.Context() ctx: KoaContext,
-    @RequestParams.Body() @RequestValidator(ThemeEntity) dto: ThemeEntity
-    ): Promise<ThemeEntity> {
-    const accessData = ctx.accessData as PoppyAccessData;
+    @RequestParams.Body() @RequestValidator(ThemeDO) dto: ThemeDO
+    ): Promise<ThemeDO> {
+    const accessData = ctx.accessData as PPAccessData;
     const appId = accessData.get<string>('appId');
 
     return await this.service.create({
@@ -93,9 +93,9 @@ export class ThemeController {
   @RequestMapping.Get('')
   async list(
     @RequestParams.Context() ctx: KoaContext,
-    @RequestParams.Query() @RequestValidator(ThemeEntity) dto: ThemeEntity
-    ): Promise<{list:ThemeEntity[], count: number }> {
-    const accessData = ctx.accessData as PoppyAccessData;
+    @RequestParams.Query() @RequestValidator(ThemeDO) dto: ThemeDO
+    ): Promise<{list:ThemeDO[], count: number }> {
+    const accessData = ctx.accessData as PPAccessData;
     const appId = accessData.get<string>('appId');
 
     const [list, count] = await this.service.findMany({
@@ -136,7 +136,7 @@ export class ThemeController {
   @RequestMapping.Get('/:id')
   async detail(
     @RequestParams.Params('id') id: string
-  ): Promise<ThemeEntity | undefined> {
+  ): Promise<ThemeDO | undefined> {
     return await this.service.find(id);
   }
 
@@ -176,9 +176,9 @@ export class ThemeController {
   async update(
     @RequestParams.Context() ctx: KoaContext,
     @RequestParams.Params('id') id: string,
-    @RequestParams.Params() @RequestValidator(ThemeEntity) dto: ThemeEntity,
+    @RequestParams.Params() @RequestValidator(ThemeDO) dto: ThemeDO,
   ): Promise<{}> {
-    const accessData = ctx.accessData as PoppyAccessData;
+    const accessData = ctx.accessData as PPAccessData;
     const appId = accessData.get<string>('appId');
     await this.service.update(id, {
       ...dto,
@@ -246,8 +246,8 @@ export class ThemeController {
   })
   @RequestMapping.Get('/theme-bundle/:appNo/:theme')
   async themeBundle(
-    @RequestParams.Params() @RequestValidator(ThemeEntity) dto: ThemeEntity
-    ): Promise<ThemeEntity | undefined> {
+    @RequestParams.Params() @RequestValidator(ThemeDO) dto: ThemeDO
+    ): Promise<ThemeDO | undefined> {
     return this.service.findOne(dto);
   }
 }

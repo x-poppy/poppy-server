@@ -1,6 +1,6 @@
 import { Column } from "@augejs/typeorm";
 
-export abstract class PPEntity {
+export abstract class PPDO {
   @Column({
     type: 'datetime',
     default: () => 'CURRENT_TIMESTAMP',

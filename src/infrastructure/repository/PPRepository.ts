@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { PPEntity } from "@/domain/model/PPEntity";
+import { PPDO } from "@/domain/model/PPDO";
 import { DeepPartialData } from "@/types/DeepPartialData";
 import { FindAllOpt } from "@/types/FindAllOpt";
 import { FindDeepPartial } from "@/types/FindDeepPartial";
@@ -7,7 +7,7 @@ import { FindManyOpt } from "@/types/FindManyOpt";
 import { FindOneOpt } from "@/types/FindOneOpts";
 import { EntityManager, EntityTarget, getRepository, Repository } from "@augejs/typeorm";
 
-export abstract class PPRepository<TPPEntity extends PPEntity> {
+export abstract class PPRepository<TPPEntity extends PPDO> {
 
   private readonly repository!: Repository<TPPEntity>;
   protected readonly getRepository: (manager?: EntityManager) => Repository<TPPEntity>;

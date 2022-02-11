@@ -1,6 +1,6 @@
 import { SwaggerDefinition } from '@augejs/koa-swagger';
 import { Column, Entity, Index, PrimaryColumn } from '@augejs/typeorm';
-import { PPEntity } from './PPEntity';
+import { PPDO } from './PPDO';
 
 export enum CustomizedServiceStatus {
   DISABLED = 'disabled',
@@ -9,24 +9,31 @@ export enum CustomizedServiceStatus {
 
 export enum CustomizedServiceCode {
   SMS = 'sms',
-  EMAIL = 'email',
+  Email = 'email',
   OTP = 'otp',
-  LOGIN = 'login',
-  AVATAR = 'avatar',
-  LOGO = 'logo'
+  Login = 'login',
+  Avatar = 'avatar',
+  TwoFactorAuth = 'twoFactorAuth',
+  Logo = 'logo'
 }
 
 @SwaggerDefinition({
   properties: {
     id: { type: 'string' },
     appId: { type: 'string' },
-    locale: { type: 'string' },
-    value: { type: 'string' },
+    icon: { type: 'string' },
+    title: { type: 'string' },
+    serviceCode: { type: 'string' },
+    moduleCode: { type: 'string' },
+    apiUrl: { type: 'string' },
+    apiKey: { type: 'string' },
+    timeout: { type: 'number' },
+    status: { type: 'string' }
   },
 })
 @Entity('pp_customized_service')
 @Index(['appId', 'serviceCode'], { unique: true })
-export class CustomizedServiceEntity  extends PPEntity {
+export class CustomizedServiceDO  extends PPDO {
   @PrimaryColumn({
     type: 'bigint',
     comment: 'id',
@@ -56,89 +63,66 @@ export class CustomizedServiceEntity  extends PPEntity {
   title!: string;
 
   @Column({
-    type: 'varchar',
-    length: 80,
-    nullable: true
-  })
-  titleI18nKey: string | null = null;
-
-  @Column({
     length: 80,
     comment: 'serviceCode is semantic'
   })
   serviceCode!: string;
 
   @Column({
+    type: 'varchar',
     length: 20,
+    default: null,
     comment: 'moduleCode is used for code implements'
   })
   @Index()
-  moduleCode!: string;
+  moduleCode: string | null = null;
 
   @Column({
     type: 'varchar',
     length: 512,
-    nullable: true
+    nullable: true,
+    default: null,
   })
   apiUrl: string | null = null;
 
   @Column({
     type: 'varchar',
     length: 512,
-    nullable: true
+    nullable: true,
+    default: null,
   })
-  callbackApiUrl: string | null = null;
+  apiKey: string | null = null;
 
   @Column({
-    type: 'varchar',
-    length: 512,
-    nullable: true
+    type: 'int',
+    default: 0
   })
-  extApiUrl: string | null = null;
+  timeout = 0;
 
   @Column({
-    type: 'varchar',
-    length: 256,
-    nullable: true
+    type: 'json',
   })
-  account: string | null = null;
+  parameters: Record<string, unknown> = {};
 
   @Column({
-    type: 'varchar',
-    length: 256,
-    nullable: true
+    type: 'json',
   })
-  extAccount: string | null = null;
-
-  @Column({
-    type: 'text',
-    nullable: true
-  })
-  priKey: string | null = null;
-
-  @Column({
-    type: 'text',
-    nullable: true
-  })
-  pubKey: string | null = null;
+  credentials: Record<string, unknown> = {};
 
   @Column({
     type: 'text',
     nullable: true,
-    comment: 'the others keys'
+    default: null,
   })
-  extKey: string | null = null;
+  mockResponse: string | null = null;
 
   @Column({
-    type: 'json',
-    nullable: true
-  })
-  extParams: Record<string, unknown> | null = null;
-
-  @Column({
+    type: 'varchar',
     length: 512,
+    nullable: true,
+    default: null,
   })
-  desc!: string;
+  desc: string | null = null;
 
   @Column({
     type: 'enum',

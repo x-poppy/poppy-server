@@ -36,6 +36,7 @@ export enum I18nMessageKeys {
   // Two_Factor_Auth Action
   Two_Factor_Auth_Type_Error = 'Two_Factor_Auth_Type_Error',
   Two_Factor_Auth_Code_Length_Error = 'Two_Factor_Auth_Code_Length_Error',
+  Two_Factor_Auth_Code_Error = 'Two_Factor_Auth_Code_Error',
   User_Opt_Key_Empty_Error = 'User_Opt_Key_Empty_Error',
   User_Opt_Key_Is_InCorrect = 'User_Opt_Key_Is_InCorrect',
 

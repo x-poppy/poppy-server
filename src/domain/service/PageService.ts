@@ -1,5 +1,5 @@
 import { Inject, Provider } from '@augejs/core';
-import { PageContentType, PageEntity } from '../model/PageEntity';
+import { PageContentType, PageEntity } from '../model/PageDO';
 import { PageRepository } from '../../infrastructure/repository/PageRepository';
 import { MenuRepository } from '@/infrastructure/repository/MenuRepository';
 import { HttpStatus, KoaContext } from '@augejs/koa';

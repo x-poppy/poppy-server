@@ -1,9 +1,17 @@
 import { I18nValidatorDecorator, I18nValidatorOwner } from '@/util/decorator/I18nValidator';
 import { I18nMessageKeys } from '@/util/I18nMessageKeys';
-import { IsIn, Length, ValidationArguments } from '@augejs/validator';
+import { SwaggerDefinition } from '@augejs/koa-swagger';
+import { Length, ValidationArguments } from '@augejs/validator';
 
+@SwaggerDefinition({
+  properties: {
+    code: {
+      type: 'string',
+    },
+  },
+})
 @I18nValidatorDecorator()
-export class TwoFactorAuthDto {
+export class TwoFactorAuthDTO {
   @Length(6, 8, {
     message: (args: ValidationArguments) => {
       const validatorOwner = args.object as I18nValidatorOwner;
@@ -16,16 +24,4 @@ export class TwoFactorAuthDto {
     },
   })
   code!: string;
-
-  @IsIn(['opt'], {
-    message: (args: ValidationArguments) => {
-      const validatorOwner = args.object as I18nValidatorOwner;
-      validatorOwner.errorMessageValues = {
-        values: (args.constraints as string[]).join(','),
-      };
-      validatorOwner.errorMessageKey = I18nMessageKeys.Two_Factor_Auth_Type_Error;
-      return validatorOwner.errorMessageKey;
-    },
-  })
-  type!: string;
 }
